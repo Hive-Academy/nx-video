@@ -1,0 +1,23 @@
+node_modules/
+dist/
+tmp/
+coverage/
+.nx/cache/
+.nx/workspace-data/
+
+# Video output and media are never committed. Restore steps live in each project README.
+video-output/
+recordings/
+out/
+*.mp4
+*.mov
+*.webm
+*.wav
+*.mp3
+
+# Local machine state
+.venv/
+.env
+.env.*
+!.env.example
+.ptah/tmp/
