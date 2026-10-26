@@ -21,3 +21,15 @@ out/
 .env.*
 !.env.example
 .ptah/tmp/
+
+# Generated video assets and vendored runtime state
+*.mkv
+*.m4v
+*.m4a
+dist/video/
+**/.whisper/
+**/selfshot/*/
+!**/selfshot/_smoke/
+**/selfshot/_smoke/*.mp4
+**/selfshot/_smoke/*.wav
+**/vendor/davinci-resolve-mcp/

@@ -1,0 +1,25 @@
+storage: ../tmp/local-registry/storage
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+packages:
+  '@hive-academy/*':
+    access: $all
+    publish: $all
+    proxy: npmjs
+  'create-nx-video':
+    access: $all
+    publish: $all
+    proxy: npmjs
+  '@*/*':
+    access: $all
+    publish: $all
+    proxy: npmjs
+  '**':
+    access: $all
+    publish: $all
+    proxy: npmjs
+log:
+  type: stdout
+  format: pretty
+  level: warn
