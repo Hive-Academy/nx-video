@@ -1,6 +1,6 @@
 # Batches - TASK_2026_003_06a8
 
-Total tasks: 17 | Batches: 6 | Complete: 3/6
+Total tasks: 17 | Batches: 6 | Complete: 4/6
 
 Plan source: `../TASK_2026_002_dcb6/implementation-plan.md`, approved by the user on 2026-10-26 (this task's Gate 2). Binding sections: 98–198 (layout, projects, package.json), 517–560 (G1 only, plus the G2 media block for the root `.gitignore`), 750–768 (createNodes, stub only), 769–779 (preset skeleton, `create-nx-video` only), 780–815 (`ci.yml` only), 890–934 (quality, order of work row 003), 1054–1069 (lane constraints).
 
@@ -22,6 +22,7 @@ Status: PASSED WITH RISKS
 | D6 | The conventional-commit check is a dependency-free script `tools/scripts/check-commits.mjs` run as a PR-only CI job, not commitlint | `@commitlint/cli`; own script | Avoids a root devDependency change outside Batch 1 and a shell spawn; CLAUDE.md "Git" names Conventional Commits only. | Yes |
 | D7 | The root `.gitignore` change is committed as a hunk only: the team-leader stages the G2 lines with `git apply --cached` of a patch that excludes the user's uncommitted `# ptah:harness:begin … end` block | Commit the whole file; stage only our hunk | The user modified `.gitignore` and has not committed it (orchestrator instruction). | Yes |
 | D8 | G1 lives in `tools/guards/no-media.mjs` as an exported pure function plus a thin CLI; its fixtures are JSON path/size lists, never real media | Fixture repo with media; path/size lists | Hard rule 1 forbids committing media even as a fixture; plan line 519 defines G1 over `git ls-files`. | Yes |
+| D9 | Batch 5 adds `nx.json` to its files, with two keys only: `release.version.manifestRootsToUpdate: ["dist/{projectRoot}"]` and `targetDefaults["nx-release-publish"].options.packageRoot: "dist/{projectRoot}"` | Leave publishing from the source root; per-project `release` blocks in both `project.json` files | The `release` block in `nx.json` (lines 14–20) sets no publish root, so `nx release publish` would pack `packages/*` source with no `.js` files (`main: ./src/index.js` and `bin/index.js` exist only in `dist/`). The installed `@nx/js` library generator writes the same two settings (`add-release-config.js:93-105`). With the version bump going into `dist/` only, tracked `package.json` files are not changed (Task 5.1). One file, no per-project edits to Batch 2/4 files. | Yes |
 
 ### Assumptions
 
@@ -199,7 +200,7 @@ Files (15 + 3 root, R10/row 7): `/home/amun/projects/nx-video/NOTICE`, root `pac
 - `ls dist/packages/nx-video` shows `package.json`, `generators.json`, `executors.json`, `README.md`, `LICENSE`, `NOTICE`, `src/index.js`.
 - Result (team-leader, 2026-10-26): 14 package files + root `NOTICE` verified on disk; D3 exports/peers/deps exact, `tslib` `2.8.1` exact; generator/executor maps empty; `LICENSE`/`NOTICE` byte-identical to root; NOTICE carries only the project copyright, the HyperFrames Apache-2.0 attribution (HeyGen, Inc., per research-part-b) and the Remotion license notice. D4 glob exact, stub returns `[]`, no reads. R4: all three tsconfigs exclude `**/files/**` and `../../test-fixtures/**`. No `npx.cmd`, `shell: true` or range pins in `packages/`. Gate `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` exit 0 (5/5 tests); dist layout as listed; G1 exit 0 after staging. Executor: codex `gpt-6-sol` (first run + one resume). Lint/test use `nx:run-commands` (row 6). Known gap passed to Batch 3: the lint command resolves only the root ESLint config (Task 3.2 wiring note).
 
-## Batch 3: Engine-zone lint and isolation test — COMPLETE
+## Batch 3: Engine-zone lint and isolation test — COMPLETE (commit f232f6a)
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: ESLint flat config and TypeScript compiler API
 - Execution mode: sequential
@@ -253,7 +254,7 @@ Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Result (team-leader, 2026-10-26, run 1): NOT ACCEPTED. Tasks 3.1–3.3 verified on disk and IMPLEMENTED: zone module has no imports; package lint target `cwd: packages/nx-video`, print-config from the package dir shows 1 `no-restricted` match; `@nx/enforce-module-boundaries` off only for `eslint.config.mjs` and the two zone specs (the three consumers of `tools/eslint/engine-zones.mjs`; none is in a zone glob, and the zone rules are `no-restricted-imports`/`no-restricted-syntax`, untouched); gate `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` exit 0, 11/11 tests; G1 80 files clean; mutation `src/remotion/` → `../hyperframes/x` fails `nx-video:lint` with the hard-rule-4 message (scratch file removed). Task 3.4 stays IN_PROGRESS: the second lane deleted `'test-fixtures/**'` from the root `eslint.config.mjs` ignores, removing the R4 mitigation (fixtures are now linted by the root config). Fix: restore that one line; no other root-config change. Simulated with `--ignore-pattern 'test-fixtures/**'`: exit 2 / exit 0 as above; the fixture spec is unaffected because it lints text through the package config with an in-zone `filePath`.
 - Result (team-leader, 2026-10-26, run 2, fix re-check): ACCEPTED. `git diff --stat eslint.config.mjs` empty (root line 13 `'test-fixtures/**'` restored, decisions.md row 8); `npx eslint test-fixtures` exit 2; `npx eslint --no-error-on-unmatched-pattern test-fixtures` exit 0; `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` passes; G1 80 files clean. R4 resolved. Task 3.4 IMPLEMENTED, then COMPLETE with the batch commit. Phase `scaffold` continues; its code-logic review is due after its last batch.
 
-## Batch 4: `create-nx-video` skeleton and README license text — PENDING
+## Batch 4: `create-nx-video` skeleton and README license text — COMPLETE
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: Nx package scaffold
 - Execution mode: sequential
@@ -264,9 +265,9 @@ Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Tasks: 2 | Depends on: Batch 2
 - Phase: scaffold | Phase review: as Batch 1
 
-Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `package.json`, `project.json`, `tsconfig.json`, `tsconfig.lib.json`, `tsconfig.spec.json`, `vitest.config.mts`, `README.md`, `LICENSE`, `bin/index.ts`, `bin/index.spec.ts`; and `/home/amun/projects/nx-video/README.md` (MODIFY)
+Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `package.json`, `project.json`, `tsconfig.json`, `tsconfig.lib.json`, `tsconfig.spec.json`, `vitest.config.mts`, `README.md`, `LICENSE`, `bin/index.ts`, `bin/index.spec.ts`, `NOTICE` (added by the fix, decisions.md row 9); and `/home/amun/projects/nx-video/README.md` (MODIFY)
 
-### Task 4.1: `create-nx-video` package — PENDING
+### Task 4.1: `create-nx-video` package — COMPLETE
 
 - Files: the ten `packages/create-nx-video/` files
 - Plan reference: implementation-plan.md:145, 151, 775–778; `research-part-c-nx.md:27`
@@ -274,7 +275,7 @@ Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `pac
 - Quality requirements: name `create-nx-video`, version `0.0.0`, MIT, `bin: {"create-nx-video": "./bin/index.js"}`, `dependencies` `create-nx-workspace` `24.0.1` exact; `bin/index.ts` with `#!/usr/bin/env node`, reads its own `package.json` version, calls `createWorkspace(\`@hive-academy/nx-video@${version}\`, {name, nxCloud: 'skip', packageManager})`, passes Nx errors through and exits non-zero; `project.json` tags `type:preset`, `scope:public`, `implicitDependencies: ["nx-video"]`, targets `build` (`@nx/js:tsc` → `dist/packages/create-nx-video`), `lint` (`nx:run-commands`: `eslint packages/create-nx-video`, `dependsOn` G1 as in Task 2.2), `test` (`nx:run-commands`: `vitest run --config packages/create-nx-video/vitest.config.mts`, Vitest `root` set to the package dir), `typecheck` (`nx:run-commands`, `tsc --noEmit` lib + spec) — the decisions.md row-6 pattern, mirroring `packages/nx-video/project.json`; no import of `packages/nx-video` source (module boundary). Spec mocks `create-nx-workspace` and asserts the preset string, `nxCloud: 'skip'` and the version source; `README.md` says the preset arrives in a later release (R9).
 - Validation notes: A-4, R9, R10
 
-### Task 4.2: README license text — PENDING
+### Task 4.2: README license text — COMPLETE
 
 - Depends on: Task 4.1
 - Files: `/home/amun/projects/nx-video/README.md`
@@ -286,6 +287,8 @@ Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `pac
 - Every listed file exists; `git diff README.md` touches only the license section.
 - `cd /home/amun/projects/nx-video && npx nx run-many -t lint,test,typecheck,build -p nx-video,create-nx-video 2>&1 | tail -25`
 - `git status --short packages/nx-video` shows no change (A-4).
+- Result (team-leader, 2026-10-26, run 1): NOT ACCEPTED. All ten package files were on disk. Pins were exact (`create-nx-workspace` `24.0.1` in the package and the root, so R10 needed no lock change). There was no `npx.cmd`, `shell: true` or `execSync`, and no import from `packages/nx-video`. `implicitDependencies: ["nx-video"]` was set. The spec asserted the preset string, `nxCloud: 'skip'` and the version source. The README said the preset comes later (R9). A-4 held: `git status --short packages/nx-video eslint.config.mjs package.json package-lock.json` was empty. The gate `run-many -t lint,test,typecheck,build -p nx-video,create-nx-video --skip-nx-cache` exited 0. G1 checked 89 files and found them clean. The built CLI exited 1 with no name. `npm pack --dry-run` of the dist listed 7 files, including `NOTICE`. `git diff README.md` showed a single hunk inside `## License`. Task 4.2 is IMPLEMENTED. Task 4.1 stays IN_PROGRESS because of one defect in how NOTICE is sourced: there is no `packages/create-nx-video/NOTICE`. The build copies the root `NOTICE` instead (`project.json` asset `{ "input": ".", "glob": "NOTICE", "output": "." }`). As a result: (a) the package README link `[NOTICE](NOTICE)` is broken in the source tree on GitHub; (b) `package.json` `files` lists `NOTICE`, but a pack from the package root would drop it without warning; (c) this departs from the Batch 2 pattern, where the package NOTICE is byte-identical to the root and its asset comes from the package path. Fix: add `packages/create-nx-video/NOTICE` byte-identical to the root `NOTICE`, and replace that asset entry with `"packages/create-nx-video/NOTICE"`. Change nothing else.
+- Result (team-leader, 2026-10-26, run 2, fix re-check): ACCEPTED. `cmp NOTICE packages/create-nx-video/NOTICE` passes; `project.json` asset line 20 reads `"packages/create-nx-video/NOTICE"`; the package has 11 files; `git diff --stat` shows only `.gitignore` (user's, not staged), `batches.md`, `decisions.md` and `README.md`. Gate `run-many -t lint,test,typecheck,build -p nx-video,create-nx-video --skip-nx-cache` passes (11 + 2 tests). G1 checked 89 files with no violations. Task 4.1 IMPLEMENTED, then COMPLETE with the batch commit. Phase `scaffold` continues.
 
 ## Batch 5: e2e project on Verdaccio, Nx 24.0.1 and 23.3.1 — PENDING
 
@@ -298,7 +301,7 @@ Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `pac
 - Tasks: 2 | Depends on: Batches 1, 2, 4
 - Phase: scaffold | Phase review: as Batch 1
 
-Files (8): `/home/amun/projects/nx-video/tools/scripts/start-local-registry.ts`, `/home/amun/projects/nx-video/tools/scripts/stop-local-registry.ts`, and under `/home/amun/projects/nx-video/e2e/nx-video-e2e/`: `project.json`, `tsconfig.json`, `tsconfig.spec.json`, `vitest.config.mts`, `src/nx-video.spec.ts`, `src/test-utils.ts`
+Files (9): `/home/amun/projects/nx-video/nx.json` (MODIFY, the two D9 keys only), `/home/amun/projects/nx-video/tools/scripts/start-local-registry.ts`, `/home/amun/projects/nx-video/tools/scripts/stop-local-registry.ts`, and under `/home/amun/projects/nx-video/e2e/nx-video-e2e/`: `project.json`, `tsconfig.json`, `tsconfig.spec.json`, `vitest.config.mts`, `src/nx-video.spec.ts`, `src/test-utils.ts`
 
 ### Task 5.1: Local registry scripts and e2e project — PENDING
 

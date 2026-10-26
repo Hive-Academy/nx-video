@@ -55,4 +55,4 @@ These commands do not exist yet. See [docs/roadmap.md](docs/roadmap.md).
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). [NOTICE](NOTICE) carries the Apache-2.0 HyperFrames attribution and the Remotion license notice. Published packages include `LICENSE` and `NOTICE`.

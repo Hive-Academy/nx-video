@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../../dist/packages/create-nx-video",
+    "declaration": true,
+    "composite": false
+  },
+  "include": ["bin/**/*.ts"],
+  "exclude": ["bin/**/*.spec.ts", "../../test-fixtures/**"]
+}
