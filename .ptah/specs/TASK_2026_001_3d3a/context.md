@@ -27,3 +27,19 @@ This repository is public. Before any file from Ptah is copied here, we must kno
 
 - Every source path has a verdict: safe, safe after removal of named files, or not safe.
 - The user reads the report before `TASK_2026_002` starts.
+
+## Orchestration (2026-10-26)
+
+- **Type / depth**: RESEARCH, Partial. Flow: parallel research lanes → merged `research-report.md` → cross-side review → user reads report → `TASK_2026_002`.
+- **Gate 0.1 — CLI lanes**: `enabled`. Source: explicit user instruction ("work with our cli tools and our subagents (codex, ollama)"); memory had no stored preference. Approval mode: `lane-review` (but this task's acceptance requires the user to read the report anyway).
+- **Spawnable lanes** (`ptah_agent_list`): `codex` (cli, weekly 33%, room), `Ollama Code` (ptah-cli `pc-f3384f72-a556-4ab4-b2b1-7e1e028f22cb`, ollama-cloud, session 17%, room). `copilot` and `claude` are installed but disabled.
+- **Source access**: read-only clone at `/home/amun/projects/ptah-extension` (cloned from public `Hive-Academy/ptah-extension`; the D: path is not on this Linux machine). Baseline `e0ca51e6e` present; 5715 commits.
+
+### Lane split
+
+| Part | Questions | Executor | Deliverable |
+|---|---|---|---|
+| A | Q1 history scan | codex lane | `research-part-a-history.md` |
+| B | Q2 Remotion, Q3 HyperFrames + davinci-resolve-mcp licenses, Q5 npm names | Ollama Code lane | `research-part-b-licenses.md` |
+| C | Q4 Nx 23 plugin packaging | researcher-expert subagent | `research-part-c-nx.md` |
+| Merge | all | orchestrator | `research-report.md` |

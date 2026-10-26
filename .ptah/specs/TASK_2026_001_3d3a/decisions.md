@@ -1,0 +1,21 @@
+# Decisions — TASK_2026_001_3d3a
+
+| # | Stage | Decision | Evidence / source |
+|---|---|---|---|
+| 1 | pre-flight | Type RESEARCH, depth Partial | `task.md` type; roadmap row 001 |
+| 2 | Gate 0.1 | Lanes `enabled`, approval `lane-review` | Explicit user instruction naming codex and ollama; no stored preference in memory |
+| 3 | source | Read from a fresh clone of public GitHub repo at `~/projects/ptah-extension` instead of `D:/projects/ptah-extension` | D: path absent on this Linux host; CLAUDE.md allows GitHub as source; clone is read-only use |
+| 4 | split | Q1 → codex (heavy git/history work), Q2/Q3/Q5 → Ollama Code (web/license lookups), Q4 → researcher-expert subagent | Independent questions; parallel; two lane vendors as user requested |
+| 5 | scope | `tools/video-editor/` has 0 tracked files and 0 commits at baseline — lane A must determine where it lives (gitignored, other path, or local-only) | `git ls-tree` / `git log --all` on the clone |
+| 6 | recover | Codex lane A failed at start (`gpt-6.1-sol` rejected: not offered on the ChatGPT account, set in Ptah `agentOrchestration.codexModel`). Respawned once with `model: gpt-6-sol` | Lane stderr; `~/.codex/models_cache.json` lists `gpt-6-sol`. Non-limit failure; user setting left unchanged — user should fix it |
+| 7 | verify B | Part B claims spot-checked and confirmed: remotion@4.0.484 `SEE LICENSE IN LICENSE.md`; hyperframes 0.8.98/0.8.30 Apache-2.0; shader-transitions has no npm license field; `@hive-academy/nx-video` and `create-nx-video` free; `@hive-academy` maintained by the user's account | `npm view` output 2026-10-26 |
+| 8 | verify C | Nx current major is 24 (`nx@24.0.1`; 24.0.0 released 2026-10-21), not 23. Plan docs say "Nx 23" — TASK_2026_002 must target Nx 24 | `npm view nx version time` |
+| 9 | verify A | Part A confirmed: `tools/video-editor/` was tracked in `c032b0f1e` and untracked in `eb0c43fdd` (orchestrator's earlier "0 commits" was a simplified-history artifact); `SELFSHOT_KIT_SLUGS = new Set(['_smoke'])` at `export-kit.mjs:63`; vendor commit `6eca4bf` per `c032b0f1e:tools/video-editor/CLAUDE.md` | `git log --all --full-history`, `git show` |
+| 10 | Q3 | davinci-resolve-mcp upstream identified as `samuelgursky/davinci-resolve-mcp` (MIT); commit `6eca4bfc…` dated 2026-09-06 matches the vendored commit and date. Recommend download-at-pinned-SHA in the `editor` generator. User to confirm the remote | GitHub API commit + license endpoints |
+| 11 | merge | Extraction method: clean copy from `e0ca51e6e` with source-commit reference | Part A; `docs/decisions.md` history gate |
+| 12 | review | Cross-side review of the merged report (in-process author) by the Ollama Code lane, focused on parts A and C and the merge; Ollama authored part B, so B claims are excluded from its review (orchestrator verified B via npm) | agent-lanes §6 Document gates |
+| 13 | review | Cross-side review (Ollama Code, code-logic-reviewer role) verdict APPROVED; 12 part-A claims re-verified; independent media sweep found 212 files, none uncovered. 3 minor defects: GLB count fixed in the report; part-A inventory GLB omission and `b69ec6a7e` attribution noted in the report (part A left as the lane wrote it) | `research-report-review.md`; orchestrator re-listed GLBs |
+| 14 | user | **Remotion**: the user is the only person working → Free License applies (≤3 employees). README still carries the Remotion license notice | User answer 2026-10-26 |
+| 15 | user | **davinci-resolve-mcp upstream**: not confirmable on this host — `~/ptah-extension` (user's Linux checkout, `0e17912e3`) and the clone both lack the gitignored `tools/video-editor/`; the vendor exists only on the Windows D: machine. Proceed with `samuelgursky/davinci-resolve-mcp` @ `6eca4bfc…` (hash+date match), marked *unconfirmed* in TASK_2026_002/008 | User answer; `ls` of both checkouts |
+| 16 | user | **npm publish**: user can publish to `@hive-academy`; use a granular npm token as a GitHub secret with provenance (not OIDC trusted publishing) | User answer — overrides part C decision 6 |
+| 17 | user | **Nx**: target Nx 24 (develop on 24.0.1, peers `>=23 <25`); `docs/decisions.md` to be updated in TASK_2026_002 | User answer |
