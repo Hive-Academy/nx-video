@@ -30,7 +30,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "dependsOn": [{ "projects": ["nx-video-source"], "target": "no-media" }],
-      "options": { "command": "eslint packages/nx-video" }
+      "options": { "command": "eslint .", "cwd": "packages/nx-video" }
     },
     "test": {
       "executor": "nx:run-commands",

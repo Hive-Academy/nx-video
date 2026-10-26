@@ -1,6 +1,6 @@
 # Batches - TASK_2026_003_06a8
 
-Total tasks: 17 | Batches: 6 | Complete: 2/6
+Total tasks: 17 | Batches: 6 | Complete: 3/6
 
 Plan source: `../TASK_2026_002_dcb6/implementation-plan.md`, approved by the user on 2026-10-26 (this task's Gate 2). Binding sections: 98–198 (layout, projects, package.json), 517–560 (G1 only, plus the G2 media block for the root `.gitignore`), 750–768 (createNodes, stub only), 769–779 (preset skeleton, `create-nx-video` only), 780–815 (`ci.yml` only), 890–934 (quality, order of work row 003), 1054–1069 (lane constraints).
 
@@ -143,7 +143,7 @@ Files (14): `/home/amun/projects/nx-video/package.json`, `/home/amun/projects/nx
 - Edge cases: case-insensitive extensions, ENOENT skip, `docs/images/` exception, `.gitignore` no-duplicate merge.
 - Result (team-leader, 2026-10-26): files verified on disk; `npm ci` 871 packages, Nx v24.0.1, `test` 4/4 pass (`--skip-nx-cache`), ESLint exit 0, G1 exit 0 after staging. `.gitignore` staged hunk-only by `git apply --cached` (D7); the harness block stays unstaged. Executor: codex `gpt-6-sol`. Pinned devDependencies: Nx family 24.0.1, `vitest@4.1.12`, `typescript@6.0.3`, `eslint@9.39.5`, `typescript-eslint@8.72.0`, `verdaccio@6.11.1`, `tslib@2.8.1`, `@types/node@24.19.2`.
 
-## Batch 2: `@hive-academy/nx-video` empty plugin and createNodes stub — COMPLETE
+## Batch 2: `@hive-academy/nx-video` empty plugin and createNodes stub — COMPLETE (commit 6ebd42d)
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: Nx plugin TypeScript scaffold
 - Execution mode: sequential
@@ -199,7 +199,7 @@ Files (15 + 3 root, R10/row 7): `/home/amun/projects/nx-video/NOTICE`, root `pac
 - `ls dist/packages/nx-video` shows `package.json`, `generators.json`, `executors.json`, `README.md`, `LICENSE`, `NOTICE`, `src/index.js`.
 - Result (team-leader, 2026-10-26): 14 package files + root `NOTICE` verified on disk; D3 exports/peers/deps exact, `tslib` `2.8.1` exact; generator/executor maps empty; `LICENSE`/`NOTICE` byte-identical to root; NOTICE carries only the project copyright, the HyperFrames Apache-2.0 attribution (HeyGen, Inc., per research-part-b) and the Remotion license notice. D4 glob exact, stub returns `[]`, no reads. R4: all three tsconfigs exclude `**/files/**` and `../../test-fixtures/**`. No `npx.cmd`, `shell: true` or range pins in `packages/`. Gate `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` exit 0 (5/5 tests); dist layout as listed; G1 exit 0 after staging. Executor: codex `gpt-6-sol` (first run + one resume). Lint/test use `nx:run-commands` (row 6). Known gap passed to Batch 3: the lint command resolves only the root ESLint config (Task 3.2 wiring note).
 
-## Batch 3: Engine-zone lint and isolation test — IN_PROGRESS
+## Batch 3: Engine-zone lint and isolation test — COMPLETE
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: ESLint flat config and TypeScript compiler API
 - Execution mode: sequential
@@ -212,14 +212,14 @@ Files (15 + 3 root, R10/row 7): `/home/amun/projects/nx-video/NOTICE`, root `pac
 
 Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/amun/projects/nx-video/tools/eslint/engine-zones.d.mts`, `/home/amun/projects/nx-video/packages/nx-video/eslint.config.mjs`, `/home/amun/projects/nx-video/packages/nx-video/project.json` (MODIFY, `lint` target options only), `/home/amun/projects/nx-video/packages/nx-video/src/engine-isolation.spec.ts`, `/home/amun/projects/nx-video/packages/nx-video/src/engine-zones-lint.spec.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/static-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/dynamic-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/require-cross-engine.ts`
 
-### Task 3.1: Zone table module — IN_PROGRESS
+### Task 3.1: Zone table module — COMPLETE
 
 - Files: `tools/eslint/engine-zones.mjs`, `tools/eslint/engine-zones.d.mts`
 - Plan reference: implementation-plan.md:155–180
 - Quality requirements: export the seven zone rows of the table at lines 167–175 as data (zone globs relative to `packages/nx-video/`, allowed, forbidden, forbidden packages such as node builtins / `@nx/devkit` / `src/shared/**` for the studio zone, and the one allowed studio file `src/remotion/studio/lib/qrcode.mjs` for scripts); the message string from line 160; the pin-literal patterns (`hyperframes@`, `remotion@`, `@remotion/`) and the allowed files (`src/remotion/versions.ts`, `src/hyperframes/versions.ts`, generator `files/**`); the forbidden spawn strings (`npx.cmd`, `shell: true`, `execFileSync('npx'`). Pure data, no imports. `.d.mts` types it.
 - Validation notes: one source of truth (plan line 165)
 
-### Task 3.2: Lint blocks per zone — IN_PROGRESS
+### Task 3.2: Lint blocks per zone — COMPLETE
 
 - Depends on: Task 3.1
 - Files: `packages/nx-video/eslint.config.mjs`
@@ -228,7 +228,7 @@ Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Lint target wiring (added at Batch 2 acceptance): `packages/nx-video/project.json` `lint` is `nx:run-commands` (decisions.md row 6) running `eslint packages/nx-video` from the workspace root. ESLint 9.39.5 resolves `eslint.config.mjs` from the cwd, so as committed it would load only the root config and silently skip the zone blocks. Change only that target's `options` so the package config is the one loaded (`"cwd": "packages/nx-video"`, `"command": "eslint ."`, or an explicit `--config packages/nx-video/eslint.config.mjs`); keep `dependsOn` G1. Prove it with `npx eslint --print-config packages/nx-video/src/index.ts` (or the cwd equivalent) showing a zone rule, and by the Task 3.4 spec. No other edit to `project.json`.
 - Validation notes: R3
 
-### Task 3.3: Isolation test backstop — IN_PROGRESS
+### Task 3.3: Isolation test backstop — COMPLETE
 
 - Depends on: Task 3.1
 - Files: `packages/nx-video/src/engine-isolation.spec.ts`
@@ -236,7 +236,7 @@ Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Quality requirements: walks `packages/nx-video/src/**/*.{ts,tsx,mjs}` (excluding `*.spec.ts` and generator `files/**`), parses imports with the TypeScript compiler API (static, `import type`, `export … from`, dynamic `import()`, `require()`), resolves relative specifiers to files, normalises separators (Windows), and checks each resolved path against the zone table; asserts no pin literal outside the allowed files and no forbidden spawn string. A self-test writes a synthetic tree into a temp dir (Remotion file statically, dynamically and via `require` importing a HyperFrames file, plus one `..`-path escape) and asserts four violations — the scanner takes a root argument so both runs share the code (R2). The exclusion list is asserted exact (R5).
 - Validation notes: R2, R5
 
-### Task 3.4: Lint fixtures and fixture test — IN_PROGRESS
+### Task 3.4: Lint fixtures and fixture test — COMPLETE
 
 - Depends on: Task 3.2
 - Files: `test-fixtures/lint/{static,dynamic,require}-cross-engine.ts`, `packages/nx-video/src/engine-zones-lint.spec.ts`
@@ -249,7 +249,9 @@ Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Every listed file exists; `engine-zones.mjs` has no imports.
 - `cd /home/amun/projects/nx-video && npx nx run-many -t lint,test,typecheck,build -p nx-video --output-style=static --skip-nx-cache 2>&1 | tail -25` (the spec output names the four self-test violations and the three fixture errors)
 - The `lint` target loads `packages/nx-video/eslint.config.mjs` (print-config shows a zone rule).
-- `npx eslint test-fixtures` reports nothing (ignored), proving R4.
+- R4: root `eslint.config.mjs` keeps `test-fixtures/**` in its global `ignores` (Task 1.2 mitigation). ESLint 9 proof: `npx eslint test-fixtures` exits 2 with "All files matched by 'test-fixtures' are ignored", and `npx eslint --no-error-on-unmatched-pattern test-fixtures` exits 0 with no output. (Corrected at Batch 3 verification: the earlier wording "reports nothing" assumed ESLint 8 behaviour.)
+- Result (team-leader, 2026-10-26, run 1): NOT ACCEPTED. Tasks 3.1–3.3 verified on disk and IMPLEMENTED: zone module has no imports; package lint target `cwd: packages/nx-video`, print-config from the package dir shows 1 `no-restricted` match; `@nx/enforce-module-boundaries` off only for `eslint.config.mjs` and the two zone specs (the three consumers of `tools/eslint/engine-zones.mjs`; none is in a zone glob, and the zone rules are `no-restricted-imports`/`no-restricted-syntax`, untouched); gate `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` exit 0, 11/11 tests; G1 80 files clean; mutation `src/remotion/` → `../hyperframes/x` fails `nx-video:lint` with the hard-rule-4 message (scratch file removed). Task 3.4 stays IN_PROGRESS: the second lane deleted `'test-fixtures/**'` from the root `eslint.config.mjs` ignores, removing the R4 mitigation (fixtures are now linted by the root config). Fix: restore that one line; no other root-config change. Simulated with `--ignore-pattern 'test-fixtures/**'`: exit 2 / exit 0 as above; the fixture spec is unaffected because it lints text through the package config with an in-zone `filePath`.
+- Result (team-leader, 2026-10-26, run 2, fix re-check): ACCEPTED. `git diff --stat eslint.config.mjs` empty (root line 13 `'test-fixtures/**'` restored, decisions.md row 8); `npx eslint test-fixtures` exit 2; `npx eslint --no-error-on-unmatched-pattern test-fixtures` exit 0; `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` passes; G1 80 files clean. R4 resolved. Task 3.4 IMPLEMENTED, then COMPLETE with the batch commit. Phase `scaffold` continues; its code-logic review is due after its last batch.
 
 ## Batch 4: `create-nx-video` skeleton and README license text — PENDING
 
