@@ -29,3 +29,7 @@ The HyperFrames side: promos and motion-kit films built from HTML fragments.
 ## Acceptance
 
 - AC8: in an empty Nx workspace, `hyperframes-project` + `frame` + `assemble` + `check` give a project that passes `check` with 0 errors, and `render` writes the MP4 to `video-output/`.
+
+## Scope change (2026-10-26)
+
+The approved extract plan split this task. The `kit`, `kit-component` and `promo` generators and the `kit-build`, `snapshot` and `preview` executors moved to `TASK_2026_014_deaa`. This task keeps `hyperframes-project`, `frame`, `assemble`, `check` and `hyperframes-render` (target name `render`, plan D14), the createNodes support for `hyperframes.json`, and spike A9. Build from `TASK_2026_002_dcb6/implementation-plan.md`.

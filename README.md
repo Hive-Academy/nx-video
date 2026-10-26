@@ -8,7 +8,7 @@ Programmatic video production for Nx workspaces: capture product walkthroughs wi
 ## What this repository will ship
 
 1. **An Nx plugin** — `@hive-academy/nx-video`. Generators install the code into your workspace. Executors capture, narrate, render and check your machine.
-2. **A Claude plugin marketplace** — `.claude-plugin/marketplace.json`. It installs the video skills, the `video-director` agent and the MCP server configuration.
+2. **A Claude plugin marketplace** — `.claude-plugin/marketplace.json`. It installs the video skills and the `video-director` agent. The `editor` generator sets up the DaVinci Resolve MCP server per machine.
 3. **A preset** — `create-nx-video`. It creates a new workspace with the plugin already set up.
 
 The code comes from the video tooling in [Ptah](https://github.com/Hive-Academy/ptah-extension). Ptah will consume this package to record its own videos.
@@ -37,6 +37,12 @@ nx g @hive-academy/nx-video:studio
 nx g @hive-academy/nx-video:scene
 nx g @hive-academy/nx-video:hyperframes-project
 nx run <studio>:doctor
+nx run <studio>:capture
+nx run <studio>:selfshot
+nx run <studio>:render
+nx run <hyperframes-project>:assemble
+nx run <hyperframes-project>:check
+nx run <hyperframes-project>:render
 ```
 
 These commands do not exist yet. See [docs/roadmap.md](docs/roadmap.md).
