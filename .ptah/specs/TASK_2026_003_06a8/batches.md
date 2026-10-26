@@ -1,6 +1,6 @@
 # Batches - TASK_2026_003_06a8
 
-Total tasks: 17 | Batches: 6 | Complete: 5/6
+Total tasks: 17 | Batches: 6 | Complete: 6/6
 
 Plan source: `../TASK_2026_002_dcb6/implementation-plan.md`, approved by the user on 2026-10-26 (this task's Gate 2). Binding sections: 98–198 (layout, projects, package.json), 517–560 (G1 only, plus the G2 media block for the root `.gitignore`), 750–768 (createNodes, stub only), 769–779 (preset skeleton, `create-nx-video` only), 780–815 (`ci.yml` only), 890–934 (quality, order of work row 003), 1054–1069 (lane constraints).
 
@@ -62,14 +62,14 @@ Status: PASSED WITH RISKS
 
 ## Deferred verification (cannot be verified locally on Linux)
 
-These are not passes. Each stays open until a pushed CI run proves it:
+These are not passes. Each stays open until a pushed CI run proves it. Status at task close (team-leader, Mode 3, 2026-10-26): all six are **open (CI-only; blocked on gh auth/push)**. **AC1 is NOT met**: it requires CI to pass on ubuntu, windows and macos, and no CI run has happened.
 
-1. `ci.yml` on `windows-latest` and `macos-latest` (AC1), including `npm ci`, lint/test/typecheck/build and the e2e install of the empty plugin.
-2. The whole `ci.yml` run on GitHub, including ubuntu: `gh` is not authenticated on this host and nothing is pushed (decisions.md row 3).
-3. The PR-only conventional-commit job against a real `pull_request` event.
-4. Branch protection requiring the three matrix jobs (plan line 813) — a repository setting, 013 or the user.
-5. The Git Bash executor e2e proof of hard rule 5 (plan line 785): no executor exists until 005. In 003 the Git Bash leg only proves `npm ci` + Nx + e2e spawn paths under `defaults.run.shell: bash` on Windows.
-6. Nx 23.3.1 on Windows and macOS: not in the matrix by D5.
+1. `ci.yml` on `windows-latest` and `macos-latest` (AC1), including `npm ci`, lint/test/typecheck/build and the e2e install of the empty plugin. — **open (CI-only; blocked on gh auth/push)**
+2. The whole `ci.yml` run on GitHub, including ubuntu: `gh` is not authenticated on this host and nothing is pushed (decisions.md row 3). — **open (CI-only; blocked on gh auth/push)**
+3. The PR-only conventional-commit job against a real `pull_request` event. — **open (CI-only; blocked on gh auth/push)**
+4. Branch protection requiring the three matrix jobs (plan line 813) — a repository setting, 013 or the user. — **open (CI-only; blocked on gh auth/push)**
+5. The Git Bash executor e2e proof of hard rule 5 (plan line 785): no executor exists until 005. In 003 the Git Bash leg only proves `npm ci` + Nx + e2e spawn paths under `defaults.run.shell: bash` on Windows. — **open (CI-only; blocked on gh auth/push)**
+6. Nx 23.3.1 on Windows and macOS: not in the matrix by D5. — **open (CI-only; blocked on gh auth/push)**
 
 Local evidence on Linux for each batch is the scoped command below plus, for Batch 5, the e2e on both Nx versions.
 
@@ -330,7 +330,7 @@ Files (9): `/home/amun/projects/nx-video/nx.json` (MODIFY, the two D9 keys only)
   Only CI can prove (Deferred items 1–2): that `taskkill /T` reaps the tree on `windows-latest`, the macOS process-group path, and the `npx-cli.js` lookup on each runner's Node layout.
 - Result (team-leader, 2026-10-26, run 2, fix re-check): ACCEPTED. (1) `start-local-registry.ts:66` passes `--location=none` in the spawn argv; the installed `@nx/js` verdaccio schema enum `location` is `["global","user","project","none"]`. (2) A preflight `fetch(/-/ping)` with `AbortSignal.timeout(1_000)` throws `port 4873 already serves a registry` before `mkdtempSync` and spawn (`:56-60`). (3) On win32, `stop-local-registry.ts:9` runs `spawnSync('taskkill', ['/pid', pid, '/T', '/F'], { shell: false })`. The Unix path still kills the process group with `process.kill(-pid)` and falls back to `child.kill`. `rmSync(configDirectory)` runs in `finally` (`:29-31`). `grep` finds no `execSync`, `exec(`, `npx.cmd`, `shell: true`, `homedir`, `.yarnrc` or `~/.npmrc` in `tools/scripts/` or `e2e/`. `~/.yarnrc`, `~/.yarnrc.yml` and `~/.npmrc` contain no `4873`. `git status --short` shows only the Batch 5 paths and the known untracked dirs. The gate `run-many -t lint,typecheck -p nx-video-e2e --skip-nx-cache` passes. G1 checked 101 files and found no violations. Port 4873 is free. The e2e was not rerun; this pass relies on the lane's report that both legs passed. Task 5.1 is IMPLEMENTED, then COMPLETE with the batch commit. Phase `scaffold` continues.
 
-## Batch 6: CI workflow, conventional-commit check, PR template — COMPLETE
+## Batch 6: CI workflow, conventional-commit check, PR template — COMPLETE (commit 32a0e88; phase review: code-logic-review.md APPROVED WITH NOTES, code-logic-review-fixes.md APPROVED)
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: GitHub Actions
 - Execution mode: sequential
@@ -366,3 +366,21 @@ Files (4): `/home/amun/projects/nx-video/.github/workflows/ci.yml`, `/home/amun/
 - Full local gate: `npx nx run-many -t lint,test,typecheck,build 2>&1 | tail -25` across all projects.
 - Deferred verification items 1–6 stay open; the phase summary must not call them passed.
 - Result (team-leader, 2026-10-26, run 1): ACCEPTED. All 4 files are on disk. `ci.yml`: actions pinned to exact tags `actions/checkout@v4.2.2` and `actions/setup-node@v4.4.0`; `permissions: contents: read`; `defaults.run.shell: bash` at workflow level; `build` matrix ubuntu/windows/macos with `fail-fast: false`; the e2e steps set `NX_VIDEO_E2E_NX_VERSION` (`24.0.1` in `build`, `23.3.1` in `e2e-nx23`, which runs on `ubuntu-latest` only); the `commits` job is PR-only with `fetch-depth: 0`, and the PR SHAs reach the script only through `env:` (`BASE_SHA`/`HEAD_SHA`, quoted `"$BASE_SHA"`), with no `${{ }}` in any `run:`; no step writes `~/.npmrc` or yarn config; the 010+ comment line is present. `check-commits.mjs` uses `spawnSync('git', [...], { shell: false })`, skips commits with more than one parent, and exits 1 on an offender (checked in a throwaway repo: `bad subject` -> exit 1). Validator: `actionlint` absent; the `yaml` package parsed the file (`yaml-ok`). `git check-ignore -v` on both `.github` files exits 1. `node --test "tools/**/*.spec.mjs"`: 8 pass, 0 fail. `check-commits.mjs a721752 HEAD` exits 0. Gate `run-many -t lint,test,typecheck,build -p nx-video,create-nx-video,nx-video-e2e,nx-video-source --exclude-task-dependencies --skip-nx-cache` exits 0. G1 checked 110 files with no violations. The e2e target was not run. Deferred items 1–6 stay open. Tasks 6.1 and 6.2 IMPLEMENTED, then COMPLETE with the batch commit. Phase `scaffold` review is due.
+
+## Phase `scaffold` review — APPROVED
+
+- Range: `a721752..32a0e88` (Batches 1–6), plus the post-review `project.json` one-liner.
+- `code-logic-review.md`: code-logic plus style for the public package surface. Score 7/10, **APPROVED WITH NOTES**, 0 Blocking, 0 Serious. Reviewer Ollama Code `glm-5.3:cloud` (family ollama-cloud). Implementer family: codex. This is a cross-family review, so it needs no weaker-evidence label.
+- `code-logic-review-fixes.md`: scoped re-review, **APPROVED**. It withdraws finding 5 and approves `"location": "none"` in the root `project.json` `local-registry` options. The orchestrator wrote that fix (claude family), and the reviewer is ollama-cloud, so this review is cross-family too.
+- Triage (`decisions.md` row 11, one fix round): there were no Blocking or Serious findings. Finding 5 is withdrawn. Moderate and Minor findings are carried as named later work. Findings 3, 4, 6 and 12 go to `TASK_2026_004_8680/context.md`. Findings 1, 2, 7, 8, 9, 10 and 11 go to `TASK_2026_010_6e8e/context.md`.
+- Orchestrator corrections in `decisions.md` rows 8 and 9 fall inside the reviewed diff.
+
+## Completion (team-leader, Mode 3, 2026-10-26)
+
+- 6/6 batches COMPLETE, 17/17 tasks COMPLETE. Commits 16030ef, 6ebd42d, f232f6a, 7a7f4a1, 4852f3a and 32a0e88 all resolve on `task/2026-003-scaffold`.
+- Re-check at close: `run-many -t lint,test,typecheck,build -p nx-video,create-nx-video,nx-video-e2e,nx-video-source --exclude-task-dependencies --skip-nx-cache` passed for 4 projects. `no-media` checked 115 files and found no violations. The e2e was not rerun at close. It passed locally on Linux for Nx 24.0.1 and 23.3.1 in Batch 5.
+- Write-path trace: `project.json` `local-registry.options.location: "none"` is read by `@nx/js` `verdaccio.impl.js:41`. With `none`, the executor skips `setupNpm` and `setupYarn`, so it no longer writes to user or project npm or yarn config. This is the intended behaviour. `start-local-registry.ts` already isolates npm through a temp userconfig.
+- Parity: N/A. The scaffold creates new projects and does not replace, consolidate, rebuild or redesign an existing surface.
+- Visual evidence: N/A. The task has no rendered UI.
+- Risks R1–R11 are resolved in their tasks (see the batch results). R12 remains **open**: the six deferred verification items above are CI-only and blocked on gh auth and a push.
+- **AC1 is NOT met.** No CI run has happened on ubuntu, windows or macos.
