@@ -1,4 +1,5 @@
 import nxPlugin from '@nx/eslint-plugin';
+import jsoncParser from 'jsonc-eslint-parser';
 
 export default [
   ...nxPlugin.configs['flat/base'],
@@ -12,6 +13,10 @@ export default [
       'test-fixtures/**',
       '**/src/generators/**/files/**',
     ],
+  },
+  {
+    files: ['**/*.json'],
+    languageOptions: { parser: jsoncParser },
   },
   {
     files: ['**/*.{ts,tsx,js,mjs,cjs}'],

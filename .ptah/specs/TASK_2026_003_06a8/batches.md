@@ -1,6 +1,6 @@
 # Batches - TASK_2026_003_06a8
 
-Total tasks: 17 | Batches: 6 | Complete: 1/6
+Total tasks: 17 | Batches: 6 | Complete: 2/6
 
 Plan source: `../TASK_2026_002_dcb6/implementation-plan.md`, approved by the user on 2026-10-26 (this task's Gate 2). Binding sections: 98–198 (layout, projects, package.json), 517–560 (G1 only, plus the G2 media block for the root `.gitignore`), 750–768 (createNodes, stub only), 769–779 (preset skeleton, `create-nx-video` only), 780–815 (`ci.yml` only), 890–934 (quality, order of work row 003), 1054–1069 (lane constraints).
 
@@ -14,7 +14,7 @@ Status: PASSED WITH RISKS
 
 | # | Decision | Options | Evidence | Reversible |
 |---|---|---|---|---|
-| D1 | Test runner is Vitest through `@nx/vitest@24.0.1` for every project; guard scripts under `tools/` use `node --test` (no extra deps) | Jest (`@nx/jest`); Vitest | The plan leaves `@nx/vite\|jest` open (line 102). `@nx/plugin@24.0.1` has `peerDependencies: {"@nx/vitest": "24.0.1"}` (`npm view`, 2026-10-26). The zone table is ESM (`tools/eslint/engine-zones.mjs`, line 165) and must be imported by both the flat ESLint config and the isolation test; Jest's CJS transform needs `--experimental-vm-modules` for that, Vitest does not. The e2e generator's Vitest variant is verified (`research-part-c-nx.md:30`: `maxWorkers: 1, isolate: false`). | Yes, before 004 adds specs |
+| D1 | Test runner is Vitest for every project, run through an explicit `nx:run-commands` target that calls the installed `vitest` binary (`vitest run --config <projectRoot>/vitest.config.mts`); `lint` is likewise `nx:run-commands` calling the installed `eslint` (decisions.md row 6: Nx 24's `@nx/vitest` and `@nx/eslint` ship empty executor maps). Guard scripts under `tools/` use `node --test` (no extra deps) | Jest (`@nx/jest`); Vitest | The plan leaves `@nx/vite\|jest` open (line 102). `@nx/plugin@24.0.1` has `peerDependencies: {"@nx/vitest": "24.0.1"}` (`npm view`, 2026-10-26). The zone table is ESM (`tools/eslint/engine-zones.mjs`, line 165) and must be imported by both the flat ESLint config and the isolation test; Jest's CJS transform needs `--experimental-vm-modules` for that, Vitest does not. The e2e generator's Vitest variant is verified (`research-part-c-nx.md:30`: `maxWorkers: 1, isolate: false`). | Yes, before 004 adds specs |
 | D2 | No npm workspaces. Root `package.json` holds every devDependency; package-level `package.json` files are publish manifests only. Explicit `project.json` targets, no inference plugins in `nx.json` | npm workspaces + TS project references; integrated layout | Keeps `package-lock.json` owned by Batch 1 so batches stay file-disjoint; the plan names `project.json` per project (line 111) and explicit targets (lines 142–147). | Yes |
 | D3 | `@hive-academy/nx-video/package.json` in 003 exports only `"."`, `./generators.json`, `./executors.json`, `./package.json`; peers only `nx` and `@nx/devkit` (`>=23 <25`); dependency `tslib`. The `./manifest`, `./capture`, `./remotion` exports and the optional engine peers land with the tasks that create them (004/005/009) | Declare all exports and peers now; add them with their code | An export pointing at a missing file breaks `npm pack` consumers and the 003 e2e install; scope rule "nothing from 004+". | Yes |
 | D4 | The createNodes stub uses the plan's final glob `**/{remotion.config.ts,hyperframes.json,kit.json}` and returns `[]` (no targets) | Return no targets; infer placeholder targets | Plan line 1092: Component 17 needs the executor ids to exist; none exist in 003. | Yes (005/009 fill it) |
@@ -76,12 +76,12 @@ Local evidence on Linux for each batch is the scoped command below plus, for Bat
 
 - Branch `task/2026-003-scaffold` only. Never touch `main`, never change git config.
 - `git -c user.name=Abdallah -c user.email=abdallah.khalil.nada@gmail.com commit`, Conventional Commits (`build(workspace): ...`, `feat(nx-video): ...`, `ci: ...`), body ends with the attribution trailer.
-- Stage explicit paths only. Never stage `.claude/`, `.codex/`, `.mcp.json`, `.ptah/analysis/`, `.ptah/harness/`, `.ptah/subagent-handoffs/`, other task folders, or the orchestrator's `context.md`/`task.md`/`decisions.md` edits.
+- Stage explicit paths only. Never stage `.claude/`, `.codex/`, `.mcp.json`, `.ptah/analysis/`, `.ptah/harness/`, `.ptah/subagent-handoffs/`, `*.harvested.json`, `subagent-handoff-*.md`, or other task folders. The orchestrator's `context.md`/`task.md`/`decisions.md` in this folder are staged only when the orchestrator says so (it did for Batch 2).
 - `.gitignore`: hunk-only staging (D7). Check with `git diff --cached .gitignore` that the harness block is not staged.
 - After staging and before committing: `node tools/guards/no-media.mjs` (from Batch 1 on) must pass.
 - `batches.md` is staged with each batch commit.
 
-## Batch 1: Workspace root and guard G1 — COMPLETE
+## Batch 1: Workspace root and guard G1 — COMPLETE (commit 16030ef)
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (spawn with model `gpt-6-sol`, decisions.md row 5); capability: Node/Nx workspace config
 - Execution mode: sequential
@@ -143,7 +143,7 @@ Files (14): `/home/amun/projects/nx-video/package.json`, `/home/amun/projects/nx
 - Edge cases: case-insensitive extensions, ENOENT skip, `docs/images/` exception, `.gitignore` no-duplicate merge.
 - Result (team-leader, 2026-10-26): files verified on disk; `npm ci` 871 packages, Nx v24.0.1, `test` 4/4 pass (`--skip-nx-cache`), ESLint exit 0, G1 exit 0 after staging. `.gitignore` staged hunk-only by `git apply --cached` (D7); the harness block stays unstaged. Executor: codex `gpt-6-sol`. Pinned devDependencies: Nx family 24.0.1, `vitest@4.1.12`, `typescript@6.0.3`, `eslint@9.39.5`, `typescript-eslint@8.72.0`, `verdaccio@6.11.1`, `tslib@2.8.1`, `@types/node@24.19.2`.
 
-## Batch 2: `@hive-academy/nx-video` empty plugin and createNodes stub — IN_PROGRESS
+## Batch 2: `@hive-academy/nx-video` empty plugin and createNodes stub — COMPLETE
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: Nx plugin TypeScript scaffold
 - Execution mode: sequential
@@ -154,9 +154,9 @@ Files (14): `/home/amun/projects/nx-video/package.json`, `/home/amun/projects/nx
 - Tasks: 3 | Depends on: Batch 1
 - Phase: scaffold | Phase review: as Batch 1
 
-Files (15): `/home/amun/projects/nx-video/NOTICE`, and under `/home/amun/projects/nx-video/packages/nx-video/`: `package.json`, `project.json`, `generators.json`, `executors.json`, `README.md`, `LICENSE`, `NOTICE`, `tsconfig.json`, `tsconfig.lib.json`, `tsconfig.spec.json`, `vitest.config.mts`, `src/index.ts`, `src/plugin/create-nodes.ts`, `src/plugin/create-nodes.spec.ts`
+Files (15 + 3 root, R10/row 7): `/home/amun/projects/nx-video/NOTICE`, root `package.json`/`package-lock.json` (`jsonc-eslint-parser@2.4.2` exact; the lock also drops one `extraneous` `vitest/node_modules/yaml` entry, an npm prune), root `eslint.config.mjs` (`**/*.json` parser block), and under `/home/amun/projects/nx-video/packages/nx-video/`: `package.json`, `project.json`, `generators.json`, `executors.json`, `README.md`, `LICENSE`, `NOTICE`, `tsconfig.json`, `tsconfig.lib.json`, `tsconfig.spec.json`, `vitest.config.mts`, `src/index.ts`, `src/plugin/create-nodes.ts`, `src/plugin/create-nodes.spec.ts`
 
-### Task 2.1: Package manifest, empty generator/executor manifests, license files — IN_PROGRESS
+### Task 2.1: Package manifest, empty generator/executor manifests, license files — COMPLETE
 
 - Files: `packages/nx-video/{package.json,generators.json,executors.json,README.md,LICENSE}`, root `NOTICE`, `packages/nx-video/NOTICE`
 - Plan reference: implementation-plan.md:111, 182–197, 907
@@ -170,18 +170,18 @@ Files (15): `/home/amun/projects/nx-video/NOTICE`, and under `/home/amun/project
 - Validation notes: D3, hard rule 6
 - Implementation details: none.
 
-### Task 2.2: Project and TypeScript/Vitest config — IN_PROGRESS
+### Task 2.2: Project and TypeScript/Vitest config — COMPLETE
 
 - Depends on: Task 2.1
 - Files: `packages/nx-video/{project.json,tsconfig.json,tsconfig.lib.json,tsconfig.spec.json,vitest.config.mts}`
 - Plan reference: implementation-plan.md:142–147, 155–165
 - Quality requirements:
-  - `project.json`: name `nx-video`, tags `type:plugin`, `scope:public`; `build` `@nx/js:tsc` → `dist/packages/nx-video`, assets exactly as plan line 144 (globs that match nothing today are kept so later tasks do not edit this target); `lint` `@nx/eslint:lint` with `lintFilePatterns` covering `{projectRoot}/**/*.{ts,tsx,mjs,js,json}` and `dependsOn: [{"projects": ["nx-video-source"], "target": "no-media"}]` (G1 as a lint dependency, plan line 519); `test` `@nx/vitest:test`; `typecheck` `nx:run-commands` running `tsc --noEmit` for lib and spec configs.
+  - `project.json`: name `nx-video`, tags `type:plugin`, `scope:public`; `build` `@nx/js:tsc` → `dist/packages/nx-video`, assets exactly as plan line 144 (globs that match nothing today are kept so later tasks do not edit this target); `lint` `nx:run-commands` running `eslint packages/nx-video` (row 6; JSON files linted through the root `jsonc-eslint-parser` block, row 7) with `dependsOn: [{"projects": ["nx-video-source"], "target": "no-media"}]` (G1 as a lint dependency, plan line 519); `test` `nx:run-commands` running `vitest run --config packages/nx-video/vitest.config.mts` (row 6); `typecheck` `nx:run-commands` running `tsc --noEmit` for lib and spec configs.
   - `tsconfig.*.json` extend `../../tsconfig.base.json`, `strict`, exclude `**/files/**` and never include `../../test-fixtures/**` (R4); spec config may include `../../tools/eslint/*.mjs` for Batch 3 (`allowJs` + `checkJs: false`).
   - `vitest.config.mts`: node environment, `include: ['src/**/*.spec.ts']`.
 - Validation notes: R4
 
-### Task 2.3: createNodes stub and entry point — IN_PROGRESS
+### Task 2.3: createNodes stub and entry point — COMPLETE
 
 - Depends on: Task 2.2
 - Files: `packages/nx-video/src/index.ts`, `src/plugin/create-nodes.ts`, `src/plugin/create-nodes.spec.ts`
@@ -197,8 +197,9 @@ Files (15): `/home/amun/projects/nx-video/NOTICE`, and under `/home/amun/project
 - Every listed file exists; `generators.json`/`executors.json` are empty maps.
 - `cd /home/amun/projects/nx-video && npx nx run-many -t lint,test,typecheck,build -p nx-video 2>&1 | tail -25`
 - `ls dist/packages/nx-video` shows `package.json`, `generators.json`, `executors.json`, `README.md`, `LICENSE`, `NOTICE`, `src/index.js`.
+- Result (team-leader, 2026-10-26): 14 package files + root `NOTICE` verified on disk; D3 exports/peers/deps exact, `tslib` `2.8.1` exact; generator/executor maps empty; `LICENSE`/`NOTICE` byte-identical to root; NOTICE carries only the project copyright, the HyperFrames Apache-2.0 attribution (HeyGen, Inc., per research-part-b) and the Remotion license notice. D4 glob exact, stub returns `[]`, no reads. R4: all three tsconfigs exclude `**/files/**` and `../../test-fixtures/**`. No `npx.cmd`, `shell: true` or range pins in `packages/`. Gate `run-many -t lint,test,typecheck,build -p nx-video --skip-nx-cache` exit 0 (5/5 tests); dist layout as listed; G1 exit 0 after staging. Executor: codex `gpt-6-sol` (first run + one resume). Lint/test use `nx:run-commands` (row 6). Known gap passed to Batch 3: the lint command resolves only the root ESLint config (Task 3.2 wiring note).
 
-## Batch 3: Engine-zone lint and isolation test — PENDING
+## Batch 3: Engine-zone lint and isolation test — IN_PROGRESS
 
 - Recommended executor: CLI lane, Gate 0.1 roster codex (model `gpt-6-sol`); capability: ESLint flat config and TypeScript compiler API
 - Execution mode: sequential
@@ -209,24 +210,25 @@ Files (15): `/home/amun/projects/nx-video/NOTICE`, and under `/home/amun/project
 - Tasks: 4 | Depends on: Batch 2
 - Phase: scaffold | Phase review: as Batch 1
 
-Files (8): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/amun/projects/nx-video/tools/eslint/engine-zones.d.mts`, `/home/amun/projects/nx-video/packages/nx-video/eslint.config.mjs`, `/home/amun/projects/nx-video/packages/nx-video/src/engine-isolation.spec.ts`, `/home/amun/projects/nx-video/packages/nx-video/src/engine-zones-lint.spec.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/static-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/dynamic-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/require-cross-engine.ts`
+Files (9): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/amun/projects/nx-video/tools/eslint/engine-zones.d.mts`, `/home/amun/projects/nx-video/packages/nx-video/eslint.config.mjs`, `/home/amun/projects/nx-video/packages/nx-video/project.json` (MODIFY, `lint` target options only), `/home/amun/projects/nx-video/packages/nx-video/src/engine-isolation.spec.ts`, `/home/amun/projects/nx-video/packages/nx-video/src/engine-zones-lint.spec.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/static-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/dynamic-cross-engine.ts`, `/home/amun/projects/nx-video/test-fixtures/lint/require-cross-engine.ts`
 
-### Task 3.1: Zone table module — PENDING
+### Task 3.1: Zone table module — IN_PROGRESS
 
 - Files: `tools/eslint/engine-zones.mjs`, `tools/eslint/engine-zones.d.mts`
 - Plan reference: implementation-plan.md:155–180
 - Quality requirements: export the seven zone rows of the table at lines 167–175 as data (zone globs relative to `packages/nx-video/`, allowed, forbidden, forbidden packages such as node builtins / `@nx/devkit` / `src/shared/**` for the studio zone, and the one allowed studio file `src/remotion/studio/lib/qrcode.mjs` for scripts); the message string from line 160; the pin-literal patterns (`hyperframes@`, `remotion@`, `@remotion/`) and the allowed files (`src/remotion/versions.ts`, `src/hyperframes/versions.ts`, generator `files/**`); the forbidden spawn strings (`npx.cmd`, `shell: true`, `execFileSync('npx'`). Pure data, no imports. `.d.mts` types it.
 - Validation notes: one source of truth (plan line 165)
 
-### Task 3.2: Lint blocks per zone — PENDING
+### Task 3.2: Lint blocks per zone — IN_PROGRESS
 
 - Depends on: Task 3.1
 - Files: `packages/nx-video/eslint.config.mjs`
 - Plan reference: implementation-plan.md:157–162
 - Quality requirements: extends the root config; builds one flat-config block per zone from the table (`files` `**/*.{ts,tsx,mjs,js}` in the zone; `ignores` generator `files/**`); core `no-restricted-imports` `patterns` for forbidden zones (covers `import`, `import type`, `export … from`); core `no-restricted-syntax` selectors for `ImportExpression` with a matching literal source, `ImportExpression` with a non-literal source, `CallExpression[callee.name='require']` with a matching or non-literal first argument; a literal selector for the pin strings outside `versions.ts`; every message names hard rule 4. Add `@nx/dependency-checks` for `package.json` only if it passes on the empty package.
+- Lint target wiring (added at Batch 2 acceptance): `packages/nx-video/project.json` `lint` is `nx:run-commands` (decisions.md row 6) running `eslint packages/nx-video` from the workspace root. ESLint 9.39.5 resolves `eslint.config.mjs` from the cwd, so as committed it would load only the root config and silently skip the zone blocks. Change only that target's `options` so the package config is the one loaded (`"cwd": "packages/nx-video"`, `"command": "eslint ."`, or an explicit `--config packages/nx-video/eslint.config.mjs`); keep `dependsOn` G1. Prove it with `npx eslint --print-config packages/nx-video/src/index.ts` (or the cwd equivalent) showing a zone rule, and by the Task 3.4 spec. No other edit to `project.json`.
 - Validation notes: R3
 
-### Task 3.3: Isolation test backstop — PENDING
+### Task 3.3: Isolation test backstop — IN_PROGRESS
 
 - Depends on: Task 3.1
 - Files: `packages/nx-video/src/engine-isolation.spec.ts`
@@ -234,7 +236,7 @@ Files (8): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 - Quality requirements: walks `packages/nx-video/src/**/*.{ts,tsx,mjs}` (excluding `*.spec.ts` and generator `files/**`), parses imports with the TypeScript compiler API (static, `import type`, `export … from`, dynamic `import()`, `require()`), resolves relative specifiers to files, normalises separators (Windows), and checks each resolved path against the zone table; asserts no pin literal outside the allowed files and no forbidden spawn string. A self-test writes a synthetic tree into a temp dir (Remotion file statically, dynamically and via `require` importing a HyperFrames file, plus one `..`-path escape) and asserts four violations — the scanner takes a root argument so both runs share the code (R2). The exclusion list is asserted exact (R5).
 - Validation notes: R2, R5
 
-### Task 3.4: Lint fixtures and fixture test — PENDING
+### Task 3.4: Lint fixtures and fixture test — IN_PROGRESS
 
 - Depends on: Task 3.2
 - Files: `test-fixtures/lint/{static,dynamic,require}-cross-engine.ts`, `packages/nx-video/src/engine-zones-lint.spec.ts`
@@ -245,7 +247,8 @@ Files (8): `/home/amun/projects/nx-video/tools/eslint/engine-zones.mjs`, `/home/
 ### Batch 3 verification
 
 - Every listed file exists; `engine-zones.mjs` has no imports.
-- `cd /home/amun/projects/nx-video && npx nx run-many -t lint,test,typecheck,build -p nx-video 2>&1 | tail -25` (the spec output names the four self-test violations and the three fixture errors)
+- `cd /home/amun/projects/nx-video && npx nx run-many -t lint,test,typecheck,build -p nx-video --output-style=static --skip-nx-cache 2>&1 | tail -25` (the spec output names the four self-test violations and the three fixture errors)
+- The `lint` target loads `packages/nx-video/eslint.config.mjs` (print-config shows a zone rule).
 - `npx eslint test-fixtures` reports nothing (ignored), proving R4.
 
 ## Batch 4: `create-nx-video` skeleton and README license text — PENDING
@@ -266,7 +269,7 @@ Files (11): under `/home/amun/projects/nx-video/packages/create-nx-video/`: `pac
 - Files: the ten `packages/create-nx-video/` files
 - Plan reference: implementation-plan.md:145, 151, 775–778; `research-part-c-nx.md:27`
 - Pattern to follow: `@nx/plugin:create-package` template `files/create-framework-package/bin/index.ts__tmpl__` (transcribe; do not let the generator write `packages/nx-video/generators.json` or `src/generators/preset/**` — A-4)
-- Quality requirements: name `create-nx-video`, version `0.0.0`, MIT, `bin: {"create-nx-video": "./bin/index.js"}`, `dependencies` `create-nx-workspace` `24.0.1` exact; `bin/index.ts` with `#!/usr/bin/env node`, reads its own `package.json` version, calls `createWorkspace(\`@hive-academy/nx-video@${version}\`, {name, nxCloud: 'skip', packageManager})`, passes Nx errors through and exits non-zero; `project.json` tags `type:preset`, `scope:public`, `implicitDependencies: ["nx-video"]`, targets `build` (`@nx/js:tsc` → `dist/packages/create-nx-video`), `lint`, `test`, `typecheck`; no import of `packages/nx-video` source (module boundary). Spec mocks `create-nx-workspace` and asserts the preset string, `nxCloud: 'skip'` and the version source; `README.md` says the preset arrives in a later release (R9).
+- Quality requirements: name `create-nx-video`, version `0.0.0`, MIT, `bin: {"create-nx-video": "./bin/index.js"}`, `dependencies` `create-nx-workspace` `24.0.1` exact; `bin/index.ts` with `#!/usr/bin/env node`, reads its own `package.json` version, calls `createWorkspace(\`@hive-academy/nx-video@${version}\`, {name, nxCloud: 'skip', packageManager})`, passes Nx errors through and exits non-zero; `project.json` tags `type:preset`, `scope:public`, `implicitDependencies: ["nx-video"]`, targets `build` (`@nx/js:tsc` → `dist/packages/create-nx-video`), `lint` (`nx:run-commands`: `eslint packages/create-nx-video`, `dependsOn` G1 as in Task 2.2), `test` (`nx:run-commands`: `vitest run --config packages/create-nx-video/vitest.config.mts`, Vitest `root` set to the package dir), `typecheck` (`nx:run-commands`, `tsc --noEmit` lib + spec) — the decisions.md row-6 pattern, mirroring `packages/nx-video/project.json`; no import of `packages/nx-video` source (module boundary). Spec mocks `create-nx-workspace` and asserts the preset string, `nxCloud: 'skip'` and the version source; `README.md` says the preset arrives in a later release (R9).
 - Validation notes: A-4, R9, R10
 
 ### Task 4.2: README license text — PENDING
@@ -300,7 +303,7 @@ Files (8): `/home/amun/projects/nx-video/tools/scripts/start-local-registry.ts`,
 - Files: `tools/scripts/{start,stop}-local-registry.ts`, `e2e/nx-video-e2e/{project.json,tsconfig.json,tsconfig.spec.json,vitest.config.mts}`
 - Plan reference: implementation-plan.md:106–107, 132, 146; `research-part-c-nx.md:30-34,105`
 - Pattern to follow: `@nx/plugin:e2e-project` Vitest variant output
-- Quality requirements: `project.json` name `nx-video-e2e`, tag `type:e2e`, `implicitDependencies: ["nx-video","create-nx-video"]`, `e2e` target (`@nx/vitest:test`, `dependsOn: ["^build"]`), no `build`; Vitest `globalSetup` starts `nx-video-source:local-registry`, publishes both packages with `nx release version 0.0.0-e2e` + `nx release publish --tag e2e` (A-2) and stops the registry in teardown; `maxWorkers: 1`, `isolate: false`, long `testTimeout`; storage path stays space-free (R7). The scripts must not mutate tracked files (`nx release version` with `--git-commit=false --git-tag=false --stage-changes=false`; restore any `package.json` version bump in teardown).
+- Quality requirements: `project.json` name `nx-video-e2e`, tag `type:e2e`, `implicitDependencies: ["nx-video","create-nx-video"]`, `e2e` target (`nx:run-commands` running `vitest run --config e2e/nx-video-e2e/vitest.config.mts`, decisions.md row 6, `dependsOn: ["^build"]`), `lint` and `typecheck` targets in the same row-6 pattern as `packages/nx-video/project.json`, no `build`; Vitest `globalSetup` starts `nx-video-source:local-registry`, publishes both packages with `nx release version 0.0.0-e2e` + `nx release publish --tag e2e` (A-2) and stops the registry in teardown; `maxWorkers: 1`, `isolate: false`, long `testTimeout`; storage path stays space-free (R7). The scripts must not mutate tracked files (`nx release version` with `--git-commit=false --git-tag=false --stage-changes=false`; restore any `package.json` version bump in teardown).
 - Validation notes: A-2, R7
 
 ### Task 5.2: e2e spec — PENDING

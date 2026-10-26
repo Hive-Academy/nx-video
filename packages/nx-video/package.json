@@ -1,0 +1,31 @@
+{
+  "name": "@hive-academy/nx-video",
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": { "types": "./src/index.d.ts", "default": "./src/index.js" },
+    "./generators.json": "./generators.json",
+    "./executors.json": "./executors.json",
+    "./package.json": "./package.json"
+  },
+  "generators": "./generators.json",
+  "executors": "./executors.json",
+  "peerDependencies": {
+    "nx": ">=23 <25",
+    "@nx/devkit": ">=23 <25"
+  },
+  "dependencies": {
+    "tslib": "2.8.1"
+  },
+  "files": ["src", "generators.json", "executors.json", "README.md", "LICENSE", "NOTICE"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hive-Academy/nx-video.git",
+    "directory": "packages/nx-video"
+  },
+  "homepage": "https://github.com/Hive-Academy/nx-video#readme",
+  "publishConfig": { "access": "public" }
+}

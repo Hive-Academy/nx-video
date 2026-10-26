@@ -1,0 +1,11 @@
+# Decisions — TASK_2026_003_06a8
+
+| # | Decision | Evidence | Who decided |
+|---|---|---|---|
+| 1 | Skip the PM and architect phases. The approved TASK_2026_002 plan is this task's plan, and team-leader Mode 1 decomposes from it. | The user approved the plan on 2026-10-26 (002 decisions row 22). The plan specifies the layout, the targets, G1, the lint zones and `ci.yml` for 003. | Orchestrator (evidence) |
+| 2 | Use Nx 24.0.1, not the Nx 23 that `context.md` names. | `docs/decisions.md` 2026-10-26 entry; the plan's Order of work, row 003 | User (via the plan) |
+| 3 | Branch `task/2026-003-scaffold` is stacked on `task/2026-002-extract-plan`. | No PRs are merged yet; `gh` is not authenticated on this host | Orchestrator (evidence) |
+| 4 | Pre-flight routing returned null, so the skill table decided: DEVOPS, Partial. | `ptah_route_decide` returned a low-confidence fallback | Orchestrator |
+| 5 | Gate 0.1 roster (`ptah_route_decide`, source ranking, confidence null, low-confidence fallback): implement → codex lane (`gpt-6-sol`), review → Ollama Code `glm-5.3:cloud` (ollama-cloud family, a different family from codex). The router also proposed codex for decompose. That is overridden: the team-leader runs as a subagent, because the skill makes it the role that commits each batch. | route_decide gate-0.1 result; orchestration SKILL "Invoking agents" | Orchestrator |
+| 6 | `lint` and `test` targets use `nx:run-commands` that calls the installed ESLint and Vitest binaries, the same way `typecheck` already does. D2 is unchanged: explicit `project.json` targets and no inference plugins. Revises batches.md D1, which said "through `@nx/vitest`". | The installed `@nx/eslint@24.0.1` and `@nx/vitest@24.0.1` ship `executors.json` with `"executors": {}`. Nx 24 provides lint and test only as inferred targets (`@nx/eslint/plugin`, `@nx/vitest`). Inference was rejected because it adds inferred targets to every project, including the root `nx-video-source`, and reverses D2. | Orchestrator (evidence; reversible) |
+| 7 | Lint JSON files with `jsonc-eslint-parser@2.4.2`, pinned exactly as a root devDependency. A `**/*.json` block in the root `eslint.config.mjs` uses it. | Batch 2 report: the root ESLint config has no JSON parser. 2.4.2 is already resolved under `@nx/eslint-plugin@24.0.1`. | Orchestrator (evidence; reversible) |
