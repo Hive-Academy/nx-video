@@ -1,0 +1,23 @@
+{
+  "name": "nx-video-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "e2e/nx-video-e2e/src",
+  "projectType": "application",
+  "tags": ["type:e2e"],
+  "implicitDependencies": ["nx-video", "create-nx-video"],
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": { "command": "vitest run --config e2e/nx-video-e2e/vitest.config.mts" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint e2e/nx-video-e2e" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc --noEmit -p e2e/nx-video-e2e/tsconfig.spec.json" }
+    }
+  }
+}
