@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "owner": "ptah",
+  "target": "vscode",
+  "entries": {
+    ".vscode/mcp.json#context7": {
+      "hash": "bec7d980ef6a20e5eb4dd445d5428974233fa31e7d3dc008e8657cb5d9cadccf",
+      "source": "context7",
+      "kind": "mcp"
+    },
+    ".vscode/mcp.json#next-devtools": {
+      "hash": "e088abaeab6b7f26377e469552d6c238267964f1188dd40e4fa5e763f493a8c2",
+      "source": "next-devtools",
+      "kind": "mcp"
+    },
+    ".vscode/mcp.json#playwright": {
+      "hash": "300f39cbc2020b84f40efd3d35808651ce84edaa663c4ee5c45eb25dc3e2e29f",
+      "source": "playwright",
+      "kind": "mcp"
+    }
+  }
+}

@@ -33,3 +33,14 @@ dist/video/
 **/selfshot/_smoke/*.mp4
 **/selfshot/_smoke/*.wav
 **/vendor/davinci-resolve-mcp/
+
+# ptah:harness:begin
+# Managed by Ptah. Derived copies of ~/.ptah/user — edit the source, not these.
+# Delete this whole block to opt out, or set harness.manageGitignore to false.
+.agents/skills/
+.claude/commands/
+.claude/skills/
+.codex/agents/
+.github/agents/
+.github/skills/
+# ptah:harness:end

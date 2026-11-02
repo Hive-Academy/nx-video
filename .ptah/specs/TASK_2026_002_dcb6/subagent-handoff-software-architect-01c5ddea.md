@@ -1,0 +1,1 @@
+Ptah subagent handoff stub. Never edit this file. The handoff record is `/home/amun/projects/nx-video/.ptah/subagent-handoffs/20261026T155052260Z-6332e9bfbf85067b-toolu_01JXoghibsEojsuG6PUSDXon-01c5ddea.handoff.md`: if its frontmatter has `status: pending`, read it, continue from it, then set `status: consumed` in the record.
