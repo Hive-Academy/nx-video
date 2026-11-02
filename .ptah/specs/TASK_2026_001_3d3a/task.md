@@ -1,6 +1,6 @@
 ---
 id: TASK_2026_001_3d3a
-status: backlog
+status: done
 type: RESEARCH
 title: Research the history scan, the Remotion license and Nx plugin packaging
 depends_on: []

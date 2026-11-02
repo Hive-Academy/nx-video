@@ -32,3 +32,11 @@ Turn the inventory in `docs/decisions.md` into a confirmed list and a plan. This
 
 - No source file is unaccounted for.
 - The user approves the plan. Record the approval with a date in `docs/decisions.md`.
+
+## Orchestration (2026-10-26)
+
+- **Type / depth**: REFACTORING, Full (user approval gate). Flow: inventory (codex lane) → architect plan (software-architect subagent) → cross-side review of the plan (codex lane, different execution side) → **user approval** → close.
+- **Gate 0.1**: lanes `enabled` (carried from TASK_2026_001, explicit user instruction). Codex lanes pass `model: gpt-6-sol` until the user fixes `agentOrchestration.codexModel`.
+- **Source**: read-only clone `/home/amun/projects/ptah-extension` (baseline `e0ca51e6e`; HEAD `0e17912e3`). The gitignored `tools/video-editor/` is only on the Windows D: machine.
+- **Inputs carried from TASK_2026_001**: `research-report.md` and `decisions.md` rows 11–17 (clean copy, Nx 24, npm token + provenance, Free Remotion license, davinci-resolve-mcp `samuelgursky` @ `6eca4bfc…` unconfirmed).
+- **Branch**: `task/2026-002-extract-plan`, stacked on `task/2026-001-research` (unpushed — no GitHub credentials on this host).

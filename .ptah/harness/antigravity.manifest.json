@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "owner": "ptah",
+  "target": "antigravity",
+  "entries": {
+    ".agents/skills/agent-lanes": {
+      "hash": "90143af0681b332f7a10f5bf16f45fe31d0828deb8142d7999adc36719ba7110",
+      "source": "/home/amun/.ptah/user/skills/agent-lanes",
+      "kind": "skill"
+    },
+    ".agents/skills/ddd-architecture": {
+      "hash": "0a6cf7cb878b59ed09e61291399bea12cd75e8fe9dee2807c468e42eb2377a63",
+      "source": "/home/amun/.ptah/user/skills/ddd-architecture",
+      "kind": "skill"
+    },
+    ".agents/skills/frontend-design": {
+      "hash": "07433e1f6e4c54e22ad0b41fe3500f112d9f060a1f18248e799d2d25b3d19ea5",
+      "source": "/home/amun/.ptah/user/skills/frontend-design",
+      "kind": "skill"
+    },
+    ".agents/skills/humanize-library": {
+      "hash": "0b29028d79c4d987223da105781449f0a0c6d1af06c2fd06be489ca3cf5fc958",
+      "source": "/home/amun/.ptah/user/skills/humanize-library",
+      "kind": "skill"
+    },
+    ".agents/skills/nestjs-backend-patterns": {
+      "hash": "481d26377bbf3900acd292f180081089862cddc4f60ecf5a972f116ccbd1363a",
+      "source": "/home/amun/.ptah/user/skills/nestjs-backend-patterns",
+      "kind": "skill"
+    },
+    ".agents/skills/nestjs-deployment": {
+      "hash": "90d5302a0d45bbdb2067f52180a41e68de0393596c59227674d0382768151ecb",
+      "source": "/home/amun/.ptah/user/skills/nestjs-deployment",
+      "kind": "skill"
+    },
+    ".agents/skills/nx-workspace-architect": {
+      "hash": "2f15dc4c1204432c09c760939bb22d72bde61b74bdc2895618f50df59424b3ef",
+      "source": "/home/amun/.ptah/user/skills/nx-workspace-architect",
+      "kind": "skill"
+    },
+    ".agents/skills/orchestration": {
+      "hash": "d0b87a0e58631eca19a50e90f08087732d6d345b9a6945931bf14c219f9691f6",
+      "source": "/home/amun/.ptah/user/skills/orchestration",
+      "kind": "skill"
+    },
+    ".agents/skills/ptah-cli-usage": {
+      "hash": "da08281cdda11deef7a0b202267a1124b45a1854b4fa2621f3964a5ed42adc10",
+      "source": "/home/amun/.ptah/user/skills/ptah-cli-usage",
+      "kind": "skill"
+    },
+    ".agents/skills/ptah-surface-authoring": {
+      "hash": "70376dec9eaea4e77316c343b7e678cda5935c6e5997c51959aa68bdf873c4dc",
+      "source": "/home/amun/.ptah/user/skills/ptah-surface-authoring",
+      "kind": "skill"
+    },
+    ".agents/skills/resilient-nestjs-patterns": {
+      "hash": "ac32b83fc75fcbd184c3c8a03f1f99805237544db51498dbf4780f0acb323715",
+      "source": "/home/amun/.ptah/user/skills/resilient-nestjs-patterns",
+      "kind": "skill"
+    },
+    ".agents/skills/saas-platform-patterns": {
+      "hash": "5111a01f6c3cc002dc11133819f0e1ff2165e3e47475efc29da5d35e6bcbb082",
+      "source": "/home/amun/.ptah/user/skills/saas-platform-patterns",
+      "kind": "skill"
+    },
+    ".agents/skills/saas-workspace-initializer": {
+      "hash": "0ceefd4c8649fce9c0c685708b1aee7839381979c6def12606bd049214199c38",
+      "source": "/home/amun/.ptah/user/skills/saas-workspace-initializer",
+      "kind": "skill"
+    },
+    ".agents/skills/session-handoff": {
+      "hash": "fced0b17b6a5e9e2611ae64128f017f4f9fbef7b41212d3eacbcb1fafbce1949",
+      "source": "/home/amun/.ptah/user/skills/session-handoff",
+      "kind": "skill"
+    },
+    ".agents/skills/skill-creator": {
+      "hash": "25c1189da6506f003c081492f7b853033e042b699fd27764b598782a9c19f1a0",
+      "source": "/home/amun/.ptah/user/skills/skill-creator",
+      "kind": "skill"
+    },
+    ".agents/skills/technical-content-writer": {
+      "hash": "39a301d0f9ee25f2bfbfce36efb73433bb550086a5bfe7067d5cbc64a57db218",
+      "source": "/home/amun/.ptah/user/skills/technical-content-writer",
+      "kind": "skill"
+    },
+    ".agents/skills/tribunal": {
+      "hash": "bc71f05a1bb7f2a3827d0c1489dc33e8c2b1066f30405b99b0234f8483386278",
+      "source": "/home/amun/.ptah/user/skills/tribunal",
+      "kind": "skill"
+    },
+    ".agents/skills/ui-ux-designer": {
+      "hash": "5596e12f9a276304a597249afb6ea40c8b078dd8a95bbcd1b42674843734f6a6",
+      "source": "/home/amun/.ptah/user/skills/ui-ux-designer",
+      "kind": "skill"
+    },
+    ".agents/skills/video-showcase": {
+      "hash": "ac7253bd98b209740f8607031b126494d3fc1289dca262ebf938cf27c8b82b20",
+      "source": "/home/amun/.ptah/user/skills/video-showcase",
+      "kind": "skill"
+    },
+    ".agents/skills/webhook-architecture": {
+      "hash": "5e69ddabee393fa2c4815cbb7fda9f7948303a78bf5a413a167b0ba008ffd60f",
+      "source": "/home/amun/.ptah/user/skills/webhook-architecture",
+      "kind": "skill"
+    }
+  }
+}

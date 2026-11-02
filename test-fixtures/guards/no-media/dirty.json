@@ -1,0 +1,7 @@
+[
+  { "path": "a.mp4", "size": 1 },
+  { "path": "B.WAV", "size": 1 },
+  { "path": "m.glb", "size": 1 },
+  { "path": "src/logo.png", "size": 1 },
+  { "path": "big.bin", "size": 2097152 }
+]

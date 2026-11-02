@@ -1,0 +1,1 @@
+void require('../hyperframes/example');

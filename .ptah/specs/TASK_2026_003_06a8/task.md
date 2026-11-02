@@ -1,6 +1,6 @@
 ---
 id: TASK_2026_003_06a8
-status: backlog
+status: in_review
 type: DEVOPS
 title: Scaffold the plugin workspace and the CI matrix
 depends_on: [TASK_2026_002_dcb6]

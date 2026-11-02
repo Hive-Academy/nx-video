@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-10-26T14:44:05.477Z",
+  "configHash": "",
+  "detectedStack": {
+    "languages": [],
+    "frameworks": [],
+    "buildTools": [],
+    "testingFrameworks": [],
+    "additionalTools": [],
+    "projectType": "general",
+    "configFiles": []
+  },
+  "analysisDirectory": null,
+  "analysisPhaseIds": [],
+  "promptLength": 5952
+}

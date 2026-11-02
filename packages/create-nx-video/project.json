@@ -1,0 +1,44 @@
+{
+  "name": "create-nx-video",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/create-nx-video/bin",
+  "projectType": "library",
+  "tags": ["type:preset", "scope:public"],
+  "implicitDependencies": ["nx-video"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "packages/create-nx-video/bin/index.ts",
+        "outputPath": "dist/packages/create-nx-video",
+        "tsConfig": "packages/create-nx-video/tsconfig.lib.json",
+        "assets": [
+          "packages/create-nx-video/package.json",
+          "packages/create-nx-video/README.md",
+          "packages/create-nx-video/LICENSE",
+          "packages/create-nx-video/NOTICE"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["nx-video-source"], "target": "no-media" }],
+      "options": { "command": "eslint packages/create-nx-video" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/create-nx-video/vitest.config.mts" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p packages/create-nx-video/tsconfig.lib.json",
+          "tsc --noEmit -p packages/create-nx-video/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

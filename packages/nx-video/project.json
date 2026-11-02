@@ -1,0 +1,50 @@
+{
+  "name": "nx-video",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/nx-video/src",
+  "projectType": "library",
+  "tags": ["type:plugin", "scope:public"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "main": "packages/nx-video/src/index.ts",
+        "outputPath": "dist/packages/nx-video",
+        "tsConfig": "packages/nx-video/tsconfig.lib.json",
+        "assets": [
+          "packages/nx-video/package.json",
+          "packages/nx-video/generators.json",
+          "packages/nx-video/executors.json",
+          "packages/nx-video/**/schema.json",
+          "packages/nx-video/src/generators/**/files/**",
+          "packages/nx-video/src/remotion/scripts/**/*.mjs",
+          "packages/nx-video/src/remotion/scripts/**/*.json",
+          "packages/nx-video/src/remotion/studio/lib/**/*.mjs",
+          "packages/nx-video/README.md",
+          "packages/nx-video/LICENSE",
+          "packages/nx-video/NOTICE"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "dependsOn": [{ "projects": ["nx-video-source"], "target": "no-media" }],
+      "options": { "command": "eslint .", "cwd": "packages/nx-video" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run --config packages/nx-video/vitest.config.mts" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p packages/nx-video/tsconfig.lib.json",
+          "tsc --noEmit -p packages/nx-video/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

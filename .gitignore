@@ -21,3 +21,26 @@ out/
 .env.*
 !.env.example
 .ptah/tmp/
+
+# Generated video assets and vendored runtime state
+*.mkv
+*.m4v
+*.m4a
+dist/video/
+**/.whisper/
+**/selfshot/*/
+!**/selfshot/_smoke/
+**/selfshot/_smoke/*.mp4
+**/selfshot/_smoke/*.wav
+**/vendor/davinci-resolve-mcp/
+
+# ptah:harness:begin
+# Managed by Ptah. Derived copies of ~/.ptah/user — edit the source, not these.
+# Delete this whole block to opt out, or set harness.manageGitignore to false.
+.agents/skills/
+.claude/commands/
+.claude/skills/
+.codex/agents/
+.github/agents/
+.github/skills/
+# ptah:harness:end

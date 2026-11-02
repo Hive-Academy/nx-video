@@ -1,0 +1,5 @@
+[
+  { "path": "src/index.ts", "size": 1024 },
+  { "path": "docs/images/x.png", "size": 10000 },
+  { "path": "allowed.bin", "size": 2097152 }
+]

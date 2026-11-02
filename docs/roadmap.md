@@ -7,18 +7,23 @@ Each row is a task folder in `.ptah/specs/`. The folder name is the canonical id
 | 001 | Research: history scan, Remotion license, Nx plugin packaging | RESEARCH | — | Gate for all copies |
 | 002 | Confirm the inventory and write the extract plan | REFACTORING | 001 | **User approval gate** |
 | 003 | Scaffold the plugin workspace and the CI matrix | DEVOPS | 002 | AC1 |
-| 004 | Move the capture and render contract into a scoped package | REFACTORING | 003 | — |
+| 004 | Manifest and capture subpath exports in `@hive-academy/nx-video` | REFACTORING | 003 | — |
 | 005 | `init` and `studio` generators, `render`, `narrate`, `selfshot` executors | FEATURE | 004 | AC2, AC4 |
 | 006 | Director harness, `capture` executor, `scene` generator | FEATURE | 004 | — |
 | 007 | `doctor` executor | FEATURE | 003 | AC3 |
-| 008 | `editor` generator | FEATURE | 007 | — |
-| 009 | HyperFrames generators and executors | FEATURE | 003 | AC8 |
+| 008 | `editor` generator (later minor release, after 013) | FEATURE | 007, 009, 013 | — |
+| 009 | HyperFrames `hyperframes-project`, `frame`, `assemble`, `check`, `hyperframes-render` | FEATURE | 003 | AC8 |
 | 010 | CI guards: recording leak guard and layout-ignore rule | DEVOPS | 005, 009 | AC6, AC9 |
 | 011 | Claude plugin marketplace manifest | FEATURE | 005, 006, 009 | AC5 |
-| 012 | `create-nx-video` preset | FEATURE | 005 | — |
-| 013 | Release pipeline and first publish | DEVOPS | 010, 011 | — |
+| 012 | `create-nx-video` preset | FEATURE | 005, 009 | — |
+| 013 | Release pipeline, `render-smoke.yml` pre-publish gate and first publish | DEVOPS | 007, 009, 010, 011, 012, 014 | — |
+| 014 | HyperFrames `kit`, `kit-component`, `promo` generators and `kit-build`, `snapshot`, `preview` executors | FEATURE | 009 | — |
 
 After 013, the work continues in Ptah `TASK_2026_582_a7db`: Ptah consumes the package (AC7, AC10).
+
+The first release (013) ships everything except the editor. The real render smoke for AC2, AC4 and AC8 (`render-smoke.yml`) is a required pre-publish gate. The editor (008) follows 013 as a minor release, and Ptah's AC7 and AC10 do not need it.
+
+The `depends_on` lines in the older `task.md` files predate the 2026-10-26 plan approval. This table is the binding order.
 
 ## Acceptance criteria
 
@@ -35,4 +40,4 @@ After 013, the work continues in Ptah `TASK_2026_582_a7db`: Ptah consumes the pa
 
 ## Suggested agents
 
-001 researcher-expert · 002 software-architect · 003, 010, 013 devops-engineer · 004–009, 011, 012 backend-developer · then senior-tester and the reviewers for each feature task.
+001 researcher-expert · 002 software-architect · 003, 010, 013 devops-engineer · 004–009, 011, 012, 014 backend-developer · then senior-tester and the reviewers for each feature task.

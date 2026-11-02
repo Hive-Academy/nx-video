@@ -13,8 +13,8 @@ Decisions carried over from Ptah `TASK_2026_582_a7db`. Add new decisions at the 
 
 | Product | Contents |
 |---|---|
-| Nx plugin `@hive-academy/nx-video` | Generators `init`, `studio`, `scene`, `editor` (optional). Executors `capture`, `narrate`, `render`, `selfshot`, `doctor` |
-| Marketplace | `.claude-plugin/marketplace.json` with the skills, the agents and the MCP servers. It must validate against the Ptah marketplace schema (`libs/backend/plugin-marketplace/src/lib/registry/marketplace-manifest.schema.ts:66-98` in Ptah) |
+| Nx plugin `@hive-academy/nx-video` | Generators `init`, `studio`, `scene`, `hyperframes-project`, `frame`, `kit`, `kit-component`, `promo`, `preset`, `editor` (later minor release). Remotion executors `studio`, `capture`, `narrate`, `caption`, `render`, `selfshot`, `master`, `outro`, `qr`, `tui-frames`, `export-kit`. HyperFrames executors `assemble`, `kit-build`, `check`, `snapshot`, `preview`, `hyperframes-render`. Engine-neutral executor `doctor`. Subpath exports `./manifest` and `./capture` (updated 2026-10-26) |
+| Marketplace | `.claude-plugin/marketplace.json` with the skills and the agents. The `davinci-resolve` MCP server is machine-specific and is configured per machine by the `editor` generator in the workspace `.mcp.json`, not shipped in the marketplace (updated 2026-10-26). It must validate against the Ptah marketplace schema (`libs/backend/plugin-marketplace/src/lib/registry/marketplace-manifest.schema.ts:66-98` in Ptah) |
 | Preset | `create-nx-video`, built on the same plugin |
 
 The `doctor` executor turns the machine facts in Ptah `tools/video-editor/CLAUDE.md` into checks with fix messages.
@@ -51,3 +51,22 @@ Template quality gates:
 - Name: `Hive-Academy/nx-video`, public, MIT license (the same as Ptah).
 - The initial commit contains documents and tasks only. No code or media is copied before `TASK_2026_001` clears the source paths.
 - The Ptah-side acceptance criteria (Ptah records with the package, the moved paths are deleted, the `agent-lanes` projects render with the package) stay in Ptah `TASK_2026_582_a7db`.
+
+## 2026-10-26 — Extract plan approved
+
+The user approved `TASK_2026_002_dcb6/implementation-plan.md` on 2026-10-26. The plan's decision log is `TASK_2026_002_dcb6/decisions.md`.
+
+- **Nx:** develop on Nx 24.0.1. Peer range `>=23 <25`.
+- **Publishing:** a granular npm token (`NPM_TOKEN` GitHub secret) with provenance. Not OIDC trusted publishing.
+- **Remotion license:** the Free License applies (single developer). The README keeps the Remotion license notice.
+- **davinci-resolve-mcp:** the `editor` generator downloads `samuelgursky/davinci-resolve-mcp` at the pinned SHA `6eca4bfc371a1c2f7cb2961efee651ab07436378` (MIT). The upstream is not confirmed yet. The editor ships in a later minor release.
+- **First release:** everything except the editor. The real render smoke for AC2, AC4 and AC8 (`render-smoke.yml`) is a required pre-publish gate.
+- **HyperFrames:** pinned npm dependencies in generated projects. The editor runs its pinned version through npx.
+- **Studio (D1):** a runtime library in the package plus a thin generated shell.
+- **Contract (D1b):** manifest and capture ship as subpath exports (`./manifest`, `./capture`) of `@hive-academy/nx-video`, not as a separate package.
+- **Ptah hooks (D6, overturned by the user):** `prewarm.ts` and `config-menu.ts` move as generic selector-driven hooks (`createMenuSurfaces`, `createPrewarm`). Ptah supplies its own selectors.
+- **Engine isolation (D13):** ESLint import-boundary blocks plus an isolation test.
+- **Pins (D15):** `init` always enforces the engine pins. There is no keep-existing bypass.
+- **Layout overrides (D9)** and **cache policy (D8):** as written in the plan.
+- **Marketplace:** skills and agents only (see "Target shape").
+- **Roadmap:** 004 retitled, 009 split into 009 and the new kit/promo task `TASK_2026_014_deaa`, 008 moved after 013. See `docs/roadmap.md`.

@@ -1,6 +1,6 @@
 ---
 id: TASK_2026_002_dcb6
-status: backlog
+status: done
 type: REFACTORING
 title: Confirm the inventory and write the extract plan
 depends_on: [TASK_2026_001_3d3a]

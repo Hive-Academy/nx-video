@@ -1,0 +1,25 @@
+{
+  "name": "nx-video-source",
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "root": ".",
+  "targets": {
+    "local-registry": {
+      "executor": "@nx/js:verdaccio",
+      "options": {
+        "port": 4873,
+        "config": ".verdaccio/config.yml",
+        "storage": "tmp/local-registry/storage",
+        "location": "none"
+      },
+      "continuous": true
+    },
+    "no-media": {
+      "executor": "nx:run-commands",
+      "options": { "command": "node tools/guards/no-media.mjs" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "node --test \"tools/**/*.spec.mjs\"" }
+    }
+  }
+}
