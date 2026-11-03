@@ -22,6 +22,10 @@ out/
 !.env.example
 .ptah/tmp/
 
+# Private, Ptah-specific video sources and projects imported from PtahCode.
+# Never commit this folder. See docs/private-ptah-import.md.
+/private/
+
 # Generated video assets and vendored runtime state
 *.mkv
 *.m4v
