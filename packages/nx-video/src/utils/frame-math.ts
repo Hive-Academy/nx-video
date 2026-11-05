@@ -31,3 +31,8 @@ export function parseTimestamp(value: string): number {
 export function totalFrames(sceneLengths: number[]): number {
   return sceneLengths.reduce((sum, length) => sum + length, 0);
 }
+
+/** Returns the duration in seconds of all scenes at the given frame rate. */
+export function totalSeconds(sceneLengths: number[], fps: number): number {
+  return sceneLengths.reduce((sum, length) => sum + length, 0) / fps;
+}
