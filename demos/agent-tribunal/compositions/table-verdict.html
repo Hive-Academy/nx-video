@@ -1,0 +1,26 @@
+<template>
+<style>
+#root{background:#163B47}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root #verdict-card .inner{background:rgba(3,15,19,.68);display:flex;align-items:center;justify-content:center}
+#root .verdict-paper{position:relative;background:#F4E9D3;color:#1A1410;width:900px;height:520px;padding:54px 66px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;font-size:52px;line-height:1.05;box-shadow:20px 24px 0 #091419}
+#root .verdict-paper mark{position:absolute;right:30px;bottom:18px;padding:4px 15px;border:6px solid #C8342B;background:#F4E9D3;color:#C8342B;font-size:36px;transform:rotate(-9deg)}
+</style>
+<div id="root" data-composition-id="table-verdict" data-width="1920" data-height="1080" data-duration="12.332"><canvas id="table-verdict-canvas" width="1920" height="1080"></canvas><div id="verdict-card" class="clip overlay" data-start="3.733" data-duration="4.100"><div class="inner"><div class="verdict-paper"><div>REMOTION FOR<br>THE SHOWCASE.</div><div>HYPERFRAMES FOR<br>THE PROMOS.</div><div>NO SHARED CODE.</div><mark>VERDICT</mark></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#verdict-card .verdict-paper',{scale:1.6,rotation:-12},{scale:1,rotation:0,duration:5/30,ease:'expo.out'},3.733);
+window.__timelines=window.__timelines||{};
+window.__timelines['table-verdict']=tl;
+window.__hf.buildReady['table-verdict']=window.TribunalReady.then(api=>api.mount({"id":"table-verdict","kind":"verdict","agent":null,"absoluteStart":87.547,"color":null,"icon":null,"rows":[{"start":87.547,"duration":3.483,"speaker":"Conductor","row":18,"localStart":0},{"start":91.28,"duration":5.944,"speaker":"Conductor","row":19,"localStart":3.733},{"start":97.974,"duration":1.655,"speaker":"All five","row":20,"localStart":10.427}]},document.getElementById('table-verdict-canvas')));
+}
+</script>
+</template>

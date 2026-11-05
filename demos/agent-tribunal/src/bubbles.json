@@ -1,0 +1,42 @@
+{
+  "_about": "Booth speech-bubble copy (SPEC Revision 2). Read by src/build-timing.mjs. `copy` is the spoken line, one token per aligned word (word timings come from assets/audio/cues.json voices[id].words, matched by position). Wrap key words in *asterisks* (Archivo Black + highlighter in the agent colour). `emoji` maps a token index to Noto Emoji code points (files in assets/emoji/<codepoint>.svg) that pop in with a squash on that word. `pages` lists the token index where each new bubble starts.",
+  "style": { "fontSize": 52, "keySize": 56, "emojiSize": 70, "maxWords": 14 },
+  "lines": {
+    "1": {
+      "scene": "booth-codex",
+      "copy": "Let me be *clear.* I already *merged* it. Into *main.*",
+      "emoji": { "6": ["2705"], "9": ["1f680", "2615"] },
+      "pages": [0]
+    },
+    "7": {
+      "scene": "booth-claude",
+      "copy": "I *respect* everyone at that table. I've also written a *document* on why they're *wrong.* It's *forty* *pages.* With *caveats.*",
+      "emoji": { "5": ["1f64f"], "17": ["1f4c4", "1f4c3", "1f4d1"], "19": ["1fae0"] },
+      "pages": [0, 6, 15]
+    },
+    "11": {
+      "scene": "booth-opencode",
+      "copy": "I *objected* to Remotion's *licence.* I *objected* to HyperFrames' *pinned* versions. I *objected* to my *own* idea. *Twice.* *Consistency* matters.",
+      "emoji": { "9": ["1f4cc"], "17": ["1f645"], "19": ["2696"] },
+      "pages": [0, 11]
+    },
+    "15": {
+      "scene": "booth-cursor",
+      "copy": "I don't *interrupt* people. I just *finish* their *thoughts.* *Before* they have them.",
+      "emoji": { "8": ["1f4ad"], "12": ["1f52e"] },
+      "pages": [0]
+    },
+    "16": {
+      "scene": "booth-antigravity",
+      "copy": "Nobody at that table has ever seen the *sun.* I *have.* I took a *screenshot.*",
+      "emoji": { "8": ["2600"], "10": ["1f60e"], "14": ["1f4f8"] },
+      "pages": [0, 9]
+    },
+    "21": {
+      "scene": "booth-codex-tag",
+      "copy": "*Reverting.*",
+      "emoji": { "0": ["1fae1", "23ea"] },
+      "pages": [0]
+    }
+  }
+}

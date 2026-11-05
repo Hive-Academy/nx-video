@@ -1,0 +1,38 @@
+<template>
+<style>
+#root{background:#8C8CFF}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .punch-zone{position:absolute;left:1010px;right:70px;top:150px;bottom:190px;display:flex;align-items:center;justify-content:center}
+#root .punch-group{position:relative}
+#root .punch-plate{position:relative;border:7px solid #1A1410;box-shadow:14px 14px 0 #1A1410;padding:26px 40px 30px;transform:rotate(-4deg)}
+#root .punch-plate.inv{border-color:#FFFFFF}
+#root .punch-plate.inv .punch-word{color:#FFFFFF}
+#root .punch-word{display:flex;flex-direction:column;align-items:center;font-family:'Archivo Black',sans-serif;line-height:.92;letter-spacing:-.02em;color:#FFF6E5;-webkit-text-stroke:12px #1A1410;paint-order:stroke fill;text-shadow:7px 8px 0 #1A1410;white-space:nowrap}
+#root .punch-tag{position:absolute;left:-46px;top:-108px;display:flex;align-items:center;gap:0}
+#root .punch-tag .badge{width:118px;height:118px;position:relative;z-index:1}
+#root .punch-tag em{background:#1A1410;font:900 30px Inter,sans-serif;font-style:normal;letter-spacing:.04em;color:#FFF6E5;padding:8px 18px 8px 26px;margin-left:-16px;border:4px solid #1A1410;box-shadow:5px 5px 0 #1A1410}
+</style>
+<div id="root" data-composition-id="punch-cursor" data-width="1920" data-height="1080" data-duration="0.867"><canvas id="punch-cursor-canvas" width="1920" height="1080"></canvas><div id="punch-cursor-word" class="clip overlay" data-start="0.000" data-duration="0.867"><div class="inner"><div class="punch-zone"><div id="punch-cursor-group" class="punch-group"><div id="punch-cursor-plate" class="punch-plate" style="background:#8C8CFF"><div class="punch-word" style="font-size:110px"><span data-layout-allow-overlap>AUTO-</span><span data-layout-allow-overlap>COMPLETE!</span></div></div><div id="punch-cursor-tag" class="punch-tag" data-layout-allow-overlap><span class="badge"><img src="assets/icons/cursor.svg" alt="Cursor logo"></span><em data-layout-allow-overlap>CURSOR</em></div></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+gsap.set('#punch-cursor-group',{opacity:0,scale:2.7,rotation:-14,x:120,y:-40});
+tl.fromTo('#punch-cursor-group',{opacity:0},{opacity:1,duration:0.033,ease:'none',immediateRender:false},0.033);
+tl.fromTo('#punch-cursor-group',{scale:2.7,rotation:-14,x:120,y:-40},{scale:1,rotation:0,x:0,y:0,duration:0.100,ease:'power3.in',immediateRender:false},0.033);
+tl.set('#punch-cursor-group',{x:16,y:-9},0.133);
+tl.set('#punch-cursor-group',{x:-12,y:7},0.166);
+tl.set('#punch-cursor-group',{x:0,y:0},0.200);
+tl.fromTo('#punch-cursor-tag',{scale:0,rotation:-30},{scale:1,rotation:-8,duration:.45,ease:'elastic.out(1,0.5)'},0.200);
+window.__timelines=window.__timelines||{};
+window.__timelines['punch-cursor']=tl;
+window.__hf.buildReady['punch-cursor']=window.TribunalReady.then(api=>api.mount({"id":"punch-cursor","kind":"punch","agent":"Cursor","absoluteStart":4.7,"color":"#8C8CFF","icon":"assets/icons/cursor.png","rows":[{"start":4.7,"duration":0.867,"speaker":"Cursor","row":"P2","localStart":0,"impact":4.833,"localImpact":0.133,"word":"AUTOCOMPLETE!"}]},document.getElementById('punch-cursor-canvas')));
+}
+</script>
+</template>

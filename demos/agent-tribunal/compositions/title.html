@@ -1,0 +1,44 @@
+<template>
+<style>
+#root{background:#0F2A33}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .temple{position:absolute;inset:0;overflow:hidden;z-index:0}
+#root .temple-img{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;transform-origin:50% 48%}
+#root .temple-shade{position:absolute;inset:0;background:radial-gradient(ellipse 70% 72% at 50% 50%,rgba(5,8,9,.64) 0%,rgba(5,8,9,.74) 58%,rgba(3,5,6,.9) 100%)}
+
+#root .title-stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;text-align:center}
+#root #title-word{display:block;font-size:168px;line-height:.94;letter-spacing:-.02em;text-shadow:6px 6px 0 #E8A33D}
+#root #title-sub{font:600 46px Inter,sans-serif}
+#root .title-cast{display:flex;gap:22px;margin-top:18px}
+#root .title-cast-item{display:block}
+#root .title-cast .badge{width:100px;height:100px;border-width:4px;box-shadow:5px 5px 0 #07181E}
+</style>
+<div id="root" data-composition-id="title" data-width="1920" data-height="1080" data-duration="2.500"><div class="temple"><img id="title-temple" class="temple-img" src="assets/backgrounds/temple-16x9.jpg" alt=""><div class="temple-shade"></div></div><div id="title-main" class="clip overlay" data-start="0.000" data-duration="2.500"><div class="inner"><div class="title-stack"><div id="title-shake"><strong id="title-word" data-var-text="title">THE TRIBUNAL</strong></div><small id="title-sub">Episode 1: Remotion or HyperFrames?</small><div class="title-cast"><span id="title-cast-0" class="title-cast-item"><span class="badge"><img src="assets/icons/claude.svg" alt="Claude logo"></span></span><span id="title-cast-1" class="title-cast-item"><span class="badge"><img src="assets/icons/codex.svg" alt="Codex logo"></span></span><span id="title-cast-2" class="title-cast-item"><span class="badge"><img src="assets/icons/cursor.svg" alt="Cursor logo"></span></span><span id="title-cast-3" class="title-cast-item"><span class="badge"><img src="assets/icons/antigravity.svg" alt="Antigravity logo"></span></span><span id="title-cast-4" class="title-cast-item"><span class="badge"><img src="assets/icons/opencode.svg" alt="OpenCode logo"></span></span><span id="title-cast-5" class="title-cast-item"><span class="badge dark"><img src="assets/brand/ptah-emblem-gold.png" alt="Conductor logo"></span></span></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#title-temple',{scale:1},{scale:1.035,duration:2.500,ease:'none'},0);
+gsap.set('#title-word',{opacity:0,scale:2.3,y:-30});
+tl.fromTo('#title-word',{opacity:0},{opacity:1,duration:0.033,ease:'none',immediateRender:false},0);
+tl.fromTo('#title-word',{scale:2.3,y:-30},{scale:1,y:0,duration:0.167,ease:'power3.in',immediateRender:false},0);
+tl.set('#title-shake',{x:12,y:-6},0.167);tl.set('#title-shake',{x:-9,y:5},0.200);tl.set('#title-shake',{x:0,y:0},0.233);
+tl.fromTo('#title-sub',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:.18,ease:'power2.out'},.32);
+tl.fromTo('#title-cast-0',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.620);
+tl.fromTo('#title-cast-1',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.690);
+tl.fromTo('#title-cast-2',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.760);
+tl.fromTo('#title-cast-3',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.830);
+tl.fromTo('#title-cast-4',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.900);
+tl.fromTo('#title-cast-5',{opacity:0,scale:.3,y:24},{opacity:1,scale:1,y:0,duration:.45,ease:'back.out(2.2)'},0.970);
+window.__timelines=window.__timelines||{};
+window.__timelines['title']=tl;
+
+}
+</script>
+</template>
