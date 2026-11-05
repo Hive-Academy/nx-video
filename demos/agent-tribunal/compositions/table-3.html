@@ -1,0 +1,22 @@
+<template>
+<style>
+#root{background:#163B47}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+</style>
+<div id="root" data-composition-id="table-3" data-width="1920" data-height="1080" data-duration="9.992"><canvas id="table-3-canvas" width="1920" height="1080"></canvas></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+
+window.__timelines=window.__timelines||{};
+window.__timelines['table-3']=tl;
+window.__hf.buildReady['table-3']=window.TribunalReady.then(api=>api.mount({"id":"table-3","kind":"table","agent":null,"absoluteStart":64.888,"color":null,"icon":null,"rows":[{"start":64.888,"duration":6.084,"speaker":"Codex","row":12,"localStart":0},{"start":71.222,"duration":1.393,"speaker":"Claude","row":13,"localStart":6.334},{"start":72.865,"duration":1.765,"speaker":"Codex","row":14,"localStart":7.977}]},document.getElementById('table-3-canvas')));
+}
+</script>
+</template>

@@ -1,0 +1,386 @@
+{
+  "fps": 30,
+  "total": 104.29,
+  "order": [
+    "intro",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "1",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22"
+  ],
+  "rows": {
+    "1": {
+      "start": 58.879,
+      "duration": 5.759,
+      "speaker": "Codex"
+    },
+    "2": {
+      "start": 8.8,
+      "duration": 2.5,
+      "speaker": null
+    },
+    "3": {
+      "start": 11.3,
+      "duration": 6.641,
+      "speaker": "Conductor"
+    },
+    "4": {
+      "start": 18.191,
+      "duration": 5.666,
+      "speaker": "Claude"
+    },
+    "5": {
+      "start": 23.557,
+      "duration": 3.111,
+      "speaker": "Cursor"
+    },
+    "6": {
+      "start": 26.918,
+      "duration": 2.229,
+      "speaker": "Claude"
+    },
+    "7": {
+      "start": 29.397,
+      "duration": 7.384,
+      "speaker": "Claude"
+    },
+    "8": {
+      "start": 37.031,
+      "duration": 5.248,
+      "speaker": "Antigravity"
+    },
+    "9": {
+      "start": 42.529,
+      "duration": 3.204,
+      "speaker": "OpenCode"
+    },
+    "10": {
+      "start": 46.583,
+      "duration": 1.393,
+      "speaker": "Antigravity"
+    },
+    "11": {
+      "start": 48.226,
+      "duration": 10.403,
+      "speaker": "OpenCode"
+    },
+    "12": {
+      "start": 64.888,
+      "duration": 6.084,
+      "speaker": "Codex"
+    },
+    "13": {
+      "start": 71.222,
+      "duration": 1.393,
+      "speaker": "Claude"
+    },
+    "14": {
+      "start": 72.865,
+      "duration": 1.765,
+      "speaker": "Codex"
+    },
+    "15": {
+      "start": 74.88,
+      "duration": 3.855,
+      "speaker": "Cursor"
+    },
+    "16": {
+      "start": 78.985,
+      "duration": 5.062,
+      "speaker": "Antigravity"
+    },
+    "17": {
+      "start": 84.297,
+      "duration": 3,
+      "speaker": "All five"
+    },
+    "18": {
+      "start": 87.547,
+      "duration": 3.483,
+      "speaker": "Conductor"
+    },
+    "19": {
+      "start": 91.28,
+      "duration": 5.944,
+      "speaker": "Conductor"
+    },
+    "20": {
+      "start": 97.974,
+      "duration": 1.655,
+      "speaker": "All five"
+    },
+    "21": {
+      "start": 99.879,
+      "duration": 1.161,
+      "speaker": "Codex"
+    },
+    "22": {
+      "start": 101.29,
+      "duration": 3,
+      "speaker": null
+    },
+    "intro": {
+      "start": 0,
+      "duration": 4,
+      "speaker": null
+    },
+    "P1": {
+      "start": 4,
+      "duration": 0.7,
+      "speaker": "Claude",
+      "impact": 4.133,
+      "word": "PLAN."
+    },
+    "P2": {
+      "start": 4.7,
+      "duration": 0.867,
+      "speaker": "Cursor",
+      "impact": 4.833,
+      "word": "AUTOCOMPLETE!"
+    },
+    "P3": {
+      "start": 5.567,
+      "duration": 0.8,
+      "speaker": "Antigravity",
+      "impact": 5.7,
+      "word": "BROWSER!"
+    },
+    "P4": {
+      "start": 6.367,
+      "duration": 0.833,
+      "speaker": "OpenCode",
+      "impact": 6.5,
+      "word": "OBJECTION!"
+    },
+    "P5": {
+      "start": 7.2,
+      "duration": 0.9,
+      "speaker": "Codex",
+      "impact": 7.333,
+      "word": "MERGED."
+    },
+    "P6": {
+      "start": 8.1,
+      "duration": 0.7,
+      "speaker": "Conductor",
+      "impact": 8.233,
+      "word": "ORDER."
+    }
+  },
+  "scenes": [
+    {
+      "id": "intro",
+      "nums": [
+        "intro"
+      ],
+      "agent": null,
+      "start": 0,
+      "duration": 4
+    },
+    {
+      "id": "punch-claude",
+      "nums": [
+        "P1"
+      ],
+      "agent": "Claude",
+      "start": 4,
+      "duration": 0.7
+    },
+    {
+      "id": "punch-cursor",
+      "nums": [
+        "P2"
+      ],
+      "agent": "Cursor",
+      "start": 4.7,
+      "duration": 0.867
+    },
+    {
+      "id": "punch-antigravity",
+      "nums": [
+        "P3"
+      ],
+      "agent": "Antigravity",
+      "start": 5.567,
+      "duration": 0.8
+    },
+    {
+      "id": "punch-opencode",
+      "nums": [
+        "P4"
+      ],
+      "agent": "OpenCode",
+      "start": 6.367,
+      "duration": 0.833
+    },
+    {
+      "id": "punch-codex",
+      "nums": [
+        "P5"
+      ],
+      "agent": "Codex",
+      "start": 7.2,
+      "duration": 0.9
+    },
+    {
+      "id": "punch-conductor",
+      "nums": [
+        "P6"
+      ],
+      "agent": "Conductor",
+      "start": 8.1,
+      "duration": 0.7
+    },
+    {
+      "id": "title",
+      "nums": [
+        "2"
+      ],
+      "agent": null,
+      "start": 8.8,
+      "duration": 2.5
+    },
+    {
+      "id": "table-1",
+      "nums": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "agent": null,
+      "start": 11.3,
+      "duration": 18.097
+    },
+    {
+      "id": "booth-claude",
+      "nums": [
+        "7"
+      ],
+      "agent": "Claude",
+      "start": 29.397,
+      "duration": 7.634
+    },
+    {
+      "id": "table-2",
+      "nums": [
+        "8",
+        "9",
+        "10"
+      ],
+      "agent": null,
+      "start": 37.031,
+      "duration": 11.195
+    },
+    {
+      "id": "booth-opencode",
+      "nums": [
+        "11"
+      ],
+      "agent": "OpenCode",
+      "start": 48.226,
+      "duration": 10.653
+    },
+    {
+      "id": "booth-codex",
+      "nums": [
+        "1"
+      ],
+      "agent": "Codex",
+      "start": 58.879,
+      "duration": 6.009
+    },
+    {
+      "id": "table-3",
+      "nums": [
+        "12",
+        "13",
+        "14"
+      ],
+      "agent": null,
+      "start": 64.888,
+      "duration": 9.992
+    },
+    {
+      "id": "booth-cursor",
+      "nums": [
+        "15"
+      ],
+      "agent": "Cursor",
+      "start": 74.88,
+      "duration": 4.105
+    },
+    {
+      "id": "booth-antigravity",
+      "nums": [
+        "16"
+      ],
+      "agent": "Antigravity",
+      "start": 78.985,
+      "duration": 5.312
+    },
+    {
+      "id": "table-chaos",
+      "nums": [
+        "17"
+      ],
+      "agent": null,
+      "start": 84.297,
+      "duration": 3.25
+    },
+    {
+      "id": "table-verdict",
+      "nums": [
+        "18",
+        "19",
+        "20"
+      ],
+      "agent": null,
+      "start": 87.547,
+      "duration": 12.332
+    },
+    {
+      "id": "booth-codex-tag",
+      "nums": [
+        "21"
+      ],
+      "agent": "Codex",
+      "start": 99.879,
+      "duration": 1.411
+    },
+    {
+      "id": "endcard",
+      "nums": [
+        "22"
+      ],
+      "agent": null,
+      "start": 101.29,
+      "duration": 3
+    }
+  ],
+  "source": "cues.json"
+}

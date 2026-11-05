@@ -1,0 +1,26 @@
+node_modules/
+renders/
+snapshots/
+.hyperframes/
+.thumbnails/
+
+# Generated or downloaded media. tools/guards/no-media.mjs rejects these in
+# this public repository; README.md says how to restore each one.
+assets/audio/
+assets/backgrounds/
+*.mp4
+*.webm
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.glb
+*.gltf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+*.woff
+*.woff2

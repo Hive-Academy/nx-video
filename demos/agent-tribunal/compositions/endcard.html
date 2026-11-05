@@ -1,0 +1,38 @@
+<template>
+<style>
+#root{background:#0F2A33}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .temple{position:absolute;inset:0;overflow:hidden;z-index:0}
+#root .temple-img{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;transform-origin:50% 48%}
+#root .temple-shade{position:absolute;inset:0;background:radial-gradient(ellipse 70% 72% at 50% 50%,rgba(5,8,9,.64) 0%,rgba(5,8,9,.74) 58%,rgba(3,5,6,.9) 100%)}
+
+#root .end-stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding-bottom:40px}
+#root .end-emblem{width:340px;height:340px;object-fit:contain;display:block;margin-bottom:6px}
+#root .end-stack strong{font-size:150px;line-height:.94;letter-spacing:-.02em;text-shadow:6px 6px 0 #E8A33D}
+#root .end-stack span{font:600 46px Inter,sans-serif}
+#root .robot-credit{position:absolute;left:0;right:0;bottom:70px;text-align:center;font:400 22px Inter,sans-serif;color:#C9D3CF}
+</style>
+<div id="root" data-composition-id="endcard" data-width="1920" data-height="1080" data-duration="3.000"><div class="temple"><img id="endcard-temple" class="temple-img" src="assets/backgrounds/temple-16x9.jpg" alt=""><div class="temple-shade"></div></div><div id="end-main" class="clip overlay" data-start="0.000" data-duration="3.000"><div class="inner"><div id="end-shake" class="end-stack"><img id="end-emblem" class="end-emblem" src="assets/brand/ptah-emblem-gold.png" alt="Ptah emblem"><strong id="end-title">The Tribunal</strong><span id="end-tag">Five agents. One verdict.</span></div><small class="robot-credit">Robot model: “cute robot” by victory_mirosya, CC BY 4.0 · Product logos belong to their owners</small></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#endcard-temple',{scale:1},{scale:1.035,duration:3.000,ease:'none'},0);
+gsap.set('#end-emblem',{opacity:0,y:-220,scale:1.22});
+tl.fromTo('#end-emblem',{opacity:0},{opacity:1,duration:0.067,ease:'none',immediateRender:false},0);
+tl.fromTo('#end-emblem',{y:-220,scale:1.22},{y:0,scale:1,duration:0.267,ease:'power3.in',immediateRender:false},0);
+tl.set('#end-shake',{x:0,y:9},0.267);tl.set('#end-shake',{x:0,y:-5},0.300);tl.set('#end-shake',{x:0,y:0},0.333);
+tl.fromTo('#end-title',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:.18,ease:'power2.out'},0.367);
+tl.fromTo('#end-tag',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:.16,ease:'power2.out'},0.567);
+window.__timelines=window.__timelines||{};
+window.__timelines['endcard']=tl;
+
+}
+</script>
+</template>

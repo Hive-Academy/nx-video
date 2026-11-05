@@ -1,0 +1,22 @@
+<template>
+<style>
+#root{background:#163B47}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+</style>
+<div id="root" data-composition-id="table-chaos" data-width="1920" data-height="1080" data-duration="3.250"><canvas id="table-chaos-canvas" width="1920" height="1080"></canvas></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+
+window.__timelines=window.__timelines||{};
+window.__timelines['table-chaos']=tl;
+window.__hf.buildReady['table-chaos']=window.TribunalReady.then(api=>api.mount({"id":"table-chaos","kind":"chaos","agent":null,"absoluteStart":84.297,"color":null,"icon":null,"rows":[{"start":84.297,"duration":3,"speaker":"All five","row":17,"localStart":0}]},document.getElementById('table-chaos-canvas')));
+}
+</script>
+</template>
