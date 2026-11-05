@@ -26,3 +26,8 @@ export function parseTimestamp(value: string): number {
   const [minutes, seconds] = value.split(':').map(Number);
   return minutes * 60 + seconds;
 }
+
+/** Returns the total frame count of all scenes. */
+export function totalFrames(sceneLengths: number[]): number {
+  return sceneLengths.reduce((sum, length) => sum + length, 0);
+}
