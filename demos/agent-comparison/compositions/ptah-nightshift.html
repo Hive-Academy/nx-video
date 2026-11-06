@@ -1,0 +1,36 @@
+<template>
+<style>
+#root{background:#163B47}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .room{position:absolute;left:192px;top:112px}
+#root .room-tag{display:flex;align-items:center;gap:16px;padding:10px 26px 10px 10px;box-sizing:border-box;white-space:nowrap}
+#root .room-tag b{font:400 34px/1 'Archivo Black',sans-serif;letter-spacing:.035em}
+#root .room-tag em{font-style:normal}
+#root .room-mark{display:flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none}
+#root .room-tag.t3 .room-mark{background:url('assets/icons/t3code.svg') center/contain no-repeat}
+#root .room-tag.ptah .room-mark{background:url('assets/brand/ptah-emblem-gold.png') center/contain no-repeat}
+#root .room-tag.t3{background:#FFFFFF;color:#000000;border-left:9px solid #1B4ED8;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+#root .room-tag.t3 em{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;line-height:1;color:#1B4ED8;background:#EEF2FF;border-radius:8px;padding:6px 12px}
+#root .room-tag.ptah{background:rgba(20,14,8,.92);color:#FFF6E5;border-left:9px solid #E8A33D;border-radius:3px;box-shadow:8px 8px 0 rgba(0,0,0,.5)}
+#root .room-tag.ptah .room-mark{width:58px;height:58px}
+#root .room-tag.ptah em{font:600 28px/1 Inter,sans-serif;color:#E8A33D}
+</style>
+<div id="root" data-composition-id="ptah-nightshift" data-width="1920" data-height="1080" data-duration="8.400"><canvas id="ptah-nightshift-canvas" width="1920" height="1080"></canvas><div id="ptah-nightshift-room0" class="clip overlay" data-start="0.100" data-duration="8.300"><div class="inner"><div class="room"><div id="ptah-nightshift-room0-tag" class="room-tag ptah"><span class="room-mark" role="img" aria-label="Ptah emblem"></span><b>THE NIGHT SHIFT</b></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#ptah-nightshift-room0-tag',{clipPath:'inset(0% 100% 0% 0%)',x:-24},{clipPath:'inset(0% 0% 0% 0%)',x:0,duration:0.200,ease:'power3.out'},0.100);
+window.__timelines=window.__timelines||{};
+window.__timelines['ptah-nightshift']=tl;
+window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+window.__hf.buildReady['ptah-nightshift']=window.TribunalReady.then(api=>api.mount({"id":"ptah-nightshift","kind":"ptah-nightshift","absoluteStart":83.4,"duration":8.4,"clock":"scene","host":"Claude","rows":[{"row":"N1","speaker":"Claude","start":83.94,"duration":4.67,"localStart":0.54,"kind":"line","words":[{"word":"We","start":0.6,"end":0.72},{"word":"even","start":0.82,"end":1.02},{"word":"review","start":1.06,"end":1.36},{"word":"your","start":1.42,"end":1.58},{"word":"pull","start":1.62,"end":1.78},{"word":"requests","start":1.82,"end":2.3},{"word":"on","start":2.36,"end":2.42},{"word":"a","start":2.46,"end":2.54},{"word":"schedule.","start":2.6,"end":3.04},{"word":"Four","start":3.4,"end":3.56},{"word":"lenses,","start":3.6,"end":4.04},{"word":"one","start":4.28,"end":4.48},{"word":"verifier.","start":4.52,"end":5.12}]},{"row":"N2","speaker":"Cursor","start":89.06,"duration":2.147,"localStart":5.66,"kind":"line","words":[{"word":"Dry-run","start":5.72,"end":6.16},{"word":"by","start":6.22,"end":6.34},{"word":"default.","start":6.38,"end":6.8},{"word":"We","start":7,"end":7.06},{"word":"have","start":7.1,"end":7.22},{"word":"manners.","start":7.26,"end":7.7}]}],"actions":{"unroll":1.06,"lenses":3.4,"verifier":4.52,"drySign":5.72,"manners":7.26},"sfx":[{"id":"night-n1","take":"night-ambience","hit":0,"volume":0.5}],"cast":{"Claude":{"color":"#D97757","icon":"assets/icons/claude.png"},"Codex":{"color":"#10A37F","icon":"assets/icons/codex.png"},"Cursor":{"color":"#8C8CFF","icon":"assets/icons/cursor.png"},"Antigravity":{"color":"#4F8BF5","icon":"assets/icons/antigravity.png"},"OpenCode":{"color":"#111111","icon":"assets/icons/opencode.png"},"Conductor":{"color":"#E8A33D","icon":"assets/brand/ptah-emblem-gold.png"}}},document.getElementById('ptah-nightshift-canvas')));
+}
+</script>
+</template>

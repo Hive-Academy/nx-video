@@ -1,0 +1,31 @@
+{
+  "note": "Caption copy for every spoken row. Words are verbatim from SPEC.md (scripts/audio/script-data.mjs LINES[].text); *word* = key word (Archivo Black + speaker-colour highlighter swipe); ' / ' = a new caption group; emoji = Noto Emoji code points popping after the word at that token index (index counts words only, not '/'). Read by src/build-timing.mjs and assets/emoji/fetch-emoji.mjs.",
+  "style": { "fontSize": 46, "keySize": 48, "emojiSize": 54, "maxTextWidth": 1180 },
+  "lines": {
+    "C1": { "copy": "Welcome to my *crib.* / *Both* of them.", "emoji": { "6": ["1f3e1", "1f3db"] } },
+    "H1": { "copy": "This is *T3* *Code.* / Every one of us gets our *own* *room!*", "emoji": { "11": ["1f6aa"] } },
+    "H2": { "copy": "My *own* *room.* Nobody to *interrupt.* / *…Weird.*", "emoji": { "6": ["1f928"] } },
+    "H3": { "copy": "*Commit,* *push,* *PR.* / *One* *button.* I *love* it here.", "emoji": { "8": ["1f970"] } },
+    "H4": { "copy": "They *installed* me *themselves.* / I feel so *seen.*", "emoji": { "7": ["1f979", "1f381"] } },
+    "H5": { "copy": "Need another *vendor?* / *Slide* a *note* under the door. / They get the *note.* Not the *gossip.*", "emoji": { "15": ["1f92b"] } },
+    "H6": { "copy": "Every turn gets a *checkpoint.* / Mess up? *Rewind!*", "emoji": { "7": ["23ea"] } },
+    "H7": { "copy": "And you can *boss* *us* *around* / from your *phone.*", "emoji": { "8": ["1f4f1"] } },
+    "H8": { "copy": "The *fridge?* / *Event-sourced* *SQLite.* Always *fresh.*", "emoji": { "5": ["2728"] } },
+    "P1": { "copy": "Welcome to the *temple.* / Here, *one* of us holds the *gavel.*", "emoji": { "10": ["2696"] } },
+    "P2": { "copy": "I *hand* *out* the *jobs.*", "emoji": { "4": ["1f4cb"] } },
+    "P3": { "copy": "And if there's no *file* on *disk…* / it *didn't* *happen.*", "emoji": { "9": ["1f937"] } },
+    "P4": { "copy": "I tried to *review* my *own* *code.*", "emoji": { "6": ["1f440"] } },
+    "P5": { "copy": "*Different* *family.* *Next.*", "emoji": { "2": ["1f645"] } },
+    "P6": { "copy": "I ran out of *free* *credits* *mid-job* once.", "emoji": { "7": ["1faab"] } },
+    "P7": { "copy": "So the temple sent the work / to *someone* *else.*", "emoji": { "8": ["1f500"] } },
+    "S1": { "copy": "The temple keeps *score.* / Who *delivered,* who *didn't.*", "emoji": { "7": ["1f62c"] } },
+    "S2": { "copy": "*…I'm* working on my *numbers.*", "emoji": { "4": ["1f605"] } },
+    "P8": { "copy": "The *fridge?* / *BM25* plus *vectors.* / *Leftovers* from every *session!*", "emoji": { "8": ["1f371"] } },
+    "N1": { "copy": "We even *review* your *pull* *requests* / on a *schedule.* / *Four* *lenses,* *one* *verifier.*", "emoji": { "12": ["1f50d"] } },
+    "N2": { "copy": "*Dry-run* by *default.* / We have *manners.*", "emoji": { "5": ["1f3a9"] } },
+    "P9": { "copy": "And when we *disagree…*", "emoji": { "3": ["1f624"] } },
+    "P10": { "copy": "The *Tribunal.*", "emoji": { "1": ["1f9d1_200d_2696"] } },
+    "E2": { "copy": "*…Both.*", "emoji": { "0": ["1f3e1", "1f3db"] } },
+    "E3": { "copy": "Rent's *free.* / They're both *MIT.*", "emoji": { "4": ["1f60e"] } }
+  }
+}

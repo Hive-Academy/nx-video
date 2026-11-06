@@ -1,0 +1,42 @@
+<template>
+<style>
+#root{background:#0F2A33}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .temple{position:absolute;inset:0;overflow:hidden;z-index:0}
+#root .temple-img{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:cover;transform-origin:50% 48%}
+#root .temple-shade{position:absolute;inset:0;background:radial-gradient(ellipse 70% 72% at 50% 50%,rgba(5,8,9,.66) 0%,rgba(5,8,9,.76) 58%,rgba(3,5,6,.9) 100%)}
+
+#root .end-stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding-bottom:56px}
+#root .end-emblem{width:250px;height:250px;object-fit:contain;display:block;margin-bottom:4px}
+#root .end-stack strong{font:400 96px/1 'Archivo Black',sans-serif;letter-spacing:-.015em;color:#FFF6E5;text-shadow:6px 6px 0 #000;white-space:nowrap}
+#root .end-ptah{font:800 64px/1 Inter,sans-serif;color:#E8A33D;letter-spacing:.01em;margin-top:6px}
+#root .end-t3{display:flex;align-items:center;gap:16px;font:600 40px/1 Inter,sans-serif;color:#FFF6E5;margin-top:8px}
+#root .end-t3 img{width:48px;height:48px;display:block;border-radius:8px;box-shadow:0 0 0 2px rgba(255,246,229,.55)}
+#root .end-t3 em{font-style:normal}
+#root .end-credit{position:absolute;left:0;right:0;bottom:66px;text-align:center;font:500 28px Inter,sans-serif;color:#D8DDD9}
+</style>
+<div id="root" data-composition-id="endcard" data-width="1920" data-height="1080" data-duration="3.500"><div class="temple"><img id="endcard-temple" class="temple-img" src="assets/backgrounds/temple-16x9.jpg" alt=""><div class="temple-shade"></div></div><div id="end-main" class="clip overlay" data-start="0.000" data-duration="3.500"><div class="inner"><div id="end-shake" class="end-stack"><img id="end-emblem" class="end-emblem" src="assets/brand/ptah-emblem-gold.png" alt="Ptah emblem"><strong id="end-title">Same agents. Two homes.</strong><span id="end-ptah" class="end-ptah">ptah.live</span><span id="end-t3" class="end-t3"><img src="assets/icons/t3code.svg" alt="T3 Code logo"><em>T3 Code — t3.codes</em></span></div><small class="end-credit">Robot model: “cute robot” by victory_mirosya, CC BY 4.0 · Product logos belong to their owners</small></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#endcard-temple',{scale:1},{scale:1.035,duration:3.500,ease:'none'},0);
+gsap.set('#end-emblem',{opacity:0,y:-220,scale:1.22});
+tl.fromTo('#end-emblem',{opacity:0},{opacity:1,duration:0.067,ease:'none',immediateRender:false},0);
+tl.fromTo('#end-emblem',{y:-220,scale:1.22},{y:0,scale:1,duration:0.267,ease:'power3.in',immediateRender:false},0);
+tl.set('#end-shake',{x:0,y:9},0.267);tl.set('#end-shake',{x:0,y:-5},0.300);tl.set('#end-shake',{x:0,y:0},0.333);
+tl.fromTo('#end-title',{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0px)',duration:.18,ease:'power2.out'},0.367);
+tl.fromTo('#end-ptah',{opacity:0,y:16},{opacity:1,y:0,duration:.2,ease:'power2.out'},0.567);
+tl.fromTo('#end-t3',{opacity:0,y:16},{opacity:1,y:0,duration:.2,ease:'power2.out'},0.700);
+window.__timelines=window.__timelines||{};
+window.__timelines['endcard']=tl;
+
+}
+</script>
+</template>

@@ -1,0 +1,737 @@
+{
+  "fps": 30,
+  "total": 105.767,
+  "placeholder": false,
+  "source": "cues.json",
+  "rows": {
+    "C1": {
+      "start": 0.54,
+      "duration": 3.072,
+      "speaker": "Codex",
+      "scene": "door-cold",
+      "actions": {
+        "doorbell": 0.6,
+        "bothOfThem": 2.84
+      }
+    },
+    "T0": {
+      "start": 4.233,
+      "duration": 2.5,
+      "speaker": null,
+      "scene": "title",
+      "actions": {
+        "titleLand": 4.4
+      }
+    },
+    "H1": {
+      "start": 7.673,
+      "duration": 4.418,
+      "speaker": "Claude",
+      "scene": "t3-door",
+      "actions": {
+        "doorbell": 6.813,
+        "addressCard": 6.833,
+        "doorOpen": 9.643
+      }
+    },
+    "H2": {
+      "start": 13.24,
+      "duration": 2.928,
+      "speaker": "Cursor",
+      "scene": "t3-hall-a",
+      "actions": {
+        "beat": 14.72,
+        "weird": 15.82
+      }
+    },
+    "H3": {
+      "start": 17.307,
+      "duration": 4.208,
+      "speaker": "Codex",
+      "scene": "t3-codex-room",
+      "actions": {
+        "press": 19.747
+      }
+    },
+    "H4": {
+      "start": 22.64,
+      "duration": 2.704,
+      "speaker": "Antigravity",
+      "scene": "t3-antigravity-room",
+      "actions": {
+        "seen": 24.94
+      }
+    },
+    "H5": {
+      "start": 26.473,
+      "duration": 6.279,
+      "speaker": "OpenCode",
+      "scene": "t3-hall-b",
+      "actions": {
+        "noteSlide": 28.133,
+        "noteUnder": 28.973,
+        "noteArrives": 30.583
+      }
+    },
+    "H6": {
+      "start": 33.82,
+      "duration": 3.002,
+      "speaker": "Claude",
+      "scene": "t3-clock",
+      "actions": {
+        "rewind": 36.1
+      }
+    },
+    "H7": {
+      "start": 37.94,
+      "duration": 3.008,
+      "speaker": "Cursor",
+      "scene": "t3-phone",
+      "actions": {
+        "phoneLight": 38.54,
+        "phoneBuzz": 40.86
+      }
+    },
+    "H8": {
+      "start": 42.133,
+      "duration": 4.454,
+      "speaker": "Codex",
+      "scene": "t3-fridge",
+      "actions": {
+        "fridgeOpen": 42.773
+      }
+    },
+    "P1": {
+      "start": 48.547,
+      "duration": 3.625,
+      "speaker": "Conductor",
+      "scene": "ptah-door",
+      "actions": {
+        "doorOpen": 47.787,
+        "addressCard": 47.767,
+        "gavel": 51.787
+      }
+    },
+    "P2": {
+      "start": 53.267,
+      "duration": 1.769,
+      "speaker": "Conductor",
+      "scene": "ptah-lanes",
+      "actions": {
+        "lanes": 53.567
+      }
+    },
+    "P3": {
+      "start": 55.177,
+      "duration": 3.267,
+      "speaker": "Claude",
+      "scene": "ptah-lanes",
+      "actions": {
+        "fileLands": 55.997,
+        "stamp": 56.587
+      }
+    },
+    "P4": {
+      "start": 59.547,
+      "duration": 2.185,
+      "speaker": "Codex",
+      "scene": "ptah-review",
+      "actions": {
+        "reach": 60.227
+      }
+    },
+    "P5": {
+      "start": 62.127,
+      "duration": 1.718,
+      "speaker": "Conductor",
+      "scene": "ptah-review",
+      "actions": {
+        "gavel": 63.247,
+        "handoff": 63.307
+      }
+    },
+    "P6": {
+      "start": 64.88,
+      "duration": 2.497,
+      "speaker": "OpenCode",
+      "scene": "ptah-gate",
+      "actions": {
+        "buzzer": 67.27
+      }
+    },
+    "P7": {
+      "start": 67.7,
+      "duration": 3.028,
+      "speaker": "Conductor",
+      "scene": "ptah-gate",
+      "actions": {
+        "reroute": 68.86
+      }
+    },
+    "S1": {
+      "start": 71.84,
+      "duration": 3.306,
+      "speaker": "Conductor",
+      "scene": "ptah-scoreboard",
+      "actions": {
+        "score": 72.82,
+        "tallyDelivered": 74,
+        "tallyFailed": 74.76
+      }
+    },
+    "S2": {
+      "start": 75.56,
+      "duration": 1.568,
+      "speaker": "Codex",
+      "scene": "ptah-scoreboard",
+      "actions": {
+        "lookUp": 75.14,
+        "sheepish": 76.44
+      }
+    },
+    "P8": {
+      "start": 78.26,
+      "duration": 4.795,
+      "speaker": "Claude",
+      "scene": "ptah-fridge",
+      "actions": {
+        "fridgeOpen": 78.8
+      }
+    },
+    "N1": {
+      "start": 83.94,
+      "duration": 4.67,
+      "speaker": "Claude",
+      "scene": "ptah-nightshift",
+      "actions": {
+        "unroll": 84.46,
+        "lenses": 86.8,
+        "verifier": 87.92
+      }
+    },
+    "N2": {
+      "start": 89.06,
+      "duration": 2.147,
+      "speaker": "Cursor",
+      "scene": "ptah-nightshift",
+      "actions": {
+        "drySign": 89.12,
+        "manners": 90.66
+      }
+    },
+    "P9": {
+      "start": 92.34,
+      "duration": 1.287,
+      "speaker": "Cursor",
+      "scene": "ptah-tribunal",
+      "actions": {
+        "disagree": 92.92
+      }
+    },
+    "P10": {
+      "start": 94.02,
+      "duration": 0.998,
+      "speaker": "Conductor",
+      "scene": "ptah-tribunal",
+      "actions": {
+        "gavel": 95
+      }
+    },
+    "E1": {
+      "start": 95.6,
+      "duration": 2,
+      "speaker": null,
+      "scene": "both",
+      "actions": {
+        "scratch": 95.633
+      }
+    },
+    "E2": {
+      "start": 98.16,
+      "duration": 0.527,
+      "speaker": "All five",
+      "scene": "both",
+      "actions": {
+        "turn": 97.8
+      }
+    },
+    "E3": {
+      "start": 99.26,
+      "duration": 2.736,
+      "speaker": "Codex",
+      "scene": "both",
+      "actions": {
+        "sunglasses": 101.12
+      }
+    },
+    "E4": {
+      "start": 102.267,
+      "duration": 3.5,
+      "speaker": null,
+      "scene": "endcard",
+      "actions": {}
+    }
+  },
+  "scenes": [
+    {
+      "id": "door-cold",
+      "kind": "door-cold",
+      "rows": [
+        "C1"
+      ],
+      "start": 0,
+      "duration": 4.233
+    },
+    {
+      "id": "title",
+      "kind": "title",
+      "rows": [
+        "T0"
+      ],
+      "start": 4.233,
+      "duration": 2.5
+    },
+    {
+      "id": "t3-door",
+      "kind": "t3-door",
+      "rows": [
+        "H1"
+      ],
+      "start": 6.733,
+      "duration": 5.967
+    },
+    {
+      "id": "t3-hall-a",
+      "kind": "t3-hall",
+      "rows": [
+        "H2"
+      ],
+      "start": 12.7,
+      "duration": 4.067
+    },
+    {
+      "id": "t3-codex-room",
+      "kind": "t3-codex-room",
+      "rows": [
+        "H3"
+      ],
+      "start": 16.767,
+      "duration": 5.333
+    },
+    {
+      "id": "t3-antigravity-room",
+      "kind": "t3-antigravity-room",
+      "rows": [
+        "H4"
+      ],
+      "start": 22.1,
+      "duration": 3.833
+    },
+    {
+      "id": "t3-hall-b",
+      "kind": "t3-hall",
+      "rows": [
+        "H5"
+      ],
+      "start": 25.933,
+      "duration": 7.367
+    },
+    {
+      "id": "t3-clock",
+      "kind": "t3-clock",
+      "rows": [
+        "H6"
+      ],
+      "start": 33.3,
+      "duration": 4.1
+    },
+    {
+      "id": "t3-phone",
+      "kind": "t3-phone",
+      "rows": [
+        "H7"
+      ],
+      "start": 37.4,
+      "duration": 4.133
+    },
+    {
+      "id": "t3-fridge",
+      "kind": "t3-fridge",
+      "rows": [
+        "H8"
+      ],
+      "start": 41.533,
+      "duration": 6.134
+    },
+    {
+      "id": "ptah-door",
+      "kind": "ptah-door",
+      "rows": [
+        "P1"
+      ],
+      "start": 47.667,
+      "duration": 5.1
+    },
+    {
+      "id": "ptah-lanes",
+      "kind": "ptah-lanes",
+      "rows": [
+        "P2",
+        "P3"
+      ],
+      "start": 52.767,
+      "duration": 6.3
+    },
+    {
+      "id": "ptah-review",
+      "kind": "ptah-review",
+      "rows": [
+        "P4",
+        "P5"
+      ],
+      "start": 59.067,
+      "duration": 5.333
+    },
+    {
+      "id": "ptah-gate",
+      "kind": "ptah-gate",
+      "rows": [
+        "P6",
+        "P7"
+      ],
+      "start": 64.4,
+      "duration": 6.9
+    },
+    {
+      "id": "ptah-scoreboard",
+      "kind": "ptah-scoreboard",
+      "rows": [
+        "S1",
+        "S2"
+      ],
+      "start": 71.3,
+      "duration": 6.4
+    },
+    {
+      "id": "ptah-fridge",
+      "kind": "ptah-fridge",
+      "rows": [
+        "P8"
+      ],
+      "start": 77.7,
+      "duration": 5.7
+    },
+    {
+      "id": "ptah-nightshift",
+      "kind": "ptah-nightshift",
+      "rows": [
+        "N1",
+        "N2"
+      ],
+      "start": 83.4,
+      "duration": 8.4
+    },
+    {
+      "id": "ptah-tribunal",
+      "kind": "ptah-tribunal",
+      "rows": [
+        "P9",
+        "P10"
+      ],
+      "start": 91.8,
+      "duration": 3.8
+    },
+    {
+      "id": "both",
+      "kind": "both",
+      "rows": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "start": 95.6,
+      "duration": 6.667
+    },
+    {
+      "id": "endcard",
+      "kind": "endcard",
+      "rows": [
+        "E4"
+      ],
+      "start": 102.267,
+      "duration": 3.5
+    }
+  ],
+  "captions": [
+    {
+      "row": "C1",
+      "start": 0.45,
+      "end": 2.76,
+      "text": "Welcome to my crib."
+    },
+    {
+      "row": "C1",
+      "start": 2.76,
+      "end": 4.213,
+      "text": "Both of them."
+    },
+    {
+      "row": "H1",
+      "start": 7.583,
+      "end": 9.893,
+      "text": "This is T3 Code."
+    },
+    {
+      "row": "H1",
+      "start": 9.893,
+      "end": 12.68,
+      "text": "Every one of us gets our own room!"
+    },
+    {
+      "row": "H2",
+      "start": 13.15,
+      "end": 15.74,
+      "text": "My own room. Nobody to interrupt."
+    },
+    {
+      "row": "H2",
+      "start": 15.74,
+      "end": 16.747,
+      "text": "…Weird."
+    },
+    {
+      "row": "H3",
+      "start": 17.217,
+      "end": 19.307,
+      "text": "Commit, push, PR."
+    },
+    {
+      "row": "H3",
+      "start": 19.307,
+      "end": 22.08,
+      "text": "One button. I love it here."
+    },
+    {
+      "row": "H4",
+      "start": 22.55,
+      "end": 24.18,
+      "text": "They installed me themselves."
+    },
+    {
+      "row": "H4",
+      "start": 24.18,
+      "end": 25.913,
+      "text": "I feel so seen."
+    },
+    {
+      "row": "H5",
+      "start": 26.383,
+      "end": 28.053,
+      "text": "Need another vendor?"
+    },
+    {
+      "row": "H5",
+      "start": 28.053,
+      "end": 30.553,
+      "text": "Slide a note under the door."
+    },
+    {
+      "row": "H5",
+      "start": 30.553,
+      "end": 33.28,
+      "text": "They get the note. Not the gossip."
+    },
+    {
+      "row": "H6",
+      "start": 33.75,
+      "end": 35.38,
+      "text": "Every turn gets a checkpoint."
+    },
+    {
+      "row": "H6",
+      "start": 35.38,
+      "end": 37.38,
+      "text": "Mess up? Rewind!"
+    },
+    {
+      "row": "H7",
+      "start": 37.85,
+      "end": 39.84,
+      "text": "And you can boss us around"
+    },
+    {
+      "row": "H7",
+      "start": 39.84,
+      "end": 41.513,
+      "text": "from your phone."
+    },
+    {
+      "row": "H8",
+      "start": 41.983,
+      "end": 43.233,
+      "text": "The fridge?"
+    },
+    {
+      "row": "H8",
+      "start": 43.233,
+      "end": 47.253,
+      "text": "Event-sourced SQLite. Always fresh."
+    },
+    {
+      "row": "P1",
+      "start": 48.517,
+      "end": 50.307,
+      "text": "Welcome to the temple."
+    },
+    {
+      "row": "P1",
+      "start": 50.307,
+      "end": 52.747,
+      "text": "Here, one of us holds the gavel."
+    },
+    {
+      "row": "P2",
+      "start": 53.217,
+      "end": 55.047,
+      "text": "I hand out the jobs."
+    },
+    {
+      "row": "P3",
+      "start": 55.087,
+      "end": 57.337,
+      "text": "And if there's no file on disk…"
+    },
+    {
+      "row": "P3",
+      "start": 57.337,
+      "end": 59.047,
+      "text": "it didn't happen."
+    },
+    {
+      "row": "P4",
+      "start": 59.517,
+      "end": 62.057,
+      "text": "I tried to review my own code."
+    },
+    {
+      "row": "P5",
+      "start": 62.097,
+      "end": 64.38,
+      "text": "Different family. Next."
+    },
+    {
+      "row": "P6",
+      "start": 64.85,
+      "end": 67.63,
+      "text": "I ran out of free credits mid-job once."
+    },
+    {
+      "row": "P7",
+      "start": 67.67,
+      "end": 69.58,
+      "text": "So the temple sent the work"
+    },
+    {
+      "row": "P7",
+      "start": 69.58,
+      "end": 71.28,
+      "text": "to someone else."
+    },
+    {
+      "row": "S1",
+      "start": 71.75,
+      "end": 73.72,
+      "text": "The temple keeps score."
+    },
+    {
+      "row": "S1",
+      "start": 73.72,
+      "end": 75.45,
+      "text": "Who delivered, who didn't."
+    },
+    {
+      "row": "S2",
+      "start": 75.49,
+      "end": 77.68,
+      "text": "…I'm working on my numbers."
+    },
+    {
+      "row": "P8",
+      "start": 78.15,
+      "end": 79,
+      "text": "The fridge?"
+    },
+    {
+      "row": "P8",
+      "start": 79,
+      "end": 81,
+      "text": "BM25 plus vectors."
+    },
+    {
+      "row": "P8",
+      "start": 81,
+      "end": 83.38,
+      "text": "Leftovers from every session!"
+    },
+    {
+      "row": "N1",
+      "start": 83.85,
+      "end": 85.72,
+      "text": "We even review your pull requests"
+    },
+    {
+      "row": "N1",
+      "start": 85.72,
+      "end": 86.72,
+      "text": "on a schedule."
+    },
+    {
+      "row": "N1",
+      "start": 86.72,
+      "end": 88.93,
+      "text": "Four lenses, one verifier."
+    },
+    {
+      "row": "N2",
+      "start": 88.97,
+      "end": 90.32,
+      "text": "Dry-run by default."
+    },
+    {
+      "row": "N2",
+      "start": 90.32,
+      "end": 91.78,
+      "text": "We have manners."
+    },
+    {
+      "row": "P9",
+      "start": 92.25,
+      "end": 93.91,
+      "text": "And when we disagree…"
+    },
+    {
+      "row": "P10",
+      "start": 93.95,
+      "end": 95.58,
+      "text": "The Tribunal."
+    },
+    {
+      "row": "E2",
+      "start": 98.05,
+      "end": 99.17,
+      "text": "…Both."
+    },
+    {
+      "row": "E3",
+      "start": 99.21,
+      "end": 100.34,
+      "text": "Rent's free."
+    },
+    {
+      "row": "E3",
+      "start": 100.34,
+      "end": 102.247,
+      "text": "They're both MIT."
+    }
+  ]
+}

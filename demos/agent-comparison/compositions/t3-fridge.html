@@ -1,0 +1,36 @@
+<template>
+<style>
+#root{background:#E9ECF2}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .room{position:absolute;left:192px;top:112px}
+#root .room-tag{display:flex;align-items:center;gap:16px;padding:10px 26px 10px 10px;box-sizing:border-box;white-space:nowrap}
+#root .room-tag b{font:400 34px/1 'Archivo Black',sans-serif;letter-spacing:.035em}
+#root .room-tag em{font-style:normal}
+#root .room-mark{display:flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none}
+#root .room-tag.t3 .room-mark{background:url('assets/icons/t3code.svg') center/contain no-repeat}
+#root .room-tag.ptah .room-mark{background:url('assets/brand/ptah-emblem-gold.png') center/contain no-repeat}
+#root .room-tag.t3{background:#FFFFFF;color:#000000;border-left:9px solid #1B4ED8;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+#root .room-tag.t3 em{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;line-height:1;color:#1B4ED8;background:#EEF2FF;border-radius:8px;padding:6px 12px}
+#root .room-tag.ptah{background:rgba(20,14,8,.92);color:#FFF6E5;border-left:9px solid #E8A33D;border-radius:3px;box-shadow:8px 8px 0 rgba(0,0,0,.5)}
+#root .room-tag.ptah .room-mark{width:58px;height:58px}
+#root .room-tag.ptah em{font:600 28px/1 Inter,sans-serif;color:#E8A33D}
+</style>
+<div id="root" data-composition-id="t3-fridge" data-width="1920" data-height="1080" data-duration="6.134"><canvas id="t3-fridge-canvas" width="1920" height="1080"></canvas><div id="t3-fridge-room0" class="clip overlay" data-start="0.100" data-duration="6.034"><div class="inner"><div class="room"><div id="t3-fridge-room0-tag" class="room-tag t3"><span class="room-mark" role="img" aria-label="T3 Code logo"></span><b>THE FRIDGE</b></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#t3-fridge-room0-tag',{clipPath:'inset(0% 100% 0% 0%)',x:-24},{clipPath:'inset(0% 0% 0% 0%)',x:0,duration:0.200,ease:'power3.out'},0.100);
+window.__timelines=window.__timelines||{};
+window.__timelines['t3-fridge']=tl;
+window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+window.__hf.buildReady['t3-fridge']=window.TribunalReady.then(api=>api.mount({"id":"t3-fridge","kind":"t3-fridge","absoluteStart":41.533,"duration":6.134,"clock":"scene","host":"Codex","rows":[{"row":"H8","speaker":"Codex","start":42.133,"duration":4.454,"localStart":0.6,"kind":"line","words":[{"word":"The","start":0.6,"end":0.72},{"word":"fridge?","start":0.78,"end":1.22},{"word":"Event-sourced","start":1.78,"end":2.6},{"word":"SQLite.","start":2.78,"end":3.58},{"word":"Always","start":4.06,"end":4.42},{"word":"fresh.","start":4.52,"end":4.92}]}],"actions":{"fridgeOpen":1.24},"sfx":[{"id":"fridge-t3","take":"fridge-open-1","hit":1.24,"volume":0.7}],"cast":{"Claude":{"color":"#D97757","icon":"assets/icons/claude.png"},"Codex":{"color":"#10A37F","icon":"assets/icons/codex.png"},"Cursor":{"color":"#8C8CFF","icon":"assets/icons/cursor.png"},"Antigravity":{"color":"#4F8BF5","icon":"assets/icons/antigravity.png"},"OpenCode":{"color":"#111111","icon":"assets/icons/opencode.png"},"Conductor":{"color":"#E8A33D","icon":"assets/brand/ptah-emblem-gold.png"}}},document.getElementById('t3-fridge-canvas')));
+}
+</script>
+</template>

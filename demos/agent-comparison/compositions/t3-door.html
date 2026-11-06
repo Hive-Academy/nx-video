@@ -1,0 +1,52 @@
+<template>
+<style>
+#root{background:#E9ECF2}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .room{position:absolute;left:192px;top:112px}
+#root .room-tag{display:flex;align-items:center;gap:16px;padding:10px 26px 10px 10px;box-sizing:border-box;white-space:nowrap}
+#root .room-tag b{font:400 34px/1 'Archivo Black',sans-serif;letter-spacing:.035em}
+#root .room-tag em{font-style:normal}
+#root .room-mark{display:flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none}
+#root .room-tag.t3 .room-mark{background:url('assets/icons/t3code.svg') center/contain no-repeat}
+#root .room-tag.ptah .room-mark{background:url('assets/brand/ptah-emblem-gold.png') center/contain no-repeat}
+#root .room-tag.t3{background:#FFFFFF;color:#000000;border-left:9px solid #1B4ED8;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+#root .room-tag.t3 em{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;line-height:1;color:#1B4ED8;background:#EEF2FF;border-radius:8px;padding:6px 12px}
+#root .room-tag.ptah{background:rgba(20,14,8,.92);color:#FFF6E5;border-left:9px solid #E8A33D;border-radius:3px;box-shadow:8px 8px 0 rgba(0,0,0,.5)}
+#root .room-tag.ptah .room-mark{width:58px;height:58px}
+#root .room-tag.ptah em{font:600 28px/1 Inter,sans-serif;color:#E8A33D}
+
+#root .address{position:absolute;left:184px;top:120px}
+#root .address-card{position:relative;display:flex;align-items:center;gap:28px;padding:22px 46px 24px 26px;transform:skewX(-8deg);box-sizing:border-box}
+#root .address-card .ac-in{display:flex;align-items:center;gap:28px;transform:skewX(8deg)}
+#root .address-card .ac-logo{width:128px;height:128px;flex:none;display:block;object-fit:contain}
+#root .address-card .ac-text{display:flex;flex-direction:column;gap:6px}
+#root .address-card strong{font:400 84px/.95 'Archivo Black',sans-serif;letter-spacing:-.01em;white-space:nowrap}
+#root .address-card span{font:700 40px/1 Inter,sans-serif;white-space:nowrap;letter-spacing:.01em}
+#root .address-card.t3{background:#FFFFFF;border:5px solid #000000;box-shadow:12px 12px 0 #000000}
+#root .address-card.t3 strong{color:#000000}
+#root .address-card.t3 span{color:#1B4ED8}
+#root .address-card.ptah{background:#140E08;border:5px solid #E8A33D;box-shadow:12px 12px 0 #000}
+#root .address-card.ptah .ac-logo{width:140px;height:140px;margin:-6px 0}
+#root .address-card.ptah strong{color:#FFF6E5}
+#root .address-card.ptah span{color:#E8A33D}
+</style>
+<div id="root" data-composition-id="t3-door" data-width="1920" data-height="1080" data-duration="5.967"><canvas id="t3-door-canvas" width="1920" height="1080"></canvas><div id="t3-door-address" class="clip overlay" data-start="0.100" data-duration="2.467"><div class="inner"><div class="address"><div id="t3-door-address-wipe"><div class="address-card t3"><div class="ac-in"><img class="ac-logo" src="assets/icons/t3code.svg" alt="T3 Code logo"><span class="ac-text"><strong>T3 Code</strong><span>t3.codes</span></span></div></div></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo('#t3-door-address-wipe',{clipPath:'inset(-30px 100% -30px -40px)',x:-40},{clipPath:'inset(-30px -40px -30px -40px)',x:0,duration:0.267,ease:'power3.out'},0.100);
+tl.to('#t3-door-address-wipe',{clipPath:'inset(-30px -40px -30px 100%)',x:30,duration:0.200,ease:'power2.in'},2.367);
+window.__timelines=window.__timelines||{};
+window.__timelines['t3-door']=tl;
+window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+window.__hf.buildReady['t3-door']=window.TribunalReady.then(api=>api.mount({"id":"t3-door","kind":"t3-door","absoluteStart":6.733,"duration":5.967,"clock":"scene","host":"Claude","rows":[{"row":"H1","speaker":"Claude","start":7.673,"duration":4.418,"localStart":0.94,"kind":"line","words":[{"word":"This","start":1,"end":1.24},{"word":"is","start":1.46,"end":1.66},{"word":"T3","start":1.72,"end":2.32},{"word":"Code.","start":2.5,"end":2.86},{"word":"Every","start":3.24,"end":3.46},{"word":"one","start":3.6,"end":3.68},{"word":"of","start":3.74,"end":3.8},{"word":"us","start":3.88,"end":4.06},{"word":"gets","start":4.1,"end":4.34},{"word":"our","start":4.4,"end":4.6},{"word":"own","start":4.68,"end":4.86},{"word":"room!","start":4.959,"end":5.26}]}],"actions":{"doorbell":0.08,"addressCard":0.1,"doorOpen":2.91},"sfx":[{"id":"doorbell-t3","take":"doorbell-2","hit":0.08,"volume":0.55},{"id":"door-open-t3","take":"door-open-1","hit":2.91,"volume":0.6}],"cast":{"Claude":{"color":"#D97757","icon":"assets/icons/claude.png"},"Codex":{"color":"#10A37F","icon":"assets/icons/codex.png"},"Cursor":{"color":"#8C8CFF","icon":"assets/icons/cursor.png"},"Antigravity":{"color":"#4F8BF5","icon":"assets/icons/antigravity.png"},"OpenCode":{"color":"#111111","icon":"assets/icons/opencode.png"},"Conductor":{"color":"#E8A33D","icon":"assets/brand/ptah-emblem-gold.png"}}},document.getElementById('t3-door-canvas')));
+}
+</script>
+</template>
