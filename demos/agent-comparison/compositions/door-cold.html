@@ -1,0 +1,36 @@
+<template>
+<style>
+#root{background:#2A2F3A}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .room{position:absolute;left:192px;top:112px}
+#root .room-tag{display:flex;align-items:center;gap:16px;padding:10px 26px 10px 10px;box-sizing:border-box;white-space:nowrap}
+#root .room-tag b{font:400 34px/1 'Archivo Black',sans-serif;letter-spacing:.035em}
+#root .room-tag em{font-style:normal}
+#root .room-mark{display:flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none}
+#root .room-tag.t3 .room-mark{background:url('assets/icons/t3code.svg') center/contain no-repeat}
+#root .room-tag.ptah .room-mark{background:url('assets/brand/ptah-emblem-gold.png') center/contain no-repeat}
+#root .room-tag.t3{background:#FFFFFF;color:#000000;border-left:9px solid #1B4ED8;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+#root .room-tag.t3 em{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;line-height:1;color:#1B4ED8;background:#EEF2FF;border-radius:8px;padding:6px 12px}
+#root .room-tag.ptah{background:rgba(20,14,8,.92);color:#FFF6E5;border-left:9px solid #E8A33D;border-radius:3px;box-shadow:8px 8px 0 rgba(0,0,0,.5)}
+#root .room-tag.ptah .room-mark{width:58px;height:58px}
+#root .room-tag.ptah em{font:600 28px/1 Inter,sans-serif;color:#E8A33D}
+</style>
+<div id="root" data-composition-id="door-cold" data-width="1920" data-height="1080" data-duration="4.233"><canvas id="door-cold-canvas" width="1920" height="1080"></canvas></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+
+window.__timelines=window.__timelines||{};
+window.__timelines['door-cold']=tl;
+window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+window.__hf.buildReady['door-cold']=window.TribunalReady.then(api=>api.mount({"id":"door-cold","kind":"door-cold","absoluteStart":0,"duration":4.233,"clock":"scene","host":"Codex","rows":[{"row":"C1","speaker":"Codex","start":0.54,"duration":3.072,"localStart":0.54,"kind":"line","words":[{"word":"Welcome","start":0.6,"end":0.98},{"word":"to","start":1.04,"end":1.12},{"word":"my","start":1.16,"end":1.36},{"word":"crib.","start":1.44,"end":1.84},{"word":"Both","start":2.84,"end":3.06},{"word":"of","start":3.1,"end":3.16},{"word":"them.","start":3.22,"end":3.52}]}],"actions":{"doorbell":0.6,"bothOfThem":2.84},"sfx":[{"id":"doorbell-c1","take":"doorbell-1","hit":0.6,"volume":0.4}],"cast":{"Claude":{"color":"#D97757","icon":"assets/icons/claude.png"},"Codex":{"color":"#10A37F","icon":"assets/icons/codex.png"},"Cursor":{"color":"#8C8CFF","icon":"assets/icons/cursor.png"},"Antigravity":{"color":"#4F8BF5","icon":"assets/icons/antigravity.png"},"OpenCode":{"color":"#111111","icon":"assets/icons/opencode.png"},"Conductor":{"color":"#E8A33D","icon":"assets/brand/ptah-emblem-gold.png"}}},document.getElementById('door-cold-canvas')));
+}
+</script>
+</template>

@@ -1,0 +1,46 @@
+<template>
+<style>
+#root{background:#2A2F3A}
+#root{position:absolute;inset:0;overflow:hidden}
+#root canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#root .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;color:#FFF6E5;font-family:'Archivo Black',sans-serif}
+#root .inner{position:absolute;inset:0}
+#root .badge{display:flex;align-items:center;justify-content:center;border-radius:50%;background:#FFF6E5;border:5px solid #1A1410;box-sizing:border-box;box-shadow:6px 6px 0 #1A1410}
+#root .badge img{width:62%;height:62%;object-fit:contain;display:block}
+#root .badge.dark{background:#1A1410;border-color:#1A1410}
+#root .badge.dark img{width:86%;height:86%}
+
+#root .room{position:absolute;left:192px;top:112px}
+#root .room-tag{display:flex;align-items:center;gap:16px;padding:10px 26px 10px 10px;box-sizing:border-box;white-space:nowrap}
+#root .room-tag b{font:400 34px/1 'Archivo Black',sans-serif;letter-spacing:.035em}
+#root .room-tag em{font-style:normal}
+#root .room-mark{display:flex;align-items:center;justify-content:center;width:54px;height:54px;flex:none}
+#root .room-tag.t3 .room-mark{background:url('assets/icons/t3code.svg') center/contain no-repeat}
+#root .room-tag.ptah .room-mark{background:url('assets/brand/ptah-emblem-gold.png') center/contain no-repeat}
+#root .room-tag.t3{background:#FFFFFF;color:#000000;border-left:9px solid #1B4ED8;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+#root .room-tag.t3 em{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;line-height:1;color:#1B4ED8;background:#EEF2FF;border-radius:8px;padding:6px 12px}
+#root .room-tag.ptah{background:rgba(20,14,8,.92);color:#FFF6E5;border-left:9px solid #E8A33D;border-radius:3px;box-shadow:8px 8px 0 rgba(0,0,0,.5)}
+#root .room-tag.ptah .room-mark{width:58px;height:58px}
+#root .room-tag.ptah em{font:600 28px/1 Inter,sans-serif;color:#E8A33D}
+
+#root .e1-zone{position:absolute;left:0;right:0;bottom:100px;display:flex;justify-content:center}
+#root .e1-plate{position:relative;background:#1A1410;border:6px solid #FFF6E5;box-shadow:14px 14px 0 #C2126B;padding:20px 54px 30px}
+#root .e1-in{display:flex;flex-direction:column;align-items:center;gap:12px}
+#root .e1-in small{font:italic 700 42px/1 Inter,sans-serif;color:#E8A33D}
+#root .e1-in strong{font:400 74px/1.04 'Archivo Black',sans-serif;color:#FFF6E5;letter-spacing:-.01em;white-space:nowrap}
+</style>
+<div id="root" data-composition-id="both" data-width="1920" data-height="1080" data-duration="6.667"><canvas id="both-canvas" width="1920" height="1080"></canvas><div id="both-e1" class="clip overlay" data-start="0.000" data-duration="2.393"><div class="inner"><div class="e1-zone"><div id="both-e1-plate" class="e1-plate"><div class="e1-in" data-layout-allow-overlap><small>So…</small><strong>which one do you live in?</strong></div></div></div></div></div></div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+gsap.set('#both-e1-plate',{opacity:0,scale:1.9,rotation:-7});
+tl.fromTo('#both-e1-plate',{opacity:0},{opacity:1,duration:0.033,ease:'none',immediateRender:false},0.033);
+tl.fromTo('#both-e1-plate',{scale:1.9,rotation:-7},{scale:1,rotation:-2,duration:0.133,ease:'power3.in',immediateRender:false},0.033);
+tl.set('#both-e1-plate',{x:12,y:-6},0.167);tl.set('#both-e1-plate',{x:-9,y:5},0.200);tl.set('#both-e1-plate',{x:0,y:0},0.233);
+tl.to('#both-e1-plate',{scale:.6,opacity:0,duration:0.133,ease:'power2.in'},2.260);
+window.__timelines=window.__timelines||{};
+window.__timelines['both']=tl;
+window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};
+window.__hf.buildReady['both']=window.TribunalReady.then(api=>api.mount({"id":"both","kind":"both","absoluteStart":95.6,"duration":6.667,"clock":"scene","host":"Codex","rows":[{"row":"E1","speaker":null,"start":95.6,"duration":2,"localStart":0,"kind":"card","words":[]},{"row":"E2","speaker":"All five","start":98.16,"duration":0.527,"localStart":2.56,"kind":"line","speakers":["Claude","Cursor","Antigravity","OpenCode","Codex"],"words":[{"word":"…Both.","start":2.6,"end":2.96}]},{"row":"E3","speaker":"Codex","start":99.26,"duration":2.736,"localStart":3.66,"kind":"line","words":[{"word":"Rent's","start":3.76,"end":4.04},{"word":"free.","start":4.16,"end":4.54},{"word":"They're","start":4.82,"end":4.98},{"word":"both","start":5.02,"end":5.3},{"word":"MIT.","start":5.52,"end":5.98}]}],"actions":{"scratch":0.033,"turn":2.2,"sunglasses":5.52},"sfx":[{"id":"scratch-e1","take":"record-scratch-2","hit":0.033,"volume":0.9}],"cast":{"Claude":{"color":"#D97757","icon":"assets/icons/claude.png"},"Codex":{"color":"#10A37F","icon":"assets/icons/codex.png"},"Cursor":{"color":"#8C8CFF","icon":"assets/icons/cursor.png"},"Antigravity":{"color":"#4F8BF5","icon":"assets/icons/antigravity.png"},"OpenCode":{"color":"#111111","icon":"assets/icons/opencode.png"},"Conductor":{"color":"#E8A33D","icon":"assets/brand/ptah-emblem-gold.png"}}},document.getElementById('both-canvas')));
+}
+</script>
+</template>
