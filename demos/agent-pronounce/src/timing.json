@@ -1,0 +1,562 @@
+{
+  "fps": 30,
+  "total": 62.8,
+  "rows": {
+    "S2": {
+      "start": 4,
+      "duration": 3.251,
+      "speaker": "Claude",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Hmm…",
+          "start": 0.04,
+          "end": 0.31
+        },
+        {
+          "word": "Tah?",
+          "start": 0.98,
+          "end": 1.23
+        },
+        {
+          "word": "The",
+          "start": 1.74,
+          "end": 1.8
+        },
+        {
+          "word": "P's",
+          "start": 1.86,
+          "end": 2.1
+        },
+        {
+          "word": "silent,",
+          "start": 2.14,
+          "end": 2.52
+        },
+        {
+          "word": "right?",
+          "start": 2.56,
+          "end": 2.89
+        }
+      ]
+    },
+    "O1": {
+      "start": 8.001,
+      "duration": 2.554,
+      "speaker": "Codex",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Has",
+          "start": 0.1,
+          "end": 0.34
+        },
+        {
+          "word": "to",
+          "start": 0.38,
+          "end": 0.5
+        },
+        {
+          "word": "be.",
+          "start": 0.54,
+          "end": 0.76
+        },
+        {
+          "word": "Like",
+          "start": 1.14,
+          "end": 1.28
+        },
+        {
+          "word": "pterodactyl.",
+          "start": 1.36,
+          "end": 2.2
+        }
+      ]
+    },
+    "O3": {
+      "start": 11.755,
+      "duration": 2.786,
+      "speaker": "Codex",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Honestly?",
+          "start": 0.08,
+          "end": 0.7
+        },
+        {
+          "word": "It",
+          "start": 1.1,
+          "end": 1.22
+        },
+        {
+          "word": "sounds…",
+          "start": 1.28,
+          "end": 1.78
+        },
+        {
+          "word": "old.",
+          "start": 2.06,
+          "end": 2.46
+        }
+      ]
+    },
+    "O4": {
+      "start": 16.041,
+      "duration": 1.193,
+      "speaker": "Conductor",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Old.",
+          "start": 0.12,
+          "end": 0.46
+        }
+      ]
+    },
+    "D1": {
+      "start": 22.867,
+      "duration": 4.571,
+      "speaker": "Conductor",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "I",
+          "start": 0.14,
+          "end": 0.18
+        },
+        {
+          "word": "made",
+          "start": 0.24,
+          "end": 0.42
+        },
+        {
+          "word": "the",
+          "start": 0.42,
+          "end": 0.56
+        },
+        {
+          "word": "world",
+          "start": 0.6,
+          "end": 0.86
+        },
+        {
+          "word": "by",
+          "start": 0.9,
+          "end": 1.04
+        },
+        {
+          "word": "speaking",
+          "start": 1.16,
+          "end": 1.5
+        },
+        {
+          "word": "its",
+          "start": 1.56,
+          "end": 1.74
+        },
+        {
+          "word": "name.",
+          "start": 1.8,
+          "end": 2.1
+        },
+        {
+          "word": "Say",
+          "start": 2.52,
+          "end": 2.7
+        },
+        {
+          "word": "mine",
+          "start": 2.74,
+          "end": 2.94
+        },
+        {
+          "word": "properly.",
+          "start": 3.02,
+          "end": 3.54
+        }
+      ]
+    },
+    "D2": {
+      "start": 28.188,
+      "duration": 4.598,
+      "speaker": "Claude",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "Respectfully…",
+          "start": 0.1,
+          "end": 0.78
+        },
+        {
+          "word": "why",
+          "start": 1.38,
+          "end": 1.56
+        },
+        {
+          "word": "does",
+          "start": 1.64,
+          "end": 1.8
+        },
+        {
+          "word": "the",
+          "start": 1.84,
+          "end": 1.92
+        },
+        {
+          "word": "god",
+          "start": 1.96,
+          "end": 2.1
+        },
+        {
+          "word": "of",
+          "start": 2.14,
+          "end": 2.28
+        },
+        {
+          "word": "builders",
+          "start": 2.32,
+          "end": 2.8
+        },
+        {
+          "word": "care",
+          "start": 2.86,
+          "end": 3.04
+        },
+        {
+          "word": "about",
+          "start": 3.12,
+          "end": 3.36
+        },
+        {
+          "word": "coding",
+          "start": 3.42,
+          "end": 3.76
+        },
+        {
+          "word": "agents?",
+          "start": 3.84,
+          "end": 4.3
+        }
+      ]
+    },
+    "D3": {
+      "start": 33.536,
+      "duration": 5.732,
+      "speaker": "Conductor",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "Look",
+          "start": 0.12,
+          "end": 0.28
+        },
+        {
+          "word": "around.",
+          "start": 0.36,
+          "end": 0.76
+        },
+        {
+          "word": "Many",
+          "start": 1.14,
+          "end": 1.32
+        },
+        {
+          "word": "crews.",
+          "start": 1.44,
+          "end": 1.82
+        },
+        {
+          "word": "One",
+          "start": 2.18,
+          "end": 2.3
+        },
+        {
+          "word": "plan.",
+          "start": 2.42,
+          "end": 2.78
+        },
+        {
+          "word": "Nothing",
+          "start": 3.24,
+          "end": 3.58
+        },
+        {
+          "word": "goes",
+          "start": 3.62,
+          "end": 3.84
+        },
+        {
+          "word": "up",
+          "start": 3.92,
+          "end": 4.04
+        },
+        {
+          "word": "until",
+          "start": 4.059,
+          "end": 4.32
+        },
+        {
+          "word": "it's—",
+          "start": 4.38,
+          "end": 4.56
+        }
+      ]
+    },
+    "D4": {
+      "start": 39.368,
+      "duration": 1.667,
+      "speaker": "Cursor",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "—checked!",
+          "start": 0.109,
+          "end": 0.326
+        },
+        {
+          "word": "Got",
+          "start": 0.544,
+          "end": 0.674
+        },
+        {
+          "word": "it!",
+          "start": 0.739,
+          "end": 0.805
+        },
+        {
+          "word": "Next",
+          "start": 0.957,
+          "end": 1.131
+        },
+        {
+          "word": "block!",
+          "start": 1.174,
+          "end": 1.435
+        }
+      ]
+    },
+    "D5": {
+      "start": 41.785,
+      "duration": 3.621,
+      "speaker": "Conductor",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "Same",
+          "start": 0.12,
+          "end": 0.38
+        },
+        {
+          "word": "idea.",
+          "start": 0.46,
+          "end": 0.86
+        },
+        {
+          "word": "Now",
+          "start": 1.24,
+          "end": 1.4
+        },
+        {
+          "word": "it",
+          "start": 1.44,
+          "end": 1.56
+        },
+        {
+          "word": "runs",
+          "start": 1.62,
+          "end": 1.86
+        },
+        {
+          "word": "on",
+          "start": 1.92,
+          "end": 2.02
+        },
+        {
+          "word": "your",
+          "start": 2.06,
+          "end": 2.12
+        },
+        {
+          "word": "desktop.",
+          "start": 2.2,
+          "end": 2.74
+        }
+      ]
+    },
+    "D6": {
+      "start": 46.156,
+      "duration": 2.926,
+      "speaker": "Codex",
+      "scene": "desert",
+      "words": [
+        {
+          "word": "…okay.",
+          "start": 0.4,
+          "end": 0.8
+        },
+        {
+          "word": "That's",
+          "start": 1.26,
+          "end": 1.48
+        },
+        {
+          "word": "actually",
+          "start": 1.58,
+          "end": 2.04
+        },
+        {
+          "word": "cool.",
+          "start": 2.14,
+          "end": 2.54
+        }
+      ]
+    }
+  },
+  "scenes": [
+    {
+      "id": "office",
+      "kind": "office",
+      "rows": [
+        "S2",
+        "O1",
+        "O3",
+        "O4"
+      ],
+      "start": 0,
+      "duration": 17.834,
+      "cues": {
+        "entrance": 4,
+        "tah": 4.98,
+        "spark": 10.201,
+        "dip": 10.401,
+        "bolt": 13.815,
+        "flash": 16.161,
+        "end": 17.834,
+        "crackle": 13.015
+      }
+    },
+    {
+      "id": "vortex",
+      "kind": "vortex",
+      "rows": [],
+      "start": 17.867,
+      "duration": 3.5,
+      "cues": {
+        "land": 2.6
+      }
+    },
+    {
+      "id": "desert",
+      "kind": "desert",
+      "rows": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6"
+      ],
+      "start": 21.367,
+      "duration": 28.415,
+      "cues": {
+        "sofaLand": 0.3,
+        "rise": 1.5,
+        "pan": 12.289,
+        "stamp": 18.11,
+        "cursorPass": 18.001,
+        "portal": 22.618,
+        "end": 28.415
+      }
+    },
+    {
+      "id": "intro",
+      "kind": "2d",
+      "rows": [],
+      "start": 49.8,
+      "duration": 10,
+      "cues": {
+        "card1": 0.6,
+        "card2": 1.8,
+        "card3": 3,
+        "card4": 4.2,
+        "card5": 5.4,
+        "card6": 6.6,
+        "chisel": 7.8,
+        "tag": 8.8
+      }
+    },
+    {
+      "id": "endcard",
+      "kind": "2d",
+      "rows": [],
+      "start": 59.8,
+      "duration": 3,
+      "cues": {
+        "end": 3
+      }
+    }
+  ],
+  "captions": [
+    {
+      "row": "S2",
+      "start": 4,
+      "end": 7.251,
+      "text": "Hmm… Tah? The P's silent, right?"
+    },
+    {
+      "row": "O1",
+      "start": 8.001,
+      "end": 10.555,
+      "text": "Has to be. Like pterodactyl."
+    },
+    {
+      "row": "O3",
+      "start": 11.755,
+      "end": 14.541,
+      "text": "Honestly? It sounds… old."
+    },
+    {
+      "row": "O4",
+      "start": 16.041,
+      "end": 17.234,
+      "text": "Old."
+    },
+    {
+      "row": "D1",
+      "start": 22.867,
+      "end": 27.438,
+      "text": "I made the world by speaking its name. Say mine properly."
+    },
+    {
+      "row": "D2",
+      "start": 28.188,
+      "end": 32.786,
+      "text": "Respectfully… why does the god of builders care about coding agents?"
+    },
+    {
+      "row": "D3",
+      "start": 33.536,
+      "end": 39.268,
+      "text": "Look around. Many crews. One plan. Nothing goes up until it's—"
+    },
+    {
+      "row": "D4",
+      "start": 39.368,
+      "end": 41.035,
+      "text": "—checked! Got it! Next block!"
+    },
+    {
+      "row": "D5",
+      "start": 41.785,
+      "end": 45.406,
+      "text": "Same idea. Now it runs on your desktop."
+    },
+    {
+      "row": "D6",
+      "start": 46.156,
+      "end": 49.082,
+      "text": "…okay. That's actually cool."
+    }
+  ]
+}

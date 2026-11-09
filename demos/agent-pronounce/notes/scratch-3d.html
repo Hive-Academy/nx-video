@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scratch 3D — Lane B</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script type="importmap">{"imports":{"three":"../node_modules/three/build/three.module.js","three/addons/":"../node_modules/three/examples/jsm/"}}</script>
+<script>window.__hf=window.__hf||{};window.__hf.buildReady=window.__hf.buildReady||{};window.TribunalReady=new Promise(r=>window.__tribunalResolve=r)</script>
+<script type="module" src="../src/scene.js"></script>
+<style>
+  body { margin: 0; background: #101721; color: #dbe3ee; font: 13px/1.4 Consolas, monospace; }
+  #stage { position: relative; width: 1080px; height: 1350px; }
+  #view { display: block; width: 1080px; height: 1350px; background: #000; }
+  #hud {
+    position: fixed; left: 12px; top: 12px; z-index: 10; background: rgba(8,14,22,.88);
+    border: 1px solid #2c3a4e; border-radius: 10px; padding: 10px 14px; display: flex;
+    gap: 14px; align-items: center; user-select: none;
+  }
+  #hud b { color: #ffd98a; }
+  #hud input, #hud select { background: #1a2432; color: #dbe3ee; border: 1px solid #33445c; border-radius: 6px; font: inherit; padding: 3px 6px; }
+  #hud input { width: 76px; }
+  #err { position: fixed; left: 12px; bottom: 12px; max-width: 60%; z-index: 10; color: #ff9a8a; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="view" width="1080" height="1350"></canvas></div>
+<div id="hud">
+  <select id="scene">
+    <option value="office">office</option>
+    <option value="vortex">vortex</option>
+    <option value="desert">desert</option>
+  </select>
+  <span>t <input id="t" type="number" step="0.1" min="0" value="0"> <b id="mark"></b></span>
+  <span id="state">mounting…</span>
+</div>
+<div id="err"></div>
+<script>
+// Lane B's scratch rig: mounts one of the three Episode 6 3D kinds with the
+// REAL composition config (copied from compositions/*.html) and seeks a
+// scene-local time. ?scene=office&t=4.6 renders one exact frame.
+window.addEventListener('error', (e) => { document.getElementById('err').textContent += (e.message || e.error) + '\n'; });
+
+const CAST = { Claude: { color: '#D97757', icon: 'claude' }, Codex: { color: '#10A37F', icon: 'codex' }, Cursor: { color: '#8C8CFF', icon: 'cursor' }, Conductor: { color: '#E8A33D', icon: 'ptah' } };
+
+const CONFIGS = {
+  office: {
+    id: 'office', kind: 'office', absoluteStart: 6.633, duration: 14.338, clock: 'scene', host: 'office',
+    rows: [
+      { row: 'O1', speaker: 'Codex', start: 6.633, duration: 4.969, localStart: 0, words: [ { word: 'No', start: 0.1, end: 0.26 }, { word: 'no.', start: 0.38, end: 0.66 }, { word: 'Silent', start: 1.22, end: 1.66 }, { word: 'P.', start: 1.8, end: 2.12 }, { word: 'Like', start: 2.52, end: 2.68 }, { word: 'pterodactyl.', start: 2.76, end: 3.72 }, { word: 'Tah.', start: 4.16, end: 4.58 } ] },
+      { row: 'O2', speaker: 'Claude', start: 11.952, duration: 3.39, localStart: 5.319, words: [ { word: 'I', start: 5.479, end: 5.499 }, { word: 'have', start: 5.539, end: 5.719 }, { word: 'forty-three', start: 5.779, end: 6.259 }, { word: 'options.', start: 6.339, end: 6.819 }, { word: 'Pita?', start: 7.019, end: 7.299 }, { word: 'Like', start: 7.339, end: 7.739 }, { word: 'the', start: 7.779, end: 7.919 }, { word: 'bread?', start: 7.939, end: 8.179 } ] },
+      { row: 'O3', speaker: 'Codex', start: 15.692, duration: 2.786, localStart: 9.059, words: [ { word: 'Honestly?', start: 9.139, end: 9.759 }, { word: 'It', start: 10.159, end: 10.279 }, { word: 'sounds…', start: 10.339, end: 10.839 }, { word: 'old.', start: 11.119, end: 11.519 } ] },
+      { row: 'O4', speaker: 'Conductor', start: 19.078, duration: 1.193, localStart: 12.445, words: [ { word: 'Old.', start: 12.565, end: 12.905 } ] },
+    ],
+    actions: { spark: 4.58, dip: 4.78, bolt: 8.179, flash: 12.565, end: 14.338 },
+    cues: { spark: 4.58, dip: 4.78, bolt: 8.179, flash: 12.565, end: 14.338 },
+    sfx: [], cast: CAST,
+  },
+  vortex: {
+    id: 'vortex', kind: 'vortex', absoluteStart: 21, duration: 3, clock: 'scene', host: 'vortex',
+    rows: [], actions: { land: 2.6 }, cues: { land: 2.6 }, sfx: [], cast: CAST,
+  },
+  desert: {
+    id: 'desert', kind: 'desert', absoluteStart: 24, duration: 25.765, clock: 'scene', host: 'desert',
+    rows: [
+      { row: 'D1', speaker: 'Conductor', start: 24.3, duration: 4.571, localStart: 0.3, words: [ { word: 'I', start: 0.44, end: 0.48 }, { word: 'made', start: 0.54, end: 0.72 }, { word: 'the', start: 0.72, end: 0.86 }, { word: 'world', start: 0.9, end: 1.16 }, { word: 'by', start: 1.2, end: 1.34 }, { word: 'speaking', start: 1.46, end: 1.8 }, { word: 'its', start: 1.86, end: 2.04 }, { word: 'name.', start: 2.1, end: 2.4 }, { word: 'Say', start: 2.82, end: 3 }, { word: 'mine', start: 3.04, end: 3.24 }, { word: 'properly.', start: 3.32, end: 3.84 } ] },
+      { row: 'D2', speaker: 'Claude', start: 29.221, duration: 4.598, localStart: 5.221, words: [ { word: 'Respectfully…', start: 5.321, end: 6.001 }, { word: 'why', start: 6.601, end: 6.781 }, { word: 'does', start: 6.861, end: 7.021 }, { word: 'the', start: 7.061, end: 7.141 }, { word: 'god', start: 7.181, end: 7.321 }, { word: 'of', start: 7.361, end: 7.501 }, { word: 'builders', start: 7.541, end: 8.021 }, { word: 'care', start: 8.081, end: 8.261 }, { word: 'about', start: 8.341, end: 8.581 }, { word: 'coding', start: 8.641, end: 8.981 }, { word: 'agents?', start: 9.061, end: 9.521 } ] },
+      { row: 'D3', speaker: 'Conductor', start: 34.169, duration: 5.732, localStart: 10.169, words: [ { word: 'Look', start: 10.289, end: 10.449 }, { word: 'around.', start: 10.529, end: 10.929 }, { word: 'Many', start: 11.309, end: 11.489 }, { word: 'crews.', start: 11.609, end: 11.989 }, { word: 'One', start: 12.349, end: 12.469 }, { word: 'plan.', start: 12.589, end: 12.949 }, { word: 'Nothing', start: 13.409, end: 13.749 }, { word: 'goes', start: 13.789, end: 14.009 }, { word: 'up', start: 14.089, end: 14.209 }, { word: 'until', start: 14.228, end: 14.489 }, { word: "it's—", start: 14.549, end: 14.729 } ] },
+      { row: 'D4', speaker: 'Cursor', start: 39.901, duration: 1.667, localStart: 15.901, words: [ { word: '—checked!', start: 16.01, end: 16.227 }, { word: 'Got', start: 16.445, end: 16.575 }, { word: 'it!', start: 16.64, end: 16.706 }, { word: 'Next', start: 16.858, end: 17.032 }, { word: 'block!', start: 17.075, end: 17.336 } ] },
+      { row: 'D5', speaker: 'Conductor', start: 41.918, duration: 3.621, localStart: 17.918, words: [ { word: 'Same', start: 18.038, end: 18.298 }, { word: 'idea.', start: 18.378, end: 18.778 }, { word: 'Now', start: 19.158, end: 19.318 }, { word: 'it', start: 19.358, end: 19.478 }, { word: 'runs', start: 19.538, end: 19.778 }, { word: 'on', start: 19.838, end: 19.938 }, { word: 'your', start: 19.978, end: 20.038 }, { word: 'desktop.', start: 20.118, end: 20.658 } ] },
+      { row: 'D6', speaker: 'Codex', start: 46.139, duration: 2.926, localStart: 22.139, words: [ { word: '…okay.', start: 22.539, end: 22.939 }, { word: "That's", start: 23.399, end: 23.619 }, { word: 'actually', start: 23.719, end: 24.179 }, { word: 'cool.', start: 24.279, end: 24.679 } ] },
+    ],
+    actions: { sofaLand: 0.3, rise: 0.3, pan: 10.289, stamp: 16.01, cursorPass: 15.901, portal: 20.118, end: 25.765 },
+    cues: { sofaLand: 0.3, rise: 0.3, pan: 10.289, stamp: 16.01, cursorPass: 15.901, portal: 20.118, end: 25.765 },
+    sfx: [], cast: CAST,
+  },
+};
+
+const q = new URLSearchParams(location.search);
+const sceneName = CONFIGS[q.get('scene')] ? q.get('scene') : 'office';
+let t = Math.max(0, Number(q.get('t')) || 0);
+const cfg = CONFIGS[sceneName];
+t = Math.min(t, cfg.duration);
+
+document.getElementById('scene').value = sceneName;
+document.getElementById('t').value = t;
+document.getElementById('mark').textContent = `${sceneName} @ ${t.toFixed(2)}s / ${cfg.duration}s`;
+document.title = `Scratch 3D — ${sceneName} @ ${t.toFixed(2)}s`;
+
+// set before the module's mount() takes its initial sample
+window.__hfThreeTime = cfg.absoluteStart + t;
+window.__hf.buildReady[sceneName] = window.TribunalReady.then((api) => api.mount(cfg, document.getElementById('view')));
+window.__hf.buildReady[sceneName].then(() => {
+  document.getElementById('state').textContent = 'ready';
+  seek(t);
+}).catch((e) => { document.getElementById('state').textContent = 'MOUNT FAILED'; document.getElementById('err').textContent = (e && e.stack) || String(e); });
+
+function seek(local) {
+  t = Math.max(0, Math.min(cfg.duration, local));
+  window.__hfThreeTime = cfg.absoluteStart + t;
+  window.dispatchEvent(new CustomEvent('hf-seek', { detail: { time: window.__hfThreeTime } }));
+  document.getElementById('t').value = t.toFixed(2);
+  document.getElementById('mark').textContent = `${sceneName} @ ${t.toFixed(2)}s / ${cfg.duration}s`;
+  document.title = `Scratch 3D — ${sceneName} @ ${t.toFixed(2)}s`;
+}
+document.getElementById('t').addEventListener('change', (e) => seek(Number(e.target.value)));
+document.getElementById('scene').addEventListener('change', (e) => {
+  const u = new URL(location); u.searchParams.set('scene', e.target.value); location = u;
+});
+addEventListener('keydown', (e) => {
+  const step = e.shiftKey ? 0.5 : 0.1;
+  if (e.key === 'ArrowLeft') { seek(t - step); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { seek(t + step); e.preventDefault(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "note": "T3 Code brand reference for the loft (identify only, never mock). Source: t3code repo commit 132be33 (2026-11-05), read-only. Hex values for oklch tokens converted with the standard OKLab matrix.",
+  "logo": {
+    "svg": "assets/icons/t3code.svg",
+    "png": "assets/icons/t3code.png",
+    "markOnly": "assets/icons/t3code-mark.svg",
+    "markOnlyPng": "assets/icons/t3code-mark.png",
+    "description": "White 'T3' glyphs on a black rounded square (128 px, radius 10). markOnly is the white T3 glyphs alone, for dark grounds.",
+    "source": "t3code/assets/prod/logo.svg and assets/prod/app-icon.icon/Assets/text.svg"
+  },
+  "colors": {
+    "black": "#000000",
+    "white": "#FFFFFF",
+    "primaryLight": "#1B4ED8",
+    "primaryDark": "#346BF1",
+    "siteAccent": "#457CFD",
+    "glowIndigo": "#696FEA",
+    "lightBackground": "#FCFCFC",
+    "zinc100": "#F4F4F5",
+    "zinc200Border": "#E4E4E7",
+    "zinc500Muted": "#71717A",
+    "zinc900Text": "#18181B",
+    "darkCard": "#0A0A0A",
+    "darkAccent": "#191A1D",
+    "pwaBackground": "#161616"
+  },
+  "sources": {
+    "primaryLight": "apps/web/src/index.css --primary: oklch(0.488 0.217 264) (light theme)",
+    "primaryDark": "apps/web/src/index.css --primary: oklch(0.571 0.21 264) (dark theme)",
+    "siteAccent": "apps/marketing/src/pages/index.astro oklch(0.62 0.2 264)",
+    "glowIndigo": "apps/marketing/src/pages/index.astro rgba(105,111,234,.4-.7) glows",
+    "lightBackground": "apps/web/src/index.css --background: zinc-25 = oklch(99.2% 0 0)",
+    "black": "apps/web/index.html and marketing theme-color #000000; dark --background #000",
+    "pwaBackground": "apps/web/public/manifest.webmanifest background_color"
+  },
+  "look": "Monochrome: black and white surfaces, zinc greys, thin 1 px white/8% borders, generous rounding (squircle app tiles), one electric-blue accent (#346BF1 on dark, #1B4ED8 on light) used sparingly for links, status and focus. Marketing site: black ground with a faint 1 px grid and soft indigo glow, white geometric sans headline. For a bright daylight loft: white/zinc-25 walls, zinc-200 trim, black accents (door frames, the logo plaque), one blue accent per room."
+}

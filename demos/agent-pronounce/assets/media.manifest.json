@@ -1,0 +1,267 @@
+{
+  "items": [
+    {
+      "path": "assets/third-party/hdri/kloofendal_48d_partly_cloudy_puresky_1k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_puresky_1k.hdr",
+      "title": "Kloofendal 48d Partly Cloudy (Pure Sky)",
+      "author": "Greg Zaal",
+      "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "fd94c84997b8a3c353b62c2125a9b44e19509956986a126e472684432a02d798"
+    },
+    {
+      "path": "assets/third-party/models/office/sofa-long.glb",
+      "url": "https://static.poly.pizza/1b04ad72-7896-4ba3-9003-46d6119bfd6e.glb",
+      "title": "Lounge Sofa Long",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/gX7VhrgdIE",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "d6591caeb972c7654213300ee50aa2f0815e411ef2e810c4800a3ab563e2f1b1"
+    },
+    {
+      "path": "assets/third-party/models/office/sofa.glb",
+      "url": "https://static.poly.pizza/f47310a0-4d22-48a3-a2ce-62f67bcc998d.glb",
+      "title": "Lounge Sofa",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/jMu2iCmGxU",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "606b37242383d7b56e53847a444dfd47abf7522d10671f62813473ee9b2ba3a1"
+    },
+    {
+      "path": "assets/third-party/models/office/laptop.glb",
+      "url": "https://static.poly.pizza/8190e659-7079-442f-9ed9-083f67b1746b.glb",
+      "title": "Laptop",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/GnbwSUiVty",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "387328b3c6530213770fb579545fa8cc27cc4ee6cf710f3f01bb28873da99b5e"
+    },
+    {
+      "path": "assets/third-party/models/office/coffee-table.glb",
+      "url": "https://static.poly.pizza/9236b518-183f-4e36-8c59-4037a8c07639.glb",
+      "title": "Table Coffee Glass",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/gPANIgapqV",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "ddeed677447b0538ea185de4e6a51937dd594bde38bc81794f7e828f6fa67bbf"
+    },
+    {
+      "path": "assets/third-party/models/office/potted-plant.glb",
+      "url": "https://static.poly.pizza/6482596c-6423-415d-bfd5-e66bcc546642.glb",
+      "title": "Potted Plant",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/23Dx9CC95C",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "533b5588b34e57ec27c72dcfc6a4dc76b8b39b48fff808e745dbb201842d6643"
+    },
+    {
+      "path": "assets/third-party/models/office/plant-small.glb",
+      "url": "https://static.poly.pizza/b892ee12-370d-4dae-aa14-d377b89f9413.glb",
+      "title": "Plant Small",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/4f6vwL8vo9",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "b856d5a38a8343ec7dc43921dfcc49af8614afbb91d16ef0a18d7ca99a26801c"
+    },
+    {
+      "path": "assets/third-party/models/office/lamp-floor.glb",
+      "url": "https://static.poly.pizza/98dd45a1-0682-4d44-83d1-32fa2a4fca5b.glb",
+      "title": "Lamp Round Floor",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/8LiDIfXVLi",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "66c669325a563ec4d9843a4c1e5a9f96c30abad13d0db710b4c00306e9cfbdc8"
+    },
+    {
+      "path": "assets/third-party/models/office/rug.glb",
+      "url": "https://static.poly.pizza/8bc9a56c-7fc3-4aaa-9a97-a765a94b8287.glb",
+      "title": "Rug Rounded",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/6RpHup9ZHp",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "6af86a680fd74a5fdaf682044866d2793652168d223860a967c903774c85e5fc"
+    },
+    {
+      "path": "assets/third-party/models/office/bookcase.glb",
+      "url": "https://static.poly.pizza/867fee8d-2b89-4383-92f9-58660a76d29a.glb",
+      "title": "Bookcase Open",
+      "author": "Kenney",
+      "source": "https://poly.pizza/m/MTH8ZwnA27",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "c37b34a2d36d3f7583ab1cd28555078c5d4840f1d38341cdce9cc1222e1b7d25"
+    },
+    {
+      "path": "assets/third-party/models/desert/step-pyramid.glb",
+      "url": "https://static.poly.pizza/3d94f9fc-1295-4b95-983b-9dfe4e6292cb.glb",
+      "title": "Step Pyramid",
+      "author": "Jarlan Perez",
+      "source": "https://poly.pizza/m/5fksyItujX1",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "fb650bc15787c1c4552147ae7181d9c2911d4728cd006313089df2986a629b65"
+    },
+    {
+      "path": "assets/third-party/models/desert/pyramid.glb",
+      "url": "https://static.poly.pizza/c325c0f2-9c30-427a-acfe-c11d466a3c5d.glb",
+      "title": "Pyramid",
+      "author": "Poly by Google",
+      "source": "https://poly.pizza/m/62oCD2veCi8",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "ce134750d2aaa40ffdd2f23adee0fda929aba5c1b3aa1eefa448226c31a40b64"
+    },
+    {
+      "path": "assets/third-party/models/desert/palm-a.glb",
+      "url": "https://static.poly.pizza/bf8ad239-46f9-46c1-bb76-c8c6bbf91493.glb",
+      "title": "Palm tree",
+      "author": "Poly by Google",
+      "source": "https://poly.pizza/m/0wynxxLgrpX",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "47075fc24977c17140b0af823b9e707fc588f5378026e83ba909ee8e1e1c748e"
+    },
+    {
+      "path": "assets/third-party/models/desert/palm-b.glb",
+      "url": "https://static.poly.pizza/8aed6d14-6648-437e-a365-d9bdbb4a0a0c.glb",
+      "title": "Palm Tree 01",
+      "author": "Jarlan Perez",
+      "source": "https://poly.pizza/m/3Z-j3UC5jPe",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "f1458bb95f3b5d5288e05c4d031f58745bd647f4ae5439884cac230c8c537f9a"
+    },
+    {
+      "path": "assets/third-party/models/desert/sled.glb",
+      "url": "https://static.poly.pizza/117cebaf-7952-4978-bfd4-12693733d7c0.glb",
+      "title": "Sled",
+      "author": "Poly by Google",
+      "source": "https://poly.pizza/m/1_Sd_OBmf5P",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "b7e9e4e9db043be88c50a5fb54f977b7991247cb9e51f5ca86fa2232cce1f35c"
+    },
+    {
+      "path": "assets/third-party/models/desert/temple.glb",
+      "url": "https://static.poly.pizza/cce8f2f7-faf4-4f54-b1fa-1f824e180f7a.glb",
+      "title": "Temple",
+      "author": "Poly by Google",
+      "source": "https://poly.pizza/m/5ii3ywpObcd",
+      "licence": "CC-BY-3.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "d4b72ccbb9f6f411d9daa0755b06a6b2875f566e69140ee4a7ef8e5a83fa2977"
+    },
+    {
+      "path": "assets/third-party/models/desert/pillar.glb",
+      "url": "https://static.poly.pizza/459e3296-6e9c-4360-a2db-d2fb875bd670.glb",
+      "title": "Pillar",
+      "author": "Kay Lousberg",
+      "source": "https://poly.pizza/m/1nt8n3rVKU",
+      "licence": "CC0-1.0",
+      "changes": "Rescaled, recoloured to the episode palette",
+      "sha256": "c873e8376a1dcfbf185a7276c28169b494c318f19eb16ffe16648e49eee699c6"
+    },
+    {
+      "path": "assets/third-party/hdri/quarry_01_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/quarry_01_2k.hdr",
+      "title": "Quarry 01",
+      "author": "Sergej Majboroda",
+      "source": "https://polyhaven.com/a/quarry_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "14afaff71929dbb29624277100e03700925420f3c016e032a6d494672c34a7b4"
+    },
+    {
+      "path": "assets/third-party/textures/aerial_sand/aerial_sand_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_sand/aerial_sand_diff_1k.jpg",
+      "title": "Aerial Sand",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/aerial_sand",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "d5195c44aec087d2a30d3ca3a3fa3458a1898986e0572e9a8043f8245598557a"
+    },
+    {
+      "path": "assets/third-party/textures/aerial_sand/aerial_sand_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_sand/aerial_sand_nor_gl_1k.jpg",
+      "title": "Aerial Sand",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/aerial_sand",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "cba74d670a681dfcdd72db72afbcb9879c7ec9f5854adae24cac8da2c432ad99"
+    },
+    {
+      "path": "assets/third-party/textures/aerial_sand/aerial_sand_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_sand/aerial_sand_rough_1k.jpg",
+      "title": "Aerial Sand",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/aerial_sand",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "7cccecb1d8d35a5404e1006688e3bd2b6675abe3c95ff26312a872a41d792897"
+    },
+    {
+      "path": "assets/third-party/textures/rock030/Rock030_1K-JPG_Color.jpg",
+      "url": "https://ambientcg.com/get?file=Rock030_1K-JPG.zip",
+      "title": "Rock 030",
+      "author": "ambientCG",
+      "source": "https://ambientcg.com/view?id=Rock030",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "extract": "Rock030_1K-JPG_Color.jpg",
+      "sha256": "1dca8a336518ce0adca4b5cbe2ab30819c8769388f1c15278082a99f022c615a"
+    },
+    {
+      "path": "assets/third-party/textures/rock030/Rock030_1K-JPG_NormalGL.jpg",
+      "url": "https://ambientcg.com/get?file=Rock030_1K-JPG.zip",
+      "title": "Rock 030",
+      "author": "ambientCG",
+      "source": "https://ambientcg.com/view?id=Rock030",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "extract": "Rock030_1K-JPG_NormalGL.jpg",
+      "sha256": "8fd1d22eb6c7b6e4a374196c0de791f724538b8b86eb9c7a946fec1f5834cb94"
+    },
+    {
+      "path": "assets/third-party/textures/rock030/Rock030_1K-JPG_Roughness.jpg",
+      "url": "https://ambientcg.com/get?file=Rock030_1K-JPG.zip",
+      "title": "Rock 030",
+      "author": "ambientCG",
+      "source": "https://ambientcg.com/view?id=Rock030",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "extract": "Rock030_1K-JPG_Roughness.jpg",
+      "sha256": "f37850f72994458994716d084683d80611528d1685264bde3071569e8ca53489"
+    },
+    {
+      "path": "assets/third-party/hdri/rogland_sunset_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/rogland_sunset_2k.hdr",
+      "title": "Rogland Sunset",
+      "author": "Greg Zaal",
+      "source": "https://polyhaven.com/a/rogland_sunset",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "27ee3f4e044688f3c46eea32a56e96188ab4dd0492f9e614f6764c4ac25defae"
+    },
+    {
+      "path": "assets/third-party/hdri/qwantani_late_afternoon_puresky_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/qwantani_late_afternoon_puresky_2k.hdr",
+      "title": "Qwantani Late Afternoon (Pure Sky)",
+      "author": "Greg Zaal, Jarod Guest",
+      "source": "https://polyhaven.com/a/qwantani_late_afternoon_puresky",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "d1c4d610811b7b94328d67fa48fc107078af21318197e5b937310c825d72074d"
+    }
+  ]
+}

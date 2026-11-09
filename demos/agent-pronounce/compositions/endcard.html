@@ -1,0 +1,39 @@
+<template>
+<style>
+#root{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#1A100C}
+#root .stage{position:absolute;inset:0}
+#root .wash{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,#4A2C1C 0%,#2A1810 46%,#140E0B 100%)}
+#root .stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:72px 28px 140px;gap:18px}
+#root .emblem{display:block;width:240px;height:240px;object-fit:contain}
+#root .lines{display:flex;flex-direction:column;align-items:center;gap:6px}
+#root .line{display:block;font-family:"EB Garamond",serif;font-weight:700;font-size:64px;line-height:1.12;letter-spacing:-.025em;color:#FFF6E6;white-space:nowrap}
+#root .url{display:block;margin-top:8px;font-family:Inter,sans-serif;font-weight:700;font-size:56px;line-height:1;letter-spacing:.01em;color:#E8A33D}
+#root .credit{position:absolute;left:32px;right:32px;bottom:52px;text-align:center;font-family:Inter,sans-serif;font-weight:500;font-size:34px;line-height:1.2;color:#F3E6D4}
+</style>
+<div data-hf-id="hf-a6pk" id="root" data-composition-id="endcard" data-width="1080" data-height="1350" data-duration="3.000">
+<div data-hf-id="hf-tqdl" id="endcard-main" class="clip stage" data-start="0.000" data-duration="3.000" data-track-index="1">
+<div data-hf-id="hf-7h0d" class="wash"></div>
+<div data-hf-id="hf-t5dh" id="endcard-stack" class="stack" data-hold="">
+<img data-hf-id="hf-0kzs" id="endcard-emblem" class="emblem" src="assets/brand/ptah-emblem-gold.png" alt="Ptah emblem">
+<div data-hf-id="hf-qvs1" class="lines">
+<p data-hf-id="hf-yo7l" id="endcard-line1" class="line">Named after the god of builders.</p>
+<p data-hf-id="hf-oifw" id="endcard-line2" class="line">Now it builds with your agents.</p>
+</div>
+<p data-hf-id="hf-4cw0" id="endcard-url" class="url">ptah.live</p>
+</div>
+<p data-hf-id="hf-hw81" id="endcard-credit" class="credit">Robot: 'cute robot' by victory_mirosya, CC BY 4.0</p>
+</div>
+</div>
+<script>
+{ const tl=gsap.timeline({paused:true});
+tl.fromTo("#endcard-emblem",{opacity:0,y:26,scale:0.94},{opacity:1,y:0,scale:1,duration:0.7,ease:"power2.out"},0.12);
+tl.fromTo("#endcard-line1",{opacity:0,y:16},{opacity:1,y:0,duration:0.5,ease:"power2.out"},0.38);
+tl.fromTo("#endcard-line2",{opacity:0,y:16},{opacity:1,y:0,duration:0.5,ease:"power2.out"},0.58);
+tl.fromTo("#endcard-url",{opacity:0,y:12},{opacity:1,y:0,duration:0.45,ease:"power2.out"},0.82);
+tl.fromTo("#endcard-credit",{opacity:0},{opacity:1,duration:0.4,ease:"power1.out"},1.05);
+tl.fromTo("#endcard-emblem",{scale:1},{scale:1.035,duration:1.7,ease:"sine.inOut",immediateRender:false},1.2);
+window.__timelines=window.__timelines||{};
+window.__timelines["endcard"]=tl;
+}
+</script>
+</template>

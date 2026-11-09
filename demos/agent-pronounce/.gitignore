@@ -1,0 +1,38 @@
+# Local maintainer note (contains an unverified security question)
+PTAH-ENHANCEMENTS.md
+
+node_modules/
+renders/
+snapshots/
+.hyperframes/
+.thumbnails/
+
+# Generated or downloaded media. tools/guards/no-media.mjs rejects these in
+# this public repository; README.md says how to restore each one.
+assets/audio/
+assets/backgrounds/
+assets/third-party/
+*.mp4
+*.webm
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.glb
+*.gltf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+*.woff
+*.woff2
+
+# GPU driver logs that headless Chrome drops into the working folder
+NVIDIA Corporation/
+
+# Local agent harness files and the HyperFrames waveform cache
+.claude/
+.ptah/
+.waveform-cache/
