@@ -43,4 +43,5 @@ dist/video/
 .codex/agents/
 .github/agents/
 .github/skills/
+.opencode/agent/
 # ptah:harness:end
