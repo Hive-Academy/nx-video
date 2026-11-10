@@ -1,39 +1,35 @@
-<template>
+﻿<template>
 <style>
-#root{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#1A100C}
-#root .stage{position:absolute;inset:0}
-#root .wash{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 38%,#4A2C1C 0%,#2A1810 46%,#140E0B 100%)}
-#root .stack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:72px 28px 140px;gap:18px}
-#root .emblem{display:block;width:240px;height:240px;object-fit:contain}
-#root .lines{display:flex;flex-direction:column;align-items:center;gap:6px}
-#root .line{display:block;font-family:"EB Garamond",serif;font-weight:700;font-size:64px;line-height:1.12;letter-spacing:-.025em;color:#FFF6E6;white-space:nowrap}
-#root .url{display:block;margin-top:8px;font-family:Inter,sans-serif;font-weight:700;font-size:56px;line-height:1;letter-spacing:.01em;color:#E8A33D}
-#root .credit{position:absolute;left:32px;right:32px;bottom:52px;text-align:center;font-family:Inter,sans-serif;font-weight:500;font-size:34px;line-height:1.2;color:#F3E6D4}
+#root{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;background:#38251d}
+#root .stage,#root .wall{position:absolute;inset:0}
+#root .wall{background:url('assets/intro/wall.svg') center/cover no-repeat;transform-origin:center;filter:brightness(.38) saturate(.78)}
+#root .shade{position:absolute;inset:0;background:radial-gradient(ellipse at 29% 20%,rgba(237,158,78,.21),transparent 45%),linear-gradient(90deg,rgba(24,21,26,.44),rgba(20,19,27,.20) 55%,rgba(14,16,22,.56));pointer-events:none}
+#root .emblem{position:absolute;left:190px;top:290px;width:370px;height:370px;object-fit:contain;filter:drop-shadow(0 12px 26px rgba(10,7,5,.55)) drop-shadow(0 0 20px rgba(255,184,92,.24))}
+#root .rule{position:absolute;left:640px;top:217px;width:3px;height:605px;background:linear-gradient(transparent,#d0a46c 24%,#d0a46c 76%,transparent);opacity:.72}
+#root .copy{position:absolute;left:705px;top:260px;width:1040px;text-align:left;color:#f4dfbb;text-shadow:0 3px 12px #1a1517}
+#root .headline{font-family:"EB Garamond",Georgia,serif;font-size:76px;font-weight:700;line-height:1.07;letter-spacing:-.018em;margin:0 0 23px}
+#root .follow{font-family:"EB Garamond",Georgia,serif;font-size:72px;font-weight:500;line-height:1.08;margin:0;color:#e9c492}
+#root .url{font-family:Inter,Arial,sans-serif;font-weight:800;font-size:85px;letter-spacing:.015em;color:#ffd18d;margin:86px 0 0;text-shadow:0 0 28px rgba(255,191,101,.18)}
+#root .credit{position:absolute;left:130px;right:130px;bottom:95px;text-align:center;font-family:Inter,Arial,sans-serif;font-size:25px;color:#d8c3a6;letter-spacing:.02em;text-shadow:0 2px 6px #1b1515}
 </style>
-<div data-hf-id="hf-a6pk" id="root" data-composition-id="endcard" data-width="1080" data-height="1350" data-duration="3.000">
-<div data-hf-id="hf-tqdl" id="endcard-main" class="clip stage" data-start="0.000" data-duration="3.000" data-track-index="1">
-<div data-hf-id="hf-7h0d" class="wash"></div>
-<div data-hf-id="hf-t5dh" id="endcard-stack" class="stack" data-hold="">
-<img data-hf-id="hf-0kzs" id="endcard-emblem" class="emblem" src="assets/brand/ptah-emblem-gold.png" alt="Ptah emblem">
-<div data-hf-id="hf-qvs1" class="lines">
-<p data-hf-id="hf-yo7l" id="endcard-line1" class="line">Named after the god of builders.</p>
-<p data-hf-id="hf-oifw" id="endcard-line2" class="line">Now it builds with your agents.</p>
-</div>
-<p data-hf-id="hf-4cw0" id="endcard-url" class="url">ptah.live</p>
-</div>
-<p data-hf-id="hf-hw81" id="endcard-credit" class="credit">Robot: 'cute robot' by victory_mirosya, CC BY 4.0</p>
-</div>
+<div id="root" data-composition-id="endcard" data-width="1920" data-height="1080" data-duration="4.000">
+ <div id="endcard-main" class="clip stage" data-start="0.000" data-duration="4.000" data-track-index="1">
+  <div id="endcard-wall" class="wall"></div><div class="shade"></div>
+  <img id="endcard-emblem" class="emblem" src="assets/brand/ptah-emblem-gold.png" alt="Ptah emblem">
+  <div class="rule"></div>
+  <div class="copy"><p id="endcard-line1" class="headline">Named after the god of builders.</p><p id="endcard-line2" class="follow">Now it builds with your agents.</p><p id="endcard-url" class="url">ptah.live</p></div>
+  <p id="endcard-credit" class="credit">Robot: “cute robot” by victory_mirosya · CC BY 4.0</p>
+ </div>
 </div>
 <script>
-{ const tl=gsap.timeline({paused:true});
-tl.fromTo("#endcard-emblem",{opacity:0,y:26,scale:0.94},{opacity:1,y:0,scale:1,duration:0.7,ease:"power2.out"},0.12);
-tl.fromTo("#endcard-line1",{opacity:0,y:16},{opacity:1,y:0,duration:0.5,ease:"power2.out"},0.38);
-tl.fromTo("#endcard-line2",{opacity:0,y:16},{opacity:1,y:0,duration:0.5,ease:"power2.out"},0.58);
-tl.fromTo("#endcard-url",{opacity:0,y:12},{opacity:1,y:0,duration:0.45,ease:"power2.out"},0.82);
-tl.fromTo("#endcard-credit",{opacity:0},{opacity:1,duration:0.4,ease:"power1.out"},1.05);
-tl.fromTo("#endcard-emblem",{scale:1},{scale:1.035,duration:1.7,ease:"sine.inOut",immediateRender:false},1.2);
-window.__timelines=window.__timelines||{};
-window.__timelines["endcard"]=tl;
-}
+{const tl=gsap.timeline({paused:true});
+ tl.fromTo('#endcard-wall',{scale:1.03},{scale:1.05,duration:4,ease:'none'},0);
+ tl.fromTo('#endcard-emblem',{scale:.98},{scale:1,duration:.75,ease:'power2.out'},0);
+ tl.fromTo('#endcard-line1',{opacity:0,y:20},{opacity:1,y:0,duration:.65,ease:'power2.out'},.38);
+ tl.fromTo('#endcard-line2',{opacity:0,y:20},{opacity:1,y:0,duration:.65,ease:'power2.out'},.75);
+ tl.fromTo('#endcard-url',{opacity:0,y:20},{opacity:1,y:0,duration:.65,ease:'power2.out'},1.22);
+ tl.fromTo('#endcard-credit',{opacity:0},{opacity:1,duration:.65,ease:'power1.out'},1.6);
+ window.__timelines=window.__timelines||{};window.__timelines.endcard=tl;}
 </script>
 </template>
+

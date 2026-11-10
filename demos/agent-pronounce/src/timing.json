@@ -1,10 +1,12 @@
 {
   "fps": 30,
-  "total": 62.8,
+  "width": 1920,
+  "height": 1080,
+  "total": 82.433,
   "rows": {
     "S2": {
       "start": 4,
-      "duration": 3.251,
+      "duration": 3.101,
       "speaker": "Claude",
       "scene": "office",
       "words": [
@@ -15,33 +17,33 @@
         },
         {
           "word": "Tah?",
-          "start": 0.98,
-          "end": 1.23
+          "start": 0.83,
+          "end": 1.08
         },
         {
           "word": "The",
-          "start": 1.74,
-          "end": 1.8
+          "start": 1.59,
+          "end": 1.65
         },
         {
           "word": "P's",
-          "start": 1.86,
-          "end": 2.1
+          "start": 1.71,
+          "end": 1.95
         },
         {
           "word": "silent,",
-          "start": 2.14,
-          "end": 2.52
+          "start": 1.99,
+          "end": 2.37
         },
         {
           "word": "right?",
-          "start": 2.56,
-          "end": 2.89
+          "start": 2.41,
+          "end": 2.74
         }
       ]
     },
     "O1": {
-      "start": 8.001,
+      "start": 8.151,
       "duration": 2.554,
       "speaker": "Codex",
       "scene": "office",
@@ -74,7 +76,7 @@
       ]
     },
     "O3": {
-      "start": 11.755,
+      "start": 11.905,
       "duration": 2.786,
       "speaker": "Codex",
       "scene": "office",
@@ -102,7 +104,7 @@
       ]
     },
     "O4": {
-      "start": 16.041,
+      "start": 15.741,
       "duration": 1.193,
       "speaker": "Conductor",
       "scene": "office",
@@ -115,7 +117,7 @@
       ]
     },
     "D1": {
-      "start": 22.867,
+      "start": 25.267,
       "duration": 4.571,
       "speaker": "Conductor",
       "scene": "desert",
@@ -178,7 +180,7 @@
       ]
     },
     "D2": {
-      "start": 28.188,
+      "start": 30.888,
       "duration": 4.598,
       "speaker": "Claude",
       "scene": "desert",
@@ -241,7 +243,7 @@
       ]
     },
     "D3": {
-      "start": 33.536,
+      "start": 36.536,
       "duration": 5.732,
       "speaker": "Conductor",
       "scene": "desert",
@@ -304,7 +306,7 @@
       ]
     },
     "D4": {
-      "start": 39.368,
+      "start": 42.468,
       "duration": 1.667,
       "speaker": "Cursor",
       "scene": "desert",
@@ -337,7 +339,7 @@
       ]
     },
     "D5": {
-      "start": 41.785,
+      "start": 45.185,
       "duration": 3.621,
       "speaker": "Conductor",
       "scene": "desert",
@@ -385,7 +387,7 @@
       ]
     },
     "D6": {
-      "start": 46.156,
+      "start": 66.80600000000001,
       "duration": 2.926,
       "speaker": "Codex",
       "scene": "desert",
@@ -424,23 +426,23 @@
         "O4"
       ],
       "start": 0,
-      "duration": 17.834,
+      "duration": 18.534,
       "cues": {
         "entrance": 4,
-        "tah": 4.98,
-        "spark": 10.201,
-        "dip": 10.401,
-        "bolt": 13.815,
-        "flash": 16.161,
-        "end": 17.834,
-        "crackle": 13.015
+        "tah": 4.83,
+        "spark": 10.351,
+        "dip": 10.551,
+        "bolt": 13.965,
+        "flash": 15.861,
+        "end": 18.534,
+        "crackle": 13.165
       }
     },
     {
       "id": "vortex",
       "kind": "vortex",
       "rows": [],
-      "start": 17.867,
+      "start": 18.567,
       "duration": 3.5,
       "cues": {
         "land": 2.6
@@ -457,43 +459,44 @@
         "D5",
         "D6"
       ],
-      "start": 21.367,
-      "duration": 28.415,
+      "start": 22.067,
+      "duration": 50.365,
       "cues": {
         "sofaLand": 0.3,
-        "rise": 1.5,
-        "pan": 12.289,
-        "stamp": 18.11,
-        "cursorPass": 18.001,
-        "portal": 22.618,
-        "end": 28.415
+        "reveal": 1.8,
+        "rise": 3.2,
+        "pan": 14.589,
+        "stamp": 20.51,
+        "cursorPass": 20.401,
+        "portal": 27.139,
+        "pushIn": 27.139,
+        "showcaseEnd": 43.939,
+        "d6": 44.739,
+        "titleTilt": 48.365,
+        "end": 50.365
       }
     },
     {
       "id": "intro",
       "kind": "2d",
       "rows": [],
-      "start": 49.8,
-      "duration": 10,
+      "start": 72.433,
+      "duration": 6,
       "cues": {
-        "card1": 0.6,
-        "card2": 1.8,
-        "card3": 3,
-        "card4": 4.2,
-        "card5": 5.4,
-        "card6": 6.6,
-        "chisel": 7.8,
-        "tag": 8.8
+        "chisel": 0.6,
+        "tag": 3.2,
+        "line": 4.2,
+        "end": 6
       }
     },
     {
       "id": "endcard",
       "kind": "2d",
       "rows": [],
-      "start": 59.8,
-      "duration": 3,
+      "start": 78.433,
+      "duration": 4,
       "cues": {
-        "end": 3
+        "end": 4
       }
     }
   ],
@@ -501,61 +504,61 @@
     {
       "row": "S2",
       "start": 4,
-      "end": 7.251,
+      "end": 7.101,
       "text": "Hmm… Tah? The P's silent, right?"
     },
     {
       "row": "O1",
-      "start": 8.001,
-      "end": 10.555,
+      "start": 8.151,
+      "end": 10.705,
       "text": "Has to be. Like pterodactyl."
     },
     {
       "row": "O3",
-      "start": 11.755,
-      "end": 14.541,
+      "start": 11.905,
+      "end": 14.691,
       "text": "Honestly? It sounds… old."
     },
     {
       "row": "O4",
-      "start": 16.041,
-      "end": 17.234,
+      "start": 15.741,
+      "end": 16.934,
       "text": "Old."
     },
     {
       "row": "D1",
-      "start": 22.867,
-      "end": 27.438,
+      "start": 25.267,
+      "end": 29.838,
       "text": "I made the world by speaking its name. Say mine properly."
     },
     {
       "row": "D2",
-      "start": 28.188,
-      "end": 32.786,
+      "start": 30.888,
+      "end": 35.486,
       "text": "Respectfully… why does the god of builders care about coding agents?"
     },
     {
       "row": "D3",
-      "start": 33.536,
-      "end": 39.268,
+      "start": 36.536,
+      "end": 42.268,
       "text": "Look around. Many crews. One plan. Nothing goes up until it's—"
     },
     {
       "row": "D4",
-      "start": 39.368,
-      "end": 41.035,
+      "start": 42.468,
+      "end": 44.135,
       "text": "—checked! Got it! Next block!"
     },
     {
       "row": "D5",
-      "start": 41.785,
-      "end": 45.406,
+      "start": 45.185,
+      "end": 48.806,
       "text": "Same idea. Now it runs on your desktop."
     },
     {
       "row": "D6",
-      "start": 46.156,
-      "end": 49.082,
+      "start": 66.80600000000001,
+      "end": 69.732,
       "text": "…okay. That's actually cool."
     }
   ]

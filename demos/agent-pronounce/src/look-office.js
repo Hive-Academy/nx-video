@@ -159,7 +159,7 @@ export async function buildOfficeLook(assets, renderer, { boltMode = false } = {
   scene.add(lapG);
   scene.add(shadows(fit(recolor(lamp, { metal: { color: '#2A2A2E', metalness: 0.7, roughness: 0.35 }, lamp: { color: '#D3B897', emissive: '#C98048', ei: 0.35 } }), { s: K, at: [1.55, 0, -1.75] })));
   scene.add(shadows(fit(recolor(plant, { wood: { color: '#C7C0B4', roughness: 0.7 }, woodDark: { color: '#3B2E26' }, plant: { color: '#3F7F4E', roughness: 0.8 } }), { s: K, at: [-1.6, 0, -1.9] })));
-  scene.add(shadows(fit(recolor(shelf, { wood: walnut }), { s: K, at: [-2.75, 0, -0.6], yaw: Math.PI / 2 })));
+  scene.add(shadows(fit(recolor(shelf, { wood: walnut }), { s: K, at: [-1.95, 0, -2.0], yaw: Math.PI / 2 })));
   scene.add(shadows(fit(recolor(plantS, { wood: { color: '#C7C0B4' }, plant: { color: '#4E8F5A' } }), { s: K, at: [-0.3, tableTop, -0.35] })));
 
   // the laptop lid shows the Ptah landing page (temple under lightning)

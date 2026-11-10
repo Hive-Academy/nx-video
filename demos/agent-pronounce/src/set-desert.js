@@ -474,22 +474,27 @@ function plan(world, ctx) {
   const ptahRows = rows.filter((r) => String(r.speaker || '').toLowerCase() === 'conductor');
 
   const sofaLand = sceneCue(ctx, 'sofaLand', 0.3);
+  const reveal = sceneCue(ctx, 'reveal', 1.8);
   const rise = sceneCue(ctx, 'rise', D1 ? D1.localStart : 0.3);
   const pan = sceneCue(ctx, 'pan', D3 ? wordTime(D3, 'Look', 0, 'start') : 10);
   const cursorPass = sceneCue(ctx, 'cursorPass', D4 ? D4.localStart : 15);
   const stamp = sceneCue(ctx, 'stamp', D4 ? wordTime(D4, 'checked', 0, 'start') : cursorPass + 0.1);
   const portal = sceneCue(ctx, 'portal', D5 ? wordTime(D5, 'desktop', 0.85, 'end') : 20);
+  const pushIn = sceneCue(ctx, 'pushIn', portal);
+  const showcaseEnd = sceneCue(ctx, 'showcaseEnd', duration - 6);
+  const d6 = sceneCue(ctx, 'd6', D6 ? D6.localStart : showcaseEnd + 0.8);
+  const titleTilt = sceneCue(ctx, 'titleTilt', duration - 2);
 
   // Six shots, each held at least 2.5 s. The hero framing stays put through the
   // landing so the approved still can match; the low angle starts once that hold
   // is long enough, which is still inside D1.
   const tHero = 0;
-  const tLow = 2.55;
-  const tTwo = Math.max(tLow + 2.55, D2 ? D2.localStart + 0.5 : 5.22);
-  const tPan = Math.max(tTwo + 2.55, D3 ? D3.localStart - 0.5 : pan);
-  const tPass = Math.max(tPan + 2.55, cursorPass - 0.5);
-  const tReturn = 20.01;
-  const tPortal = Math.max(tPass + 2.55, portal);
+  const tLow = D2 ? D2.localStart : rise + 4;
+  const tTwo = tLow + 3.0;
+  const tPan = Math.max(tTwo + 3, pan);
+  const tPass = cursorPass - 0.5;
+  const tReturn = showcaseEnd;
+  const tPortal = pushIn;
 
   const claudeSeat = world.robots.Claude.seat;
   const codexSeat = world.robots.Codex.seat;
@@ -532,12 +537,17 @@ function plan(world, ctx) {
   const glideDur = Math.max(2.05, tPortal - 0.35 - glideStart);
   glideTo(specs.Claude, glideStart, { x: world.claudeSpot.x, z: world.claudeSpot.z }, glideDur, { face: false, lean: -0.06 });
   glideTo(specs.Codex, glideStart + 0.08, { x: world.codexSpot.x, z: world.codexSpot.z }, glideDur, { face: false, lean: -0.06 });
+  glideTo(specs.Claude, showcaseEnd, { x: claudeSeat.x, z: claudeSeat.z }, 0.7, { face: false });
+  glideTo(specs.Codex, showcaseEnd, { x: codexSeat.x, z: codexSeat.z }, 0.7, { face: false });
   face(specs.Claude, glideStart, claudeYaw);
   face(specs.Codex, glideStart + 0.08, codexYaw);
   if (D6) {
     // listen() may schedule a glance as late as localStart + 0.4; turn back after it
-    face(specs.Claude, D6.localStart + 0.55, claudeYaw);
-    face(specs.Codex, D6.localStart + 0.18, codexYaw);
+    const audience = new THREE.Vector3(-0.7, 1.5, 8.2);
+    face(specs.Claude, showcaseEnd + 0.35, yawToward(claudeSeat, audience));
+    face(specs.Codex, showcaseEnd + 0.35, yawToward(codexSeat, audience));
+    face(specs.Claude, D6.localStart + 0.55, yawToward(claudeSeat, audience));
+    face(specs.Codex, D6.localStart + 0.18, yawToward(codexSeat, audience));
   }
 
   const zipDur = 1.2;
@@ -546,10 +556,13 @@ function plan(world, ctx) {
   face(specs.Cursor, -0.6, yawToward(world.passFrom, world.passCam));
 
   // --- cameras
-  const heroPos = new THREE.Vector3(0.9, 0.45, 6.2);
-  const heroLook = new THREE.Vector3(0.6, 1.5, -3.8);
+  const heroPos = new THREE.Vector3(-1.2, 0.62, 8.2);
+  const heroLook = new THREE.Vector3(-0.7, 1.65, -1.0);
   const heroKeys = [
-    { t: tHero, pos: heroPos, target: heroLook, fov: 60 },
+    { t: tHero, pos: new THREE.Vector3(-0.45, 0.85, 5.2), target: new THREE.Vector3(-0.7, 0.55, 2.0), fov: 44 },
+    { t: reveal, pos: new THREE.Vector3(-0.4, 0.9, 5.3), target: new THREE.Vector3(-0.7, 0.55, 2.0), fov: 44, ease: ease.sineInOut },
+    { t: rise + 1, pos: heroPos, target: heroLook, fov: 58, ease: ease.sineInOut },
+    { t: tTwo, pos: new THREE.Vector3(-1.1, 0.66, 8.05), target: new THREE.Vector3(-0.65, 1.68, -1.05), fov: 58, ease: ease.sineInOut },
   ];
 
   // Low angle stays on Ptah's face side and south of the visitors, so their backs stay out.
@@ -563,26 +576,26 @@ function plan(world, ctx) {
   ];
 
   // Claude in the foreground, three-quarter, looking up at Ptah.
-  const twoA = new THREE.Vector3(-0.25, 1.05, 4.8);
-  const twoB = new THREE.Vector3(-0.15, 1.12, 4.6);
-  const twoLookA = new THREE.Vector3(0.75, 0.32, 2.6);
-  const twoLookB = new THREE.Vector3(0.75, 0.34, 2.6);
+  const twoA = new THREE.Vector3(0.15, 1.4, 5.3);
+  const twoB = new THREE.Vector3(0.3, 1.4, 5.2);
+  const twoLookA = new THREE.Vector3(0.2, 0.55, 2.7);
+  const twoLookB = new THREE.Vector3(0.25, 0.55, 2.7);
   const twoKeys = [
-    { t: tTwo, pos: twoA, target: twoLookA, fov: 42 },
-    { t: tPan, pos: twoB, target: twoLookB, fov: 40, ease: ease.sineInOut },
+    { t: tTwo, pos: twoA, target: twoLookA, fov: 55 },
+    { t: tPan, pos: twoB, target: twoLookB, fov: 55, ease: ease.sineInOut },
   ];
 
   // Track the actual work lanes in front of the pylon, then reveal the ramp.
-  const panA = new THREE.Vector3(-9.8, 1.75, -9.5);
-  const panLookA = new THREE.Vector3(-4.3, -1.0, -18.5);
-  const panB = new THREE.Vector3(-9.1, 1.8, -10.0);
-  const panLookB = new THREE.Vector3(-3.9, -0.9, -19.0);
-  const panC = new THREE.Vector3(-8.7, 1.85, -9.5);
-  const panLookC = new THREE.Vector3(-3.5, -0.8, -19.0);
+  const panA = new THREE.Vector3(-10.5, 3.7, -7.5);
+  const panLookA = new THREE.Vector3(-5.5, 0.9, -18.0);
+  const panB = new THREE.Vector3(-9.7, 3.7, -7.5);
+  const panLookB = new THREE.Vector3(-5.0, 0.9, -18.0);
+  const panC = new THREE.Vector3(-8.9, 3.7, -7.5);
+  const panLookC = new THREE.Vector3(-4.5, 0.9, -18.0);
   const panKeys = [
-    { t: tPan, pos: panA, target: panLookA, fov: 57 },
+    { t: tPan, pos: panA, target: panLookA, fov: 56 },
     { t: lerp(tPan, tPass, 0.48), pos: panB, target: panLookB, fov: 56, ease: ease.sineInOut },
-    { t: tPass, pos: panC, target: panLookC, fov: 57, ease: ease.sineInOut },
+    { t: tPass, pos: panC, target: panLookC, fov: 56, ease: ease.sineInOut },
   ];
 
   const passClose = world.passCam.clone().lerp(world.passLook, 0.12);
@@ -592,24 +605,59 @@ function plan(world, ctx) {
   ];
 
   const returnKeys = [
-    { t: tReturn, pos: heroPos.clone(), target: heroLook.clone(), fov: 60 },
+    { t: tReturn, pos: world.portalCam.clone(), target: world.portalLook.clone(), fov: 46 },
+    { t: d6, pos: new THREE.Vector3(-0.7, 1.52, 8.15), target: new THREE.Vector3(-0.2, 1.9, 0.2), fov: 55, ease: ease.sineInOut },
+    { t: titleTilt, pos: new THREE.Vector3(-0.69, 1.52, 8.1), target: new THREE.Vector3(-0.2, 1.9, 0.2), fov: 55, ease: ease.sineInOut },
   ];
 
   const portalFar = world.portalCam.clone();
   const portalNear = world.portalCam.clone().addScaledVector(world.pylonFront, -0.55);
   const portalKeys = [
     { t: tPortal, pos: portalFar, target: world.portalLook.clone(), fov: 46 },
-    { t: duration, pos: portalNear, target: world.portalLook.clone(), fov: 42, ease: ease.sineInOut },
+    { t: tPortal + 1.2, pos: portalNear, target: world.portalLook.clone(), fov: 42, ease: ease.sineInOut },
   ];
+  // A camera-facing, unmarked face sits beyond the pylon front. Keep it hidden
+  // until the title move so it cannot alter the earlier wide or doorway views.
+  const slabCanvas = document.createElement('canvas');
+  slabCanvas.width = slabCanvas.height = 512;
+  const slabCtx = slabCanvas.getContext('2d');
+  const stone = slabCtx.createLinearGradient(0, 0, 512, 512);
+  stone.addColorStop(0, '#D9B27A');
+  stone.addColorStop(1, '#B98A55');
+  slabCtx.fillStyle = stone;
+  slabCtx.fillRect(0, 0, 512, 512);
+  for (let y = 54; y < 512; y += 70) {
+    slabCtx.fillStyle = 'rgba(111,70,35,0.11)';
+    slabCtx.fillRect(0, y, 512, 2);
+    slabCtx.fillStyle = 'rgba(255,226,177,0.13)';
+    slabCtx.fillRect(0, y + 2, 512, 2);
+  }
+  const slabTexture = new THREE.CanvasTexture(slabCanvas);
+  slabTexture.colorSpace = THREE.SRGBColorSpace;
+  slabTexture.wrapS = slabTexture.wrapT = THREE.RepeatWrapping;
+  slabTexture.repeat.set(32, 32);
+  const titleSlab = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshBasicMaterial({ map: slabTexture, side: THREE.DoubleSide, toneMapped: false }));
+  titleSlab.position.set(-0.7, 2.0, 1.15);
+  titleSlab.visible = false;
+  world.handles.sofa.parent.add(titleSlab);
+  const wallLook = new THREE.Vector3(-0.7, 1.8, 1.15);
+  const wallNear = new THREE.Vector3(-0.7, 1.55, 2.3);
+  const titleKeys = [
+    { t: titleTilt, pos: returnKeys[2].pos.clone(), target: returnKeys[2].target.clone(), fov: 55 },
+    { t: titleTilt + 1.5, pos: wallNear, target: wallLook, fov: 42, ease: ease.sineInOut },
+  ];
+  // Keep the return sampler on the same path across the title cue; the camera
+  // controller may retain it while the scene seeks across the final two seconds.
+  returnKeys.push(...titleKeys.slice(1));
 
   const camKeys = [
     { t0: tHero, keys: heroKeys },
-    { t0: tLow, keys: lowKeys },
     { t0: tTwo, keys: twoKeys },
     { t0: tPan, keys: panKeys },
     { t0: tPass, keys: passKeys },
-    { t0: tReturn, keys: returnKeys },
     { t0: tPortal, keys: portalKeys },
+    { t0: tReturn, keys: returnKeys },
+    { t0: titleTilt, keys: titleKeys },
   ];
   const camScratch = new THREE.Vector3();
   function camAt(t) {
@@ -620,12 +668,12 @@ function plan(world, ctx) {
 
   const shots = [
     shot('establish', heroKeys, 10, tHero, true),
-    shot('ptahLow', lowKeys, 7, tLow, true),
     shot('claudeTwo', twoKeys, 3.2, tTwo),
     shot('panCrews', panKeys, 24, tPan),
     shot('cursorStamp', passKeys, 2.8, tPass, true),
-    shot('ptahAnswer', returnKeys, 10, tReturn, true),
     shot('portal', portalKeys, 8, tPortal, true),
+    shot('returnTwo', returnKeys, 10, tReturn, true),
+    shot('titleWall', titleKeys, 8, titleTilt, true),
   ];
 
   const ptahPulse = (t) => ptahRows.reduce((a, r) => a + sampleEnvelope(r.env, t - r.localStart), 0);
@@ -656,20 +704,22 @@ function plan(world, ctx) {
       const g0 = name === 'Claude' ? glideStart : glideStart + 0.08;
       const e = smoothstep(clamp((t - g0) / glideDur));
       const destY = name === 'Claude' ? world.claudeSpot.y : world.codexSpot.y;
-      robot.root.position.y = lerp(robot.seat.y, destY, e) + (p.lift || 0);
+      const back = smoothstep(clamp((t - showcaseEnd) / 0.7));
+      robot.root.position.y = lerp(lerp(robot.seat.y, destY, e), robot.seat.y, back) + (p.lift || 0);
     }
   }
 
   function update(t, sim) {
     const cam = camAt(t);
+    titleSlab.visible = t >= titleTilt + 0.18;
     poseVisitors(sim, t);
     const crewShot = t >= tPan && t < tPass;
     world.scatterBlocks.forEach((b) => { b.visible = !crewShot; });
     const twoShot = t >= tTwo && t < tPan;
-    h.ptah.root.visible = !twoShot;
-    h.sceptre.visible = !twoShot;
-    world.extraRamps.forEach((r) => { r.visible = false; });
-    if (world.baseRamp) world.baseRamp.visible = !crewShot;
+    h.ptah.root.visible = !twoShot && t >= rise;
+    h.sceptre.visible = !twoShot && t >= rise;
+    world.extraRamps.forEach((r) => { r.visible = crewShot; });
+    if (world.baseRamp) world.baseRamp.visible = true;
     world.stampG.visible = !crewShot;
     world.gripLink.visible = !crewShot;
     world.banners.forEach((b) => {
@@ -677,8 +727,8 @@ function plan(world, ctx) {
       b.group.position.copy(b.home);
       if (crewShot && b.i < 2) b.group.position.z += b.i === 0 ? 6 : 3;
     });
-    world.post.exposure = crewShot ? 0.62 : (t >= tLow && t < tTwo ? 0.8 : 0.95);
-    h.pyramid.parent.backgroundIntensity = crewShot ? 0.44 : (t >= tLow && t < tTwo ? 0.32 : 0.9);
+    world.post.exposure = crewShot ? 0.7 : 0.82;
+    h.pyramid.parent.backgroundIntensity = 0.34;
 
     // Sofa thump. At sofaLand it is on the authored rest pose; dust hangs on.
     const sofa = h.sofa;
@@ -693,7 +743,7 @@ function plan(world, ctx) {
     }
     sofa.rotation.z = world.sofaRest.z;
 
-    const du = (t - sofaLand) / 0.55;
+    const du = (t - sofaLand) / 1.5;
     if (du >= 0 && du < 1) {
       world.landDust.visible = true;
       world.landPuff.visible = true;
@@ -944,7 +994,7 @@ function plan(world, ctx) {
     }
 
     // Portal: warm, then white, plus a shaft. Bloom picks up the untonemapped plane.
-    const pu = clamp((t - portal) / 1.1);
+    const pu = clamp((t - portal) / 1.1) * (1 - smoothstep(clamp((t - showcaseEnd) / 0.7)));
     const warm = clamp(pu / 0.12);
     const white = clamp(pu / 0.6);
     const flick = 0.94 + 0.06 * noise1(t * 1.8, 'portal');

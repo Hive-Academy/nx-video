@@ -83,6 +83,10 @@ export async function buildVortexLook(assets, renderer) {
   tumble.position.set(0, -0.65, -0.4);
   tumble.rotation.set(0.25, -0.35, 0.42);
   scene.add(tumble);
+  // A remnant of the office floor drops from beneath the sofa as the whiteout clears.
+  const fallingFloor = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.45, 0.09, 48), new THREE.MeshStandardMaterial({ color: '#6B4C36', roughness: 0.85, transparent: true }));
+  fallingFloor.position.set(0, -1.55, -0.4);
+  scene.add(fallingFloor);
   const key = new THREE.DirectionalLight('#FFE0B0', 1.2);
   key.position.set(-2, 3, 4);
   scene.add(key);
@@ -93,6 +97,6 @@ export async function buildVortexLook(assets, renderer) {
   camera.position.copy(cam);
   camera.lookAt(V(0, -0.15, -3));
   camera.rotateZ(-0.12);
-  return { scene, camera, bloom: { strength: 0.5, radius: 0.7, threshold: 0.95 }, exposure: 1.05, handles: { tunnel, sunDisc, glow, streaks, dustPoints, tumble, sofa: sofaG, codex, claude, key, back } };
+  return { scene, camera, bloom: { strength: 0.5, radius: 0.7, threshold: 0.95 }, exposure: 1.05, handles: { tunnel, sunDisc, glow, streaks, dustPoints, tumble, sofa: sofaG, codex, claude, key, back, fallingFloor } };
 }
 

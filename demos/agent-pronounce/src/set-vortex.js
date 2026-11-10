@@ -13,7 +13,10 @@ async function build(scene,assets,ctx) {
   const whiteMat=new THREE.MeshBasicMaterial({color:'#FFF0CB',transparent:true,opacity:0,depthTest:false,depthWrite:false,toneMapped:false});
   const whiteout=new THREE.Mesh(new THREE.PlaneGeometry(4,4),whiteMat);
   whiteout.renderOrder=999;scene.add(whiteout);
-  return {robots:{},h,tunnelTex,streakStart,dustStart,whiteout,whiteMat,
+  const entryMat=new THREE.MeshBasicMaterial({color:'#FFFFFF',transparent:true,opacity:1,depthTest:false,depthWrite:false,toneMapped:false});
+  const entryWhite=new THREE.Mesh(new THREE.PlaneGeometry(4,4),entryMat);
+  entryWhite.renderOrder=1000;scene.add(entryWhite);
+  return {robots:{},h,tunnelTex,streakStart,dustStart,whiteout,whiteMat,entryWhite,entryMat,
     post:{bloom:{...look.bloom},exposure:look.exposure,toneMapping:'aces',shadows:true}};
 }
 function plan(world,ctx) {
@@ -22,6 +25,13 @@ function plan(world,ctx) {
   shot.t0=0;
   function update(t) {
     const h=world.h;
+    const entry=clamp(t/0.42);
+    world.entryWhite.visible=entry<1;
+    world.entryMat.opacity=1-ease.sineInOut(entry);
+    if(world.entryWhite.visible){world.entryWhite.position.copy(shot.sample(t).pos).lerp(shot.sample(t).target,0.12);world.entryWhite.quaternion.setFromRotationMatrix(new THREE.Matrix4().lookAt(shot.sample(t).pos,shot.sample(t).target,V(0,1,0)));}
+    h.fallingFloor.visible=t<0.75;
+    h.fallingFloor.position.y=-1.55-4*ease.power2In(clamp(t/0.75));
+    h.fallingFloor.material.opacity=1-clamp((t-0.3)/0.45);
     world.tunnelTex.offset.y=((t*0.12)%1+1)%1;
     world.tunnelTex.offset.x=((t*0.025)%1+1)%1;
     h.tunnel.rotation.set(Math.PI/2,0,0);
@@ -33,7 +43,7 @@ function plan(world,ctx) {
     const arr=h.dustPoints.geometry.attributes.position.array;
     for(let i=0;i<arr.length/3;i++){arr[i*3]=world.dustStart[i*3];arr[i*3+1]=world.dustStart[i*3+1];arr[i*3+2]=((world.dustStart[i*3+2]+t*(6+4*hash('dust-speed',i))+80)%24+24)%24-22;}
     h.dustPoints.geometry.attributes.position.needsUpdate=true;
-    const u=clamp((t-3.2)/(duration-3.2));
+    const u=clamp((t-land)/Math.max(0.1,duration-land));
     h.glow.intensity=60+40*u;
     world.post.bloom.strength=0.5+1.3*u;
     world.post.exposure=1.05+0.8*u;

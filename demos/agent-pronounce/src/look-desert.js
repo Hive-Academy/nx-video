@@ -168,14 +168,14 @@ export async function buildDesertLook(assets, renderer) {
   const scene = new THREE.Scene();
   const sky = await hdri('hdri/qwantani_late_afternoon_puresky_2k.hdr');
   // put the low sun at camera-left, behind the pyramid: the HDRI is rotated so its sun azimuth lands there
-  const wantAz = THREE.MathUtils.degToRad(-128); // azimuth in three's equirect frame (camera looks down -Z = -90 deg)
+  const wantAz = THREE.MathUtils.degToRad(-165); // keep the HDRI sun just outside the left edge
   const sunAz = (sky.sunU - 0.5) * Math.PI * 2;
   const rot = sunAz - wantAz;
   scene.background = sky.tex;
   scene.environment = sky.tex;
   scene.backgroundRotation.set(0, rot, 0);
   scene.environmentRotation.set(0, rot, 0);
-  scene.backgroundIntensity = 0.9;
+  scene.backgroundIntensity = 0.34;
   scene.environmentIntensity = 0.55;
   renderer.toneMappingExposure = 0.95;
   scene.fog = new THREE.FogExp2('#E7B37E', 0.0075);
@@ -188,7 +188,7 @@ export async function buildDesertLook(assets, renderer) {
   scene.add(py);
   // the god stands in front of the work site, looking down at the visitors
   const visitors = V(-0.3, 0, 2.6);
-  const god = ptahGod(assets, V(2.4, 0, -3.8), V(0.2, 0, 6), 2.8);
+  const god = ptahGod(assets, V(2.4, 0, -3.8), V(0.2, 0, 6), 3.5);
   scene.add(god.r.root, god.was);
 
   // the sofa came too: half sunk in the sand, tipped over

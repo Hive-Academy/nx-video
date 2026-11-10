@@ -1,159 +1,65 @@
-<template>
+﻿<template>
 <style>
-#root{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#2A160E}
-#root .stage{position:absolute;inset:0}
-#root .sheet{position:absolute;left:28px;right:28px;top:28px;bottom:28px;z-index:1;background-color:#e4c98a;background-image:radial-gradient(ellipse at 16% 10%,rgba(255,248,226,.55),transparent 42%),radial-gradient(ellipse at 86% 78%,rgba(140,86,32,.16),transparent 46%),repeating-linear-gradient(90deg,rgba(120,72,28,.11) 0 1px,transparent 1px 6px),repeating-linear-gradient(1deg,rgba(92,58,22,.07) 0 2px,transparent 2px 13px),linear-gradient(180deg,#f4e4b8 0%,#e6cb8e 48%,#d4b06a 100%);box-shadow:inset 0 0 0 12px rgba(92,54,22,.35),inset 0 0 80px rgba(120,70,20,.18)}
-#root .dowel{position:absolute;left:46px;right:46px;height:30px;border-radius:15px;z-index:4;background:linear-gradient(180deg,#d7a15a 0%,#8a5428 42%,#f0d7a4 50%,#5c3718 54%,#3a2412 100%);box-shadow:0 4px 0 rgba(0,0,0,.25)}
-#root .dowel.top{top:16px}
-#root .dowel.bottom{top:1288px}
-#root .ornament{position:absolute;left:50%;top:78px;width:280px;height:36px;margin-left:-140px;z-index:2}
-#root .rule{position:absolute;left:52px;right:52px;height:4px;background:#6A4524;z-index:2}
-#root .rule.top{top:1032px;box-shadow:0 8px 0 rgba(196,154,90,.9)}
-#root .rule.ground{top:1304px;height:6px}
-#root .fig{position:absolute;top:1048px;width:156px;height:250px;z-index:4}
-#root .fig img{display:block;width:100%;height:100%;object-fit:contain}
-#root .glow{position:absolute;left:-28%;top:-6%;width:156%;height:112%;background:radial-gradient(circle,rgba(232,163,61,.9),rgba(232,163,61,0) 68%);pointer-events:none}
-#root #intro-fig-1{left:47px}
-#root #intro-fig-2{left:213px}
-#root #intro-fig-3{left:379px}
-#root #intro-fig-4{left:545px}
-#root #intro-fig-5{left:711px}
-#root #intro-fig-6{left:877px}
-#root .card{position:absolute;left:0;right:0;top:814px;z-index:5;display:flex;justify-content:center}
-#root .opening-title{position:absolute;left:0;right:0;top:470px;z-index:5;text-align:center;font-family:"Playfair Display",serif;font-size:112px;font-weight:700;letter-spacing:.09em;color:#3A2B1E;text-shadow:0 3px 0 #F6E8CC}
-#root .plaque{position:relative;display:flex;flex-direction:column;align-items:center;background:#F7E7C4;border:8px solid #2A1C12;border-radius:999px;padding:14px 56px 16px}
-#root .tie{position:absolute;right:-26px;top:50%;width:22px;height:52px;margin-top:-26px;background:#2A1C12}
-#root .tie:before{content:"";position:absolute;left:0;right:5px;top:7px;bottom:7px;background:#F7E7C4}
-#root .who{display:block;font-family:"Playfair Display",serif;font-weight:700;font-size:64px;line-height:1;letter-spacing:.01em;color:#2A1C12;white-space:nowrap}
-#root .role{display:block;margin-top:4px;font-family:"Playfair Display",serif;font-weight:700;font-size:56px;line-height:1.05;color:#2A1C12;white-space:nowrap}
-#root .stone{position:absolute;left:54px;right:54px;top:168px;height:830px;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 16%),repeating-linear-gradient(90deg,rgba(70,48,24,.06) 0 2px,transparent 2px 16px),linear-gradient(165deg,#ead6b2,#cbb589 42%,#b89468);border:6px solid #6e5234;box-shadow:inset 0 0 0 4px #f3e6cc,8px 12px 0 rgba(36,20,8,.28)}
-#root .word{display:flex;justify-content:center;gap:6px}
-#root .letter{display:block;width:148px;text-align:center;font-family:"Archivo Black",sans-serif;font-weight:400;font-size:168px;line-height:.86;color:#3A2B1E;text-shadow:0 3px 0 #F6E8CC,0 -2px 0 #24180F}
-#root .tag{display:flex;align-items:flex-end;justify-content:center;width:100%;margin:36px 0 0;font-family:"EB Garamond",serif;font-weight:700;font-size:52px;line-height:1;color:#2A1C12;white-space:nowrap}
-#root .stress{display:block;width:4px;height:18px;margin:0 3px 16px 1px;background:#2A1C12;flex:none}
-#root .chisel{position:absolute;left:50%;top:168px;width:144px;height:144px;margin-left:-72px;z-index:4}
-#root .chip{position:absolute;width:16px;height:10px;background:#F3E6C8;border:2px solid #6B4E32;z-index:4}
-#root .flash{position:absolute;inset:0;background:#fff;z-index:8;pointer-events:none;opacity:0}
-#root .grain{position:absolute;inset:0;width:100%;height:100%;z-index:9;pointer-events:none;opacity:0}
+#root{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;background:#8b603b}
+#root .stage,#root .wall{position:absolute;inset:0}
+#root .wall{background:url('assets/intro/wall.svg') center/cover no-repeat;transform-origin:50% 50%}
+#root .wall:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 18% 9%,rgba(255,219,151,.19),transparent 55%),linear-gradient(90deg,rgba(255,223,162,.08),transparent 70%);pointer-events:none}
+#root .word{position:absolute;left:276px;top:245px;width:1368px;height:400px;display:flex;justify-content:space-between;align-items:center}
+#root .letter{display:block;position:relative;min-width:295px;text-align:center;font-family:"Archivo Black",Arial Black,sans-serif;font-size:390px;font-weight:900;line-height:1;letter-spacing:-.055em;color:#895b38;-webkit-text-fill-color:#895b38;filter:url(#cut);clip-path:inset(0 100% 0 0)}
+#root .letter:first-child{margin-left:-18px}
+#root .gold{position:absolute;inset:0;color:#f5bd5b;-webkit-text-fill-color:#f5bd5b;background:linear-gradient(#fff4ba,#f5ba53 48%,#ac611d);-webkit-background-clip:text;background-clip:text;clip-path:inset(100% 0 0 0);filter:drop-shadow(0 0 14px #ffc23e) drop-shadow(0 0 28px #ffae2c)}
+#root .tag{position:absolute;left:0;right:0;top:668px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-size:110px;font-weight:700;letter-spacing:.06em;color:#593712;text-shadow:-2px -2px 1px #342011,2px 2px 1px #ffe3a1,0 0 11px #d99c42;opacity:0}
+#root .line{position:absolute;left:0;right:0;top:833px;text-align:center;font-family:"EB Garamond",Georgia,serif;font-size:92px;font-weight:600;color:#eed6aa;letter-spacing:.015em;text-shadow:-3px -3px 1px #3f291b,2px 2px 1px #ffe6aa;opacity:0}
+#root .chisel{position:absolute;left:0;top:0;width:176px;height:205px;opacity:0;z-index:5;pointer-events:none}
+#root .chisel .shaft{position:absolute;left:78px;top:0;width:20px;height:135px;transform:rotate(34deg);transform-origin:bottom;background:linear-gradient(90deg,#362d2a,#aaa9a1 30%,#f9e5c3 47%,#585850 75%,#242322);clip-path:polygon(8% 0,92% 0,92% 75%,50% 100%,8% 75%);filter:drop-shadow(5px 5px 4px #38251b)}
+#root .chisel .spark{position:absolute;left:75px;top:130px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#fff6ce 0%,#ffc66f 7%,rgba(255,186,79,.7) 17%,transparent 70%);opacity:0}
+#root .glint{position:absolute;left:270px;top:330px;width:110px;height:245px;z-index:4;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,231,171,.75),transparent);filter:blur(13px);transform:skewX(-20deg);pointer-events:none}
+#root .chip{position:absolute;width:12px;height:9px;background:#e1b77c;box-shadow:1px 1px 1px #523720;clip-path:polygon(0 10%,100% 0,71% 100%,18% 85%);opacity:0;z-index:5}
+#root .dust{position:absolute;width:18px;height:18px;border-radius:50%;background:#e8c99b;filter:blur(5px);opacity:0;z-index:5}
+#root .p-glow{position:absolute;left:310px;top:340px;width:360px;height:310px;border-radius:50%;background:radial-gradient(circle,rgba(255,194,70,.45),transparent 70%);filter:blur(22px);opacity:0}
+#root svg.defs{position:absolute;width:0;height:0;overflow:hidden}
 </style>
-<div data-hf-id="hf-w15f" id="root" data-composition-id="intro" data-width="1080" data-height="1350" data-duration="10.000">
-<div data-hf-id="hf-vicc" id="intro-main" class="clip stage" data-start="0.000" data-duration="10.000" data-track-index="1">
-<div data-hf-id="hf-jkcx" id="intro-sheet" class="sheet">
-<svg data-hf-id="hf-5f44" class="ornament" viewBox="0 0 280 36" aria-hidden="true">
-<path data-hf-id="hf-uoyx" d="M8 18 H96" stroke="#6A4524" stroke-width="4" />
-<circle data-hf-id="hf-i46y" cx="140" cy="18" r="11" fill="none" stroke="#6A4524" stroke-width="4" />
-<path data-hf-id="hf-wknm" d="M140 7 V29 M129 18 H151" stroke="#6A4524" stroke-width="3" />
-<path data-hf-id="hf-ydoc" d="M184 18 H272" stroke="#6A4524" stroke-width="4" />
-</svg>
-</div>
-<div data-hf-id="hf-0ggk" id="intro-dowel-top" class="dowel top"></div>
-<div data-hf-id="hf-qv3d" id="intro-dowel-bottom" class="dowel bottom" data-layout-allow-overflow=""></div>
-<div data-hf-id="hf-dv2m" id="intro-frieze-rule" class="rule top"></div>
-<div data-hf-id="hf-iijn" id="intro-ground" class="rule ground"></div>
-<div id="intro-opening-title" class="opening-title">STARRING</div>
-<div data-hf-id="hf-ttz1" id="intro-fig-1" class="fig"><img data-hf-id="hf-yi0y" src="assets/intro/claude.svg" alt="Claude hieroglyph, a robot holding a very long scroll"></div>
-<div data-hf-id="hf-xs32" id="intro-fig-2" class="fig"><img data-hf-id="hf-3ta8" src="assets/intro/codex.svg" alt="Codex hieroglyph, a robot giving a thumbs up"></div>
-<div data-hf-id="hf-1q73" id="intro-fig-3" class="fig"><img data-hf-id="hf-5i39" src="assets/intro/cursor.svg" alt="Cursor hieroglyph, a robot waving"></div>
-<div data-hf-id="hf-7vww" id="intro-fig-4" class="fig"><img data-hf-id="hf-di55" src="assets/intro/antigravity.svg" alt="Antigravity hieroglyph, a robot hovering"></div>
-<div data-hf-id="hf-8nkp" id="intro-fig-5" class="fig"><img data-hf-id="hf-r36l" src="assets/intro/opencode.svg" alt="OpenCode hieroglyph, a robot raising one finger"></div>
-<div data-hf-id="hf-cloq" id="intro-fig-6" class="fig"><div data-hf-id="hf-r4th" id="intro-glow" class="glow"></div><img data-hf-id="hf-g0ep" src="assets/intro/ptah.svg" alt="Ptah, mummiform, blue skullcap, straight beard, was-sceptre"></div>
-<div data-hf-id="hf-1wk7" id="intro-card-1" class="card"><div data-hf-id="hf-rbdn" id="intro-plaque-1" class="plaque"><span data-hf-id="hf-asvp" class="tie"></span><span data-hf-id="hf-dqit" class="who">CLAUDE</span><span data-hf-id="hf-w2zq" class="role">the over-prepared</span></div></div>
-<div data-hf-id="hf-r12k" id="intro-card-2" class="card"><div data-hf-id="hf-inhs" id="intro-plaque-2" class="plaque"><span data-hf-id="hf-dwq1" class="tie"></span><span data-hf-id="hf-zsii" class="who">CODEX</span><span data-hf-id="hf-4ghf" class="role">the deadpan</span></div></div>
-<div data-hf-id="hf-rsqd" id="intro-card-3" class="card"><div data-hf-id="hf-jf5l" id="intro-plaque-3" class="plaque"><span data-hf-id="hf-f3n4" class="tie"></span><span data-hf-id="hf-46ol" class="who">CURSOR</span><span data-hf-id="hf-8q8i" class="role">the eager one</span></div></div>
-<div data-hf-id="hf-akg2" id="intro-card-4" class="card"><div data-hf-id="hf-ar9q" id="intro-plaque-4" class="plaque"><span data-hf-id="hf-epc3" class="tie"></span><span data-hf-id="hf-user" class="who">ANTIGRAVITY</span><span data-hf-id="hf-rl1t" class="role">the floating agent</span></div></div>
-<div data-hf-id="hf-eik3" id="intro-card-5" class="card"><div data-hf-id="hf-epdr" id="intro-plaque-5" class="plaque"><span data-hf-id="hf-cpsy" class="tie"></span><span data-hf-id="hf-jt5e" class="who">OPENCODE</span><span data-hf-id="hf-mxt9" class="role">the objector</span></div></div>
-<div data-hf-id="hf-5uo8" id="intro-card-6" class="card"><div data-hf-id="hf-3tw4" id="intro-plaque-6" class="plaque"><span data-hf-id="hf-cbhx" class="tie"></span><span data-hf-id="hf-s3bu" class="who">PTAH</span><span data-hf-id="hf-i9gx" class="role">the builder</span></div></div>
-<div data-hf-id="hf-8ssp" id="intro-stone" class="stone">
-<div data-hf-id="hf-xnjp" id="intro-word" class="word"><span data-hf-id="hf-qntp" id="intro-letter-p" class="letter">P</span><span data-hf-id="hf-2665" id="intro-letter-t" class="letter">T</span><span data-hf-id="hf-znm5" id="intro-letter-a" class="letter">A</span><span data-hf-id="hf-jyal" id="intro-letter-h" class="letter">H</span></div>
-<p data-hf-id="hf-92lp" id="intro-tag" class="tag"><span>/pə</span><span class="stress"></span><span>tɑː/ — the P is not silent.</span></p>
-<svg data-hf-id="hf-3how" id="intro-chisel" class="chisel" viewBox="0 0 72 72" aria-hidden="true"><rect data-hf-id="hf-xfuk" x="32" y="2" width="10" height="36" rx="3" fill="#6B3E22" /><path data-hf-id="hf-xp1r" d="M22 36 h28 l-8 30 h-12 z" fill="#C5C8CC" stroke="#5C6166" stroke-width="2" /></svg>
-<i data-hf-id="hf-hb4a" id="intro-chip-0" class="chip" style="left:18%;top:46%"></i>
-<i data-hf-id="hf-hs0o" id="intro-chip-1" class="chip" style="left:24%;top:40%"></i>
-<i data-hf-id="hf-5fjp" id="intro-chip-2" class="chip" style="left:30%;top:50%"></i>
-<i data-hf-id="hf-7edq" id="intro-chip-3" class="chip" style="left:36%;top:38%"></i>
-<i data-hf-id="hf-npmt" id="intro-chip-4" class="chip" style="left:44%;top:48%"></i>
-<i data-hf-id="hf-1ooa" id="intro-chip-5" class="chip" style="left:50%;top:36%"></i>
-<i data-hf-id="hf-s2hl" id="intro-chip-6" class="chip" style="left:56%;top:47%"></i>
-<i data-hf-id="hf-1k9g" id="intro-chip-7" class="chip" style="left:62%;top:39%"></i>
-<i data-hf-id="hf-e5i0" id="intro-chip-8" class="chip" style="left:68%;top:49%"></i>
-<i data-hf-id="hf-nkh3" id="intro-chip-9" class="chip" style="left:74%;top:37%"></i>
-<i data-hf-id="hf-55z2" id="intro-chip-10" class="chip" style="left:80%;top:46%"></i>
-<i data-hf-id="hf-r7q2" id="intro-chip-11" class="chip" style="left:28%;top:34%"></i>
-</div>
-<div data-hf-id="hf-oewg" id="intro-flash" class="flash" data-layout-ignore=""></div>
-<svg data-hf-id="hf-io57" id="intro-grain" class="grain" data-layout-ignore="" viewBox="0 0 1080 1350" preserveAspectRatio="none" aria-hidden="true">
-<filter data-hf-id="hf-pwen" id="intro-grain-noise" x="-20%" y="-20%" width="140%" height="140%">
-<feturbulence data-hf-id="hf-l4b3" type="fractalNoise" baseFrequency="1.15" numOctaves="1" seed="7" />
-</filter>
-<rect data-hf-id="hf-v4qo" width="100%" height="100%" filter="url(#intro-grain-noise)" />
-</svg>
-</div>
+<div id="root" data-composition-id="intro" data-width="1920" data-height="1080" data-duration="6.000">
+ <svg class="defs" aria-hidden="true"><defs><filter id="cut" x="-5%" y="-7%" width="110%" height="114%" color-interpolation-filters="sRGB"><feOffset in="SourceAlpha" dx="7" dy="7" result="shiftBR"/><feComposite in="SourceAlpha" in2="shiftBR" operator="out" result="topLeft"/><feOffset in="SourceAlpha" dx="-6" dy="-6" result="shiftTL"/><feComposite in="SourceAlpha" in2="shiftTL" operator="out" result="bottomRight"/><feFlood flood-color="#382318" result="dark"/><feComposite in="dark" in2="topLeft" operator="in" result="shade"/><feFlood flood-color="#ffe2a2" result="light"/><feComposite in="light" in2="bottomRight" operator="in" result="bevel"/><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="18" result="noise"/><feDisplacementMap in="shade" in2="noise" scale="3" result="rough"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="rough"/><feMergeNode in="bevel"/></feMerge></filter></defs></svg>
+ <div id="intro-main" class="clip stage" data-start="0.000" data-duration="6.000" data-track-index="1">
+  <div id="intro-wall" class="wall"></div>
+  <div id="intro-p-glow" class="p-glow"></div>
+  <div class="word"><span id="letter-p" class="letter">P<span id="intro-gold" class="gold">P</span></span><span id="letter-t" class="letter">T</span><span id="letter-a" class="letter">A</span><span id="letter-h" class="letter">H</span></div>
+  <div id="intro-tag" class="tag">/pəˈtɑː/</div>
+  <div id="intro-line" class="line">The P is not silent.</div>
+  <div id="intro-glint" class="glint"></div>
+  <div id="intro-chisel" class="chisel"><div class="shaft"></div><div id="intro-spark" class="spark"></div></div>
+  <div id="intro-chips"></div>
+ </div>
 </div>
 <script>
-{ const tl=gsap.timeline({paused:true});
-const cues=[0.6,1.8,3.0,4.2,5.4,6.6];
-const dx=[415,249,83,-83,-249,-415];
-const dy=-743;
-const S=2.0;
-tl.addLabel("card1",0.6);
-tl.addLabel("card2",1.8);
-tl.addLabel("card3",3.0);
-tl.addLabel("card4",4.2);
-tl.addLabel("card5",5.4);
-tl.addLabel("card6",6.6);
-tl.addLabel("chisel",7.8);
-tl.addLabel("tag",8.8);
-tl.to("#intro-opening-title",{opacity:0,y:-22,duration:0.18,ease:"power2.in",immediateRender:false},0.38);
-tl.fromTo("#intro-dowel-bottom",{y:-1216},{y:0,duration:0.2,ease:"power2.out"},0);
-tl.set("#intro-frieze-rule, #intro-ground",{opacity:0},0);
-tl.to("#intro-frieze-rule, #intro-ground",{opacity:1,duration:0.2,immediateRender:false},0.48);
-cues.forEach(function(t,i){
-  const fig="#intro-fig-"+(i+1);
-  const plaque="#intro-plaque-"+(i+1);
-  const next=i<5?cues[i+1]:7.6;
-  const leave=i<5?next-0.34:7.30;
-  const enter=t-0.14;
-  if(i<5){
-    tl.fromTo(fig,{opacity:0,x:dx[i],y:dy+36,scaleX:S*0.4,scaleY:S*0.4,rotation:-8},{opacity:1,x:dx[i],y:dy,scaleX:S*1.12,scaleY:S*0.84,rotation:4,duration:0.18,ease:"power3.out"},enter);
-    tl.to(fig,{scaleX:S,scaleY:S,rotation:0,duration:0.16,ease:"power2.out",immediateRender:false},t+0.04);
-  }else{
-    tl.fromTo(fig,{opacity:0,x:dx[i],y:dy,scaleX:S*0.74,scaleY:S*1.05,rotation:-32},{opacity:1,x:dx[i],y:dy,scaleX:S,scaleY:S,rotation:0,duration:0.3,ease:"power2.out"},enter);
-    tl.fromTo("#intro-glow",{opacity:0},{opacity:1,duration:0.3,ease:"power1.out"},enter);
-  }
-  tl.to(fig,{x:0,y:0,scaleX:1,scaleY:1,rotation:0,duration:0.28,ease:"power2.inOut",immediateRender:false},leave);
-  tl.fromTo(plaque,{opacity:0,scale:0.55,rotation:-8,y:16},{opacity:1,scale:1,rotation:-6,y:0,duration:0.16,ease:"back.out(1.8)"},enter);
-  tl.to(plaque,{rotation:-6,duration:0.12,ease:"none",immediateRender:false},t+0.22);
-  tl.to(plaque,{rotation:-1,duration:0.16,ease:"power2.out",immediateRender:false},t+0.34);
-  tl.to(plaque,{opacity:0,y:-12,scale:0.9,duration:0.12,ease:"power2.in",immediateRender:false},next-0.20);
-  tl.fromTo("#intro-grain",{opacity:i===5?0.22:0.35},{opacity:0,duration:0.16,ease:"power2.out",immediateRender:false},enter);
-});
-tl.set("#intro-stone",{opacity:0,y:30},0);
-tl.to("#intro-stone",{opacity:1,y:0,duration:0.24,ease:"power2.out",immediateRender:false},7.52);
-tl.set(".letter",{scaleX:0,opacity:0,transformOrigin:"0% 50%"},0);
-tl.set("#intro-tag",{opacity:0,y:16},0);
-tl.set("#intro-chisel",{opacity:0,x:-237,y:-48,rotation:-18},0);
-tl.to("#intro-chisel",{opacity:1,duration:0.18,immediateRender:false},7.58);
-tl.set(".chip",{opacity:0},0);
-const hits=[-237,-79,79,237];
-const letters=["#intro-letter-p","#intro-letter-t","#intro-letter-a","#intro-letter-h"];
-const chipVec=[[-22,-34,28],[14,-26,-18],[6,-44,48],[-18,-30,16],[20,-22,-36],[4,-40,22],[-16,-28,40],[18,-36,-14],[8,-46,30],[-20,-24,18],[16,-32,-28],[10,-42,36]];
-hits.forEach(function(x,i){
-  const t=7.8+i*0.2;
-  tl.set("#intro-chisel",{opacity:1},t);
-  tl.to("#intro-chisel",{x:x,y:-26,rotation:-16,duration:0.08,ease:"power1.out",immediateRender:false},t);
-  tl.to("#intro-chisel",{y:10,rotation:8,duration:0.07,ease:"power4.in",immediateRender:false},t+0.08);
-  tl.to("#intro-chisel",{y:-22,rotation:-10,duration:0.08,ease:"power2.out",immediateRender:false},t+0.15);
-  tl.to(letters[i],{scaleX:1,opacity:1,duration:0.14,ease:"power2.out",immediateRender:false},t+0.1);
-  for(let c=0;c<3;c++){
-    const id="#intro-chip-"+(i*3+c);
-    const v=chipVec[i*3+c];
-    tl.fromTo(id,{opacity:1,x:0,y:0,rotation:0},{opacity:0,x:v[0],y:v[1],rotation:v[2],duration:0.36,ease:"power2.out",immediateRender:false},t+0.1);
-  }
-});
-tl.to("#intro-chisel",{opacity:0,duration:0.2,immediateRender:false},8.55);
-tl.to("#intro-tag",{opacity:1,y:0,duration:0.35,ease:"power2.out",immediateRender:false},8.8);
-window.__timelines=window.__timelines||{};
-window.__timelines["intro"]=tl;
-}
+{const tl=gsap.timeline({paused:true});
+ tl.fromTo('#intro-main',{scale:1},{scale:1.04,duration:6,ease:'none'},0);
+ const xs=[305,650,1000,1340],ids=['p','t','a','h'];
+ ids.forEach((letter,i)=>{
+   const t=.6+i*.53;
+   tl.fromTo('#letter-'+letter,{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)',duration:.47,ease:'none'},t);
+   tl.set('#intro-chisel',{opacity:1,x:xs[i],y:300},t);
+   tl.fromTo('#intro-chisel',{rotation:-10,y:275,x:xs[i]},{rotation:5,y:335,x:xs[i]+215,duration:.47,ease:'none'},t);
+   tl.fromTo('#intro-main',{x:0,y:0},{x:2,y:-2,duration:.045,yoyo:true,repeat:3,ease:'none'},t+.14);
+   tl.fromTo('#intro-spark',{opacity:0,scale:.2},{opacity:1,scale:1,duration:.08,ease:'power2.out'},t+.14);
+   tl.to('#intro-spark',{opacity:0,scale:1.8,duration:.21},t+.22);
+   for(let j=0;j<8;j++){
+     const el=document.createElement('div');el.className=j%3?'chip':'dust';el.id='chip-'+i+'-'+j;document.getElementById('intro-chips').appendChild(el);
+     const dx=((j*37+i*19)%110)-55,dy=65+(j*31%100);
+     tl.fromTo(el,{opacity:0,x:xs[i]+80,y:445,rotation:0},{opacity:1,x:xs[i]+80+dx,y:445+dy,rotation:dx*2,duration:.24,ease:'power1.out'},t+.17+j*.018);
+     tl.to(el,{opacity:0,y:650+dy,duration:.55,ease:'power1.in'},t+.41+j*.018);
+   }
+ });
+ tl.to('#intro-chisel',{opacity:0,duration:.2},2.75);
+ tl.fromTo('#intro-glint',{opacity:0,x:0},{opacity:.8,x:1250,duration:.3,ease:'none'},2.9);
+ tl.to('#intro-glint',{opacity:0,duration:.12},3.2);
+ tl.fromTo('#intro-tag',{opacity:0,y:18},{opacity:1,y:0,duration:.55,ease:'power2.out'},3.2);
+ tl.fromTo('#intro-line',{opacity:0,y:18},{opacity:1,y:0,duration:.55,ease:'power2.out'},4.2);
+ tl.fromTo('#intro-gold',{clipPath:'inset(100% 0 0 0)'},{clipPath:'inset(0% 0 0 0)',duration:.65,ease:'power2.out'},4.2);
+ tl.fromTo('#intro-p-glow',{opacity:0},{opacity:1,duration:.65},4.2);
+ window.__timelines=window.__timelines||{};window.__timelines.intro=tl;}
 </script>
 </template>
+
+

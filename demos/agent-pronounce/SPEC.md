@@ -26,10 +26,60 @@ Delete them only when nothing imports them.
   as characters.
 - **Cinematic open.** The film opens inside the office with a camera
   entrance, with no browser insert. The `screen` scene and line S1 are cut.
-- The primary cut is **4:5, 1080 × 1350**. The 16:9 cut comes later and is out
-  of scope for this round.
+- The primary cut is **16:9, 1920 × 1080**. Changed by the user on 2026-11-10
+  (was 4:5, 1080 × 1350). The 4:5 cut is dropped for now.
 - Captions are at least 64 px and at most 6 words per line, burned in and synced
   word by word (series rules 8–14 in `../series/README.md`).
+
+## Direction v2 (set by the user on 2026-11-10 — overrides any conflicting text below)
+
+The user's review of the 4:5 cut: the scene switches and the cast catalogue are
+"not well thought and written", the Ptah footage is "so small", "we need to own
+the stage and create an intuitive eye catching experience", "reduce the pace for
+the conversation and act as its a true short cinematic video scene". Lanes have
+full authority to fetch free GLB models, HDRIs, textures and sounds through the
+`free-media-sourcing` skill (manifest only; media is never committed).
+
+1. **Format.** 1920 × 1080, 16:9. Every set, camera, overlay, caption and 2D
+   composition is re-staged for landscape: wide establishing shots, subjects
+   composed on thirds, depth in foreground / midground / background. Nothing
+   important sits in the outer 5 % of the frame and nothing is cropped.
+2. **Film pacing.** Target length **80–95 s**. Dialogue lines and ids do not
+   change.
+   - Turn gaps (different speakers): **0.9–1.4 s**. Phrase gaps inside a line:
+     0.4–0.6 s.
+   - Reaction beats after an event: at least **1.5 s**, acted, never frozen.
+   - Every new location opens with at least **2.5 s** without dialogue.
+   - No shot is shorter than **3.0 s**. Camera moves are slow and eased; no
+     whip moves outside the vortex.
+3. **Motivated scene switches.** Every switch has a cause on screen and a sound
+   that carries across it. No hard cut, no generic cross-fade.
+   - office → vortex: the white-out on "Old." holds 0.8 s, then the floor falls
+     away under the sofa.
+   - vortex → desert: the sofa lands in a dust burst; the dust clears over
+     1.5 s into a slow crane-up that reveals the giant Ptah (the reveal is the
+     2.5 s silent opening).
+   - desert → showcase: on `portal` the pylon doorway lights and the camera
+     pushes through it until the doorway light fills the frame; the app window
+     resolves out of that light.
+   - showcase → desert: the window recedes back into the doorway; the camera
+     settles on the sofa two-shot with the giant behind for D6, then holds 2 s.
+   - desert → title: the camera tilts to a bare sandstone face that becomes the
+     title wall (match on texture and light direction).
+4. **Ptah owns the stage** (`app-window`). The app window is at least **88 % of
+   the frame width** (≥ 1690 px), centred, with thin window chrome. It plays
+   `multi-agent`, `orchestration` and `tribunal-council`, each held at least
+   **4.5 s**, with one label per clip (at most 4 words, at least 72 px) outside
+   the window content. D5 lands as the window resolves. No caption or label
+   covers the footage. The desert is not visible behind it except as a soft
+   glow at the frame edge.
+5. **The cast catalogue is cut.** `intro` becomes the **title wall**, fixed at
+   **6.0 s**: a chisel carves `PTAH` into sandstone across the full frame width,
+   then `/pəˈtɑː/`, then "The P is not silent." No name cards, no STARRING
+   card. The agents are already introduced in-world by the crew banners.
+   Cues: `chisel` 0.6, `tag` 3.2, `line` 4.2. `endcard` is fixed at **4.0 s**.
+6. **Order of work.** Lane A lands the format, timing and `app-window` first.
+   Lanes B and C start after that and snapshot at 1920 × 1080.
 
 ## Script (line ids are binding)
 

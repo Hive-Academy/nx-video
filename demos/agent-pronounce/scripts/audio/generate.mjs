@@ -51,8 +51,12 @@ for(const [id,s] of Object.entries(SFX)){
  if(force||!exists(file)){console.log('SFX',id);fs.writeFileSync(file,await api('POST','/v1/sound-generation',{json:{text:s.prompt,duration_seconds:s.duration,prompt_influence:.45},accept:'audio/mpeg'}));}
  const hit=L.sfxHits.find(h=>h.take===id);if(hit)sfx[id]={file:rel(file),start:hit.at,duration:Math.min(duration(file),Math.max(.1,L.total-hit.at)),volume:hit.volume};
 }
+const desert=L.scenes.find(s=>s.id==='desert');
+const title=L.scenes.find(s=>s.id==='intro');
+sfx['window-return']={file:rel(path.join(sfxDir,'choir-swell.mp3')),start:+(desert.start+desert.cues.showcaseEnd-.7).toFixed(3),duration:2.2,volume:.26};
+sfx['title-scrape']={file:rel(path.join(sfxDir,'chisel.mp3')),start:+(title.start-.25).toFixed(3),duration:Math.min(1,duration(path.join(sfxDir,'chisel.mp3'))),volume:.3};
 const introStart=L.scenes.find(s=>s.id==='intro').start;
-for(const [i,at] of [.6,1.8,3,4.2,5.4,6.6,8.8].entries())sfx['intro-hit-'+(i+1)]={file:rel(path.join(sfxDir,'oud-pluck.mp3')),start:+(introStart+at).toFixed(3),duration:Math.min(.7,duration(path.join(sfxDir,'oud-pluck.mp3'))),volume:.38};
+// The title wall uses the chisel cue; the former cast-card plucks are removed.
 async function music(id,prompt,seconds){
  const file=path.join(musicDir,`${id}.mp3`),raw=path.join(musicDir,`${id}-raw.mp3`);
  if(force||!exists(file)){
@@ -65,6 +69,6 @@ const intro=await music('intro-theme',MUSIC_PROMPT,10),end=await music('end-stin
 const office=L.scenes.find(s=>s.id==='office');
 const officeBed=path.join(musicDir,'office-night-bed.mp3');
 run('ffmpeg',['-y','-v','error','-stream_loop','-1','-i',path.join(sfxDir,'night-ambience.mp3'),'-t',String(office.duration),'-af',`highpass=f=100,lowpass=f=1400,volume='if(between(t,4,${Math.max(4,office.duration-.6)}),0.4,1)':eval=frame,afade=t=in:st=0:d=1,afade=t=out:st=${Math.max(0,office.duration-.6)}:d=0.6`,'-c:a','libmp3lame','-b:a','128k',officeBed]);
-const cues={fps:30,total:L.total,voices,sfx,music:null,musicClips:[{file:rel(officeBed),start:office.start,duration:office.duration,volume:.03},{...intro,start:L.scenes.find(s=>s.id==='intro').start},{...end,start:L.scenes.find(s=>s.id==='endcard').start}],timeline:L.timeline,scenes:L.scenes};
+const cues={fps:30,total:L.total,voices,sfx,music:null,musicClips:[{file:rel(officeBed),start:office.start,duration:office.duration,volume:.03},{...intro,duration:6,start:L.scenes.find(s=>s.id==='intro').start},{...end,start:L.scenes.find(s=>s.id==='endcard').start}],timeline:L.timeline,scenes:L.scenes};
 fs.writeFileSync(path.join(AUDIO,'cues.json'),JSON.stringify(cues,null,2));
 console.log('Wrote cues.json',L.total);

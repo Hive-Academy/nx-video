@@ -59,16 +59,16 @@ function plan(world,ctx) {
     spec.eyes.push({t0:bolt,t1:bolt+1.1,sx:1.35,sy:1.35});
     spec.eyes.push({t0:flash,t1:duration+1,sx:1.45,sy:1.45});
   }
-  const heroPose={pos:V(0.1,1.32,2.95),target:V(0,0.7,-1.2),fov:40};
+  const heroPose={pos:V(0.1,1.32,2.95),target:V(0,0.82,-1.2),fov:38};
   const entranceShot=custom('office entrance',(t)=>{
     const progress=clamp(t/entrance);
-    const u=ease.sineInOut(progress)+0.16*Math.sin(Math.PI*progress)**2;
-    const tilt=ease.sineInOut(clamp((t-1.5)/0.75));
-    return {pos:V(0.1,3.05-1.73*u,3.35-0.4*u),
-      target:V(0,4.0-3.3*tilt,-11+9.8*tilt),fov:40};
+    const u=ease.sineInOut(progress);
+    const look=ease.sineInOut(clamp(progress*1.4));
+    return {pos:V(0.48-0.38*u,2.85-1.53*u,-3.75+6.7*u),
+      target:V(0,2.5-1.68*look,-11+9.8*look),fov:38};
   },4.2);entranceShot.t0=0;
   const hero=custom('office hero',()=>heroPose,4.2);hero.t0=entrance;
-  const boltShot=custom('office bolt',()=>({pos:V(0.25,1.08,2.9),target:V(0,0.85,-1.2),fov:46}),4.2);boltShot.t0=12.4;
+  const boltShot=custom('office bolt',()=>({pos:V(0.25,1.12,3.55),target:V(0,1.58,-1.2),fov:49}),4.2);boltShot.t0=12.4;
   function update(t) {
     const h=world.h;
     for (const name of ['Codex','Claude']) {

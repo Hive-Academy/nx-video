@@ -251,3 +251,37 @@ files stay on disk unreviewed.
     TTS-bound, and frames are missing at the tah, crackle, hold, rise and desert-end cues.
 - There is still no visual cross-vendor review: Antigravity's quota is out, Glm cannot view
   images, and Copilot and OpenCode are disabled.
+
+## 2026-11-10 — session 3, direction v2 (user review of the 4:5 cut)
+
+User feedback: scene switches and the cast catalogue are not well thought out or written; why
+vertical; the Ptah footage is too small ("own the stage"); slow the conversation down; make it a
+true short cinematic scene; full authority to fetch GLB models and other free assets.
+
+Decisions (written into `demos/agent-pronounce/SPEC.md`, section "Direction v2"):
+
+- Format changes from 4:5 (1080 × 1350) to 16:9 (1920 × 1080). The 4:5 cut is dropped. It was
+  chosen on 2026-11-09 for social feeds; it left too little width for the sets and the app footage.
+- Film pacing: 80–95 s, turn gaps 0.9–1.4 s, reaction beats at least 1.5 s, 2.5 s silent
+  opening per location, no shot under 3 s. Dialogue lines and ids unchanged.
+- Every scene switch gets an on-screen cause (floor drop, dust clear and crane-up, push through
+  the pylon doorway, tilt to the title wall).
+- `app-window` becomes a full-stage showcase: window at least 88 % of frame width, each clip
+  held at least 4.5 s.
+- The cast catalogue (STARRING plus six cards) is cut; `intro` becomes a 6 s chiselled title
+  wall. This closes the open question about the Cursor, Antigravity and OpenCode cards.
+  Orchestrator's reading of "initial catalog": the cast line-up.
+- Order: Lane A (format, timing, showcase) first, then Lanes B (3D) and C (title, end card).
+  Codex is the only lane with room (weekly 82 %).
+
+### 2026-11-10 — direction v2 lane results
+
+- Lane A v2 (Codex 797038b6): format, retiming (82.433 s), showcase at 1740 px. Accepted.
+- Desert: rounds 1–2 rejected (blown-out sun, cropped robots, no title tilt); round 3 fixed the
+  two-shot, crews pan and tilt; round 4 fixed the opening, the D6 shot and the wall texture.
+  Accepted with minor items (see HANDOFF).
+- Office and vortex pass (Codex e0fbec37): accepted in landscape.
+- Title wall: round 1 flat letters, round 2 (block wall, progressive carving, gold P) accepted.
+- The black desert render after the format change was never reproduced; `check` hangs and
+  snapshot timeouts came from two lanes capturing at once. Rule: one capturing lane at a time.
+- Preview is a draft-quality render to the git-ignored `renders/` folder.
