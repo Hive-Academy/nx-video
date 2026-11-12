@@ -532,3 +532,22 @@ Decisions (SPEC.md "Direction v3" is the binding text):
 - Steered the desert child `5ee5ecde` to merge `b353830` and adopt the kit (one look for
   the whole film). Footage lane `30968205` (Codex) is re-cutting and masking the tour clips
   → `notes/lane-d-v4-footage.md`.
+
+## 2026-11-13 — session 5: look-dev review round and tour re-cut
+
+- Tour clips re-cut by the Codex footage lane (`scripts/footage/cut-tours.mjs`,
+  `notes/lane-d-v4-footage.md`). First result rejected: all four crops were stretched to
+  16:9. Second result accepted by eye on the four final holds: true 16:9 crops, cost figures
+  blurred, account/plan/path panes cropped or blurred. Workspace names and session titles
+  stay readable; the user has not yet said whether that is acceptable. `check --json` exit 0
+  `ok: true` (needs `--timeout 120000` while children render); media guard clean.
+- Colossus (`ad8909b`): wide still accepted; close views rejected (mask-like face with
+  glowing bars, fur-like stone, thin neck, sceptre head reads as a finger, blobby collar).
+  Second pass requested, with a tighter face still `colossus-d`.
+- Workspace (`d0ee888`): rejected for the user gate. Robots read as balls on chairs, shells
+  clip, shot a is two spheres in a dark room, shot b does not show the hero screen. Fix pass
+  requested, plus `setScreenSource` and a shared chair helper in the kit.
+- Desert (`206bc8b`): rejected for the user gate. Enclosed courtyard, no sand or horizon,
+  repeating stone, visitors standing by empty chairs, peg-doll Ptah. Fix pass requested:
+  open desert with a CC0 HDRI sky, seated visitors, staging for the 24 m colossus.
+- No still has gone to the user yet; no v4 animation started.
