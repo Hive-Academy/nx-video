@@ -6,10 +6,10 @@
 // Metres throughout (robot 0.79 m). +Z points from the facade toward the audience; the
 // screen faces +Z. Static and deterministic: every variation is seeded through util.hash.
 import * as THREE from 'three';
-import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { assetUrl } from './assets.js';
 import { glb, hdri, fit, shadows, recolor, robot, dune } from './craft.js';
 import { buildPtah } from './ptah-god.js';
+import { environment, reshadeRobot, screenLight as kitScreenLight } from './look-kit.js';
 import { brazier } from './temple.js';
 import { hash, hashRange } from './util.js';
 import { ROBOT } from './robot.js';
@@ -28,32 +28,26 @@ const CREW = { lead: 4.85, pairs: [2.45, 3.55], lateral: 0.77 };
 
 // Per-shot cameras (35 mm-equivalent focal on a 36 mm-wide gate) and post hints.
 const SHOTS = {
-  a: { pos: [1.0, 0.66, -10.9], target: [4.6, 3.3, -27], mm: 28, dof: { focus: 3.7, aperture: 0.0016, maxblur: 0.006 }, screenOn: false },
-  b: { pos: [0.2, 0.92, -5.6], target: [2.6, 5.3, -30], mm: 35, dof: { focus: 24.0, aperture: 0.00008, maxblur: 0.003 }, screenOn: true },
-  c: { pos: [0, 3.9, -12.9], target: [0, 6.95, -30], mm: 35, dof: { focus: 17.0, aperture: 0.00055, maxblur: 0.008 }, screenOn: true },
-  d: { pos: null, target: null, mm: 45, dof: { focus: 4.6, aperture: 0.0016, maxblur: 0.009 }, screenOn: true },
+  a: { pos: [1.0, 0.66, -10.9], target: [4.6, 3.3, -27], mm: 28, dof: { focus: 3.7, aperture: 0.004, maxblur: 0.006 }, screenOn: false },
+  b: { pos: [0.2, 0.92, -5.6], target: [2.6, 5.3, -30], mm: 35, dof: { focus: 24.0, aperture: 0.0002, maxblur: 0.0025 }, screenOn: true },
+  c: { pos: [0, 3.9, -12.9], target: [0, 6.95, -30], mm: 35, dof: { focus: 17.0, aperture: 0.0006, maxblur: 0.005 }, screenOn: true },
+  d: { pos: null, target: null, mm: 45, dof: { focus: 4.6, aperture: 0.003, maxblur: 0.008 }, screenOn: true },
 };
 
 export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 16 / 9 } = {}) {
   const S = SHOTS[shot] || SHOTS.b;
-  RectAreaLightUniformsLib.init();
   const scene = new THREE.Scene();
   const handles = { crews: [], visitors: [], chairs: [], braziers: [] };
 
   // ---------------------------------------------------------------- sky, IBL, sun
   const sky = await hdri('hdri/qwantani_dusk_2_puresky_2k.hdr');
-  const pm = new THREE.PMREMGenerator(renderer);
-  const envTex = pm.fromEquirectangular(sky.tex).texture;
   // rotate the HDRI so its sun sits on SUN_DIR (equirect u = atan2(z, x) / 2pi + 0.5)
   const hdriAz = (sky.sunU - 0.5) * Math.PI * 2;
   const wantAz = Math.atan2(SUN_DIR.z, SUN_DIR.x);
   const rotY = hdriAz - wantAz;
-  scene.background = sky.tex;
+  // look kit: PMREM image light + the HDRI as backplate (the kit rotates the env; the backplate rotation is set here)
+  environment(renderer, scene, sky.tex, { intensity: 0.55, rotation: rotY, background: true, backgroundIntensity: 0.95 });
   scene.backgroundRotation.set(0, rotY, 0);
-  scene.backgroundIntensity = 0.95;
-  scene.environment = envTex;
-  scene.environmentRotation.set(0, rotY, 0);
-  scene.environmentIntensity = 0.55;
 
   const sun = new THREE.DirectionalLight('#FFCC98', 3.2);
   sun.position.copy(SUN_DIR).multiplyScalar(90).add(V(0, 0, -18));
@@ -212,7 +206,8 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   appTex.offset.set(0, SCREEN_CROP.offsetY);
   appTex.generateMipmaps = true;
   const screenMat = new THREE.MeshStandardMaterial({
-    color: '#000000', roughness: 1, metalness: 0, envMapIntensity: 0,
+    // off: polished obsidian that catches the sky; on: pure emission, no veil
+    color: S.screenOn ? '#000000' : '#0B0B0E', roughness: S.screenOn ? 1 : 0.22, metalness: 0, envMapIntensity: S.screenOn ? 0 : 0.9,
     emissive: '#FFFFFF', emissiveMap: appTex, emissiveIntensity: S.screenOn ? 1.55 : 0.0, fog: false,
   });
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(SCREEN.w, SCREEN.h), screenMat);
@@ -222,7 +217,7 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   // the dark recess behind the glass edge
   site.add(mesh(new THREE.BoxGeometry(SCREEN.w + 0.1, SCREEN.h + 0.1, 0.1), new THREE.MeshStandardMaterial({ color: '#0B0A09', roughness: 0.9 }), [SCREEN.x, SCREEN.y, SCREEN.face + 0.06], { cast: false }));
   // the screen as a cool area light on the forecourt
-  const screenLight = new THREE.RectAreaLight('#9CC0FF', S.screenOn ? 5.5 : 0, SCREEN.w, SCREEN.h);
+  const screenLight = kitScreenLight(SCREEN.w, SCREEN.h, '#9CC0FF', S.screenOn ? 5.5 : 0);
   screenLight.position.set(SCREEN.x, SCREEN.y, SCREEN.z + 0.12);
   screenLight.lookAt(SCREEN.x, SCREEN.y, 10);
   site.add(screenLight);
@@ -297,6 +292,8 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     { name: 'OpenCode', key: 'far', start: V(1.8, 0, -25.95), dir: V(-1, 0, 0), len: 15, rise: 2.2, s: 2.9, seed: 303 },
   ];
   for (const def of crewDefs) handles.crews.push(buildCrew(assets, scene, def, { blockMat, rubbleMat, woodMat, leather, ropeMat }));
+  // look kit robot shading; a face light only where faces are read up close (shot d crew), the blob kept for sand contact
+  for (const c of handles.crews) for (const r of c.robots) { reshadeRobot(r, { faceLight: shot === 'd' && c.key === 'mid' ? 0.22 : 0 }); if (r.blob) r.blob.visible = true; }
 
   // stockpiles of cut blocks and site clutter
   const pile = (x, z, yaw, n, seed) => {
@@ -331,14 +328,13 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   }
 
   // ---------------------------------------------------------------- visitors and chairs
-  const chairSrc = await glb('workspace/chairdesk.glb');
+  const chairSrc = await glb('workspace/mid_century_lounge_chair/mid_century_lounge_chair_1k.gltf');
   const visitorDefs = shot === 'a'
     ? [{ name: 'Claude', chair: [0.55, -14.55], yaw: -0.18, tilt: [0.06, 0.04], seated: true }, { name: 'Codex', chair: [2.1, -14.85], yaw: 0.22, tilt: [-0.05, -0.06], seated: true }]
     : [{ name: 'Claude', chair: [-0.35, -12.6], yaw: 2.6, tilt: [0.06, 0.04], at: [0.35, -13.3] }, { name: 'Codex', chair: [2.45, -12.9], yaw: -2.4, tilt: [-0.05, -0.06], at: [1.7, -13.55] }];
   for (const v of visitorDefs) {
-    const c = fit(chairSrc.clone(true), { h: 0.78, at: [v.chair[0], 0, v.chair[1]], yaw: v.yaw, sink: 0.09 });
+    const c = fit(chairSrc.clone(true), { h: 0.74, at: [v.chair[0], 0, v.chair[1]], yaw: v.yaw, sink: 0.09 });
     c.rotation.x = v.tilt[0]; c.rotation.z = v.tilt[1];
-    recolor(c, { '*': { color: '#34363C', roughness: 0.5, metalness: 0.15 } });
     shadows(c);
     scene.add(c);
     handles.chairs.push(c);
@@ -355,6 +351,8 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
       const at = V(v.at[0], 0, v.at[1]);
       r = robot(assets, v.name, at, V(SCREEN.x + (v.name === 'Claude' ? -1 : 1), 0, -30), { scale: RS, pose: { pitch: 0.12, nod: 0.05 } });
     }
+    reshadeRobot(r, { faceLight: shot === 'a' ? 0.35 : 0 });
+    if (!v.seated && r.blob) r.blob.visible = true;
     scene.add(r.root);
     handles.visitors.push(r);
   }
@@ -399,6 +397,9 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   scene.add(motes(300, V(0, 0.05, -18), V(30, 0.6, 20), 78, { size: 0.12, opacity: 0.22, color: '#F3D2A8' }));
 
   fog.apply(scene);
+  // look kit: transparent atmosphere (dust, haze cards, shafts, motes, flames) stays out of the AO and DOF depth renders
+  scene.userData.noDepth = scene.userData.noDepth || [];
+  scene.traverse((o) => { const m = o.material; if ((o.isMesh || o.isPoints || o.isSprite) && m && !Array.isArray(m) && m.transparent) scene.userData.noDepth.push(o); });
 
   // ---------------------------------------------------------------- camera
   const camera = new THREE.PerspectiveCamera(30, aspect, 0.1, 1200);
@@ -433,12 +434,17 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     return [r.name.slice(0, 2), +((p.x + 1) / 2).toFixed(2), +((1 - p.y) / 2).toFixed(2)];
   }).filter((f) => f[1] > -0.05 && f[1] < 1.05 && f[2] > -0.05 && f[2] < 1.05);
 
+  // look kit film chain (src/look-kit.js). AO radius is larger than the workspace's: the set is metres of stone, not a desk.
+  const film = {
+    size: [1920, 1080], tone: 'aces', exposure: 0.92, msaa: 4,
+    ao: { radius: 0.45, thickness: 1.2, distanceExponent: 1.6, scale: 1, samples: 16, intensity: 0.8 },
+    dof: S.dof,
+    bloom: { strength: 0.3, radius: 0.55, threshold: 1.05 },
+    grade: { vignette: 0.3, grain: 0.022, ca: 0.0012, lift: [0.006, 0.006, 0.012], seed: 4 },
+  };
   return {
     scene, camera,
-    bloom: { strength: 0.32, radius: 0.55, threshold: 1.05 },
-    exposure: 0.92,
-    toneMapping: THREE.ACESFilmicToneMapping,
-    post: { ao: { radius: 0.9, thickness: 1.2, intensity: 0.85 }, dof: S.dof },
+    bloom: null, exposure: film.exposure, film,
     handles, info,
   };
 }
