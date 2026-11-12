@@ -459,3 +459,17 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   presenting, crews in the background, seated landing), then animation, voice, timing.
 - Seat-drop bug the user reported (seat falls while both robots already stand) is rule 3 of
   direction v4.
+- User (verbatim): "u can spawn child session asu like to get that wokring use opus with
+  meduim efforts for them". Started two child sessions (model `opus`, effort medium), each on
+  its own branch and worktree from `demo/ep06-p-is-not-silent` at `7e1bf42`:
+  - `5ee5ecde` "Ep6 v4 desert look-dev", branch `demo/ep06-v4-desert-look`, worktree
+    `.claude-worktrees/demo-ep06-v4-desert-look-3775168180f0` → `src/look-desert4.js`,
+    `notes/opus-desert-lookdev.md`, stills `desert4-a..d` (arrival seated in chairs, the
+    monument screen wide, feature push-in, crew close).
+  - `3b2b1544` "Ep6 v4 Ptah colossus", branch `demo/ep06-v4-ptah-colossus`, worktree
+    `.claude-worktrees/demo-ep06-v4-ptah-colossus-ca746bb4213a` → `src/ptah-colossus.js`
+    (`createPtahColossus`, `setState`), `notes/opus-ptah-colossus.md`, stills `colossus-a..c`.
+  Children commit on their own branches and do not push; I merge them into the episode
+  branch. The look kit comes from the workspace look-dev subagent in the main checkout; when
+  it is committed I message the desert child to merge it. Children must not edit
+  `scene.js`, `robot.js`, `assets.js` or `lighting.js`.
