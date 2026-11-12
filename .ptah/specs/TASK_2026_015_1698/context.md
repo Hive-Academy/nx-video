@@ -523,3 +523,12 @@ Decisions (SPEC.md "Direction v3" is the binding text):
 - Interim state of the film: v4.1 voice and timing over the v3 office and desert animation.
   The mouths and cameras of the old staging do not match the new lines until the scenes are
   re-animated.
+- Workspace child `0e86981c` reported phase 1: look kit and `workspace-b` committed as
+  `b353830` on `demo/ep06-v4-workspace-look` (about 40 ms per frame; office and desert stills
+  bit-identical with the kit unused). I viewed the still: real models, city bokeh and depth
+  of field are a clear step up from the rejected sheet; weak points are clipped white robot
+  shells, no visible screen glow, robots reading as balls on chairs, a foreground lamp across
+  the left robot and a black right wall. Sent as queued feedback to the child.
+- Steered the desert child `5ee5ecde` to merge `b353830` and adopt the kit (one look for
+  the whole film). Footage lane `30968205` (Codex) is re-cutting and masking the tour clips
+  → `notes/lane-d-v4-footage.md`.
