@@ -1,0 +1,151 @@
+# Episode 6 v4: workspace look-dev and look kit (opus lane)
+
+These are look-dev stills only, with no animation. The branch is `demo/ep06-v4-workspace-look`. Phase 1 is commit `b353830`.
+
+## Skills loaded
+
+- `D:/projects/nx-video/tools/skills/video-quality-bar/SKILL.md`: "A lane that has not met this bar has not finished, whatever its exit code."
+- `D:/projects/nx-video/tools/skills/threejs-scene-craft/SKILL.md`: "Robots come only from `createRobot(assets, name)` (`robot.js`). Never rebuild a character."
+- `D:/projects/nx-video/tools/skills/free-media-sourcing/SKILL.md`: "Do not hand-download a file and do not copy one from another folder."
+
+## Look recipe
+
+The scene is an evening workspace in a "2026 stylised short" style: a warm interior, a cool screen and a city at night outside.
+
+- **Light**
+  - Image-based light: PMREM from `unfinished_office_night_1k.hdr` at intensity 0.45, rotated 0.6 rad.
+  - Window backplate: `scene.background` uses `shanghai_bund_2k.hdr` at intensity 0.3, with `backgroundRotation` y = 4.05 so the night skyline sits in the window. Depth of field blurs it into bokeh.
+  - Cool: the hero screen is a RectAreaLight (#C8DAFF, 12). A "moon" DirectionalLight (#8EA6E8, 0.55, 2048 shadow) comes from the window, plus a rim spot (#A9C2FF) behind the robots.
+  - Warm practicals: a spot (#FFB46B) in each desk lamp, an emissive pendant globe with a point light, a cove strip over the slat wall, a wash on the shelves and a wash on the blueprint frame.
+- **Robots:** `reshadeRobot` gives them a clearcoat physical shell (clearcoat 1, clearcoat roughness 0.08) with env reflections. The emissive face and eyes are boosted. A face light in the agent colour throws the face colour onto the desk and chair. The engine blob shadow is replaced by real shadow maps plus GTAO.
+- **Film chain** (`film` on the look):
+  - Half-float MSAA target (4 samples), then GTAO (radius 0.16, intensity 0.85).
+  - Bokeh depth of field per shot, then UnrealBloom (0.22 / 0.55 / threshold 1.0, which is restrained).
+  - ACES tone mapping at exposure 0.95.
+  - Grade: vignette 0.32, seeded grain 0.022, edge chromatic aberration 0.0012.
+- **Surfaces:** herringbone parquet floor, plastered walls, walnut veneer desk tops (tinted #C27A46, because the Poly Haven diffuse is near-grey), instanced walnut slats behind the screen, and a herringbone wool rug. No surface the camera holds on is flat or untextured.
+- **Egyptian motif, kept quiet:** a sandstone-tinted cat (Bastet) on Claude's desk, a framed stepped-pyramid blueprint (a procedural canvas with no text) on Claude's side wall, and a brass lip under the hero screen.
+
+## Kit API
+
+`src/look-kit.js` documents the API in its header comment. In short:
+
+1. A look returns `film: { size:[w,h], tone:'aces'|'agx'|'neutral', exposure, msaa, ao:{radius,intensity}|false, dof:{focus,aperture,maxblur}|false, bloom:{strength,radius,threshold}|false, grade:{vignette,grain,ca,lift,seed} }`. That opts the look in. A look without `film` renders exactly as before.
+2. `renderFilm(renderer, scene, camera, film, w, h, frame)` runs the chain, cached per `film` object: RenderPass (freezes the shadow maps after the colour pass), GTAO, Bokeh, bloom, OutputPass tone mapping, then the grade. Objects in `scene.userData.noDepth` are hidden from the depth passes.
+3. `environment(renderer, scene, hdriTex, {intensity, rotation, background, backgroundTex, backgroundIntensity, backgroundBlurriness})`.
+4. `reshadeRobot(robot, {env, faceLight, eyeBoost, shell})`. It acts only on a robot from `createRobot` and never rebuilds the rig.
+5. `screenLight(w, h, color, intensity)`, `practical('spot'|'point', {color, intensity, distance, angle, penumbra, shadow, radius, bias})` and `contactShadow(scene, w, d, opacity)`.
+
+Wiring:
+
+- `lookdev/lookdev.js`: if `look.film` is set, it sizes the canvas to `film.size` and draws with `renderFilm`. Otherwise it uses the old composer path.
+- `src/scene.js`: `renderFrame` gains `if (post && post.film) { renderFilm(...); return; }`. It is additive: every other set passes no `film` and takes the old path. The grain seed comes from `post.filmFrame`, so the grain is deterministic per frame.
+- **r181 depth fix:** BasicDepthPacking is read with `DEPTH_PACKING = 0`. The read is inverted (`1.0 - depth`), because `MeshDepthMaterial` with BasicDepthPacking writes `1 - z` in r181. Without the inversion, the focus plane lands behind the camera and everything blurs.
+
+## Layout with cameras
+
+World scale: K = 0.63. Robots are at scale 0.38: height 0.79, head radius 0.325.
+
+| Item | Position |
+| --- | --- |
+| Room | x ±2.15, z −1.02 (screen wall) to +2.35 (window wall), ceiling 1.78 |
+| Hero screen | 2.04 × 0.96 (aspect 2.124, the landing still) at (0, 0.99, −0.9); about 3.1 head widths wide |
+| Desks | walnut, 1.06 × 0.56, top 0.47, at x ±0.62, z 0.06, yaw ±0.14 toward each other |
+| Codex | x +0.62 (#10A37F), mid-century swivel chair, seat height found by raycast |
+| Claude | x −0.62 (#D97757), same chair |
+| Back of room | window (x −1.45..0.75) with mullions, steel shelves with books, pachira, floor plant |
+| Screen wall | walnut slats and cove strip, console cabinet with vase and books |
+
+| Shot | Camera pos | Target | Focal | Focus / aperture |
+| --- | --- | --- | --- | --- |
+| a, over the shoulder | (0.06, 1.45, 2.15) | (0, 0.98, −0.9) | 30 mm | 3.1 / 0.006 |
+| b, front two-shot | (1.55, 1.15, −0.8) | (−0.05, 0.74, 0.62) | 24 mm | 2.25 / 0.004 |
+| c, Codex MCU | (−0.42, 0.98, 1.77) | (0.37, 0.7, 0.47) | 35 mm | 1.2 / 0.012 |
+
+In shot c, Codex swivels toward Claude (looking at (−0.9, 0, 0.95)). In shots a and b, both robots face the screen.
+
+## Assets
+
+All assets are from Poly Haven under CC0. They are fetched through `assets/media.manifest.json` with `node tools/media/fetch-media.mjs demos/agent-pronounce --pin`, then `--check` (125/125 ok). Credits are in `assets/CREDITS.media.md`. Nothing is committed: everything sits under the git-ignored `assets/third-party/`.
+
+- **Models** (1k glTF, one manifest entry per file), under `models/workspace/<id>/`: mid_century_lounge_chair, desk_lamp_arm_01, potted_plant_02, potted_plant_04, steel_frame_shelves_03, book_encyclopedia_set_01, concrete_cat_statue, hanging_picture_frame_01, stationery_supplies, modern_wooden_cabinet, pachira_aquatica_01, modern_ceiling_lamp_01, ceramic_vase_01, office_notepads. I skipped decorative_book_set_01 because it has no glTF.
+- **Textures:** herringbone_parquet (2k), plastered_wall_04, american_walnut_veneer, poly_wool_herringbone (1k): diffuse, nor_gl and rough maps for each.
+- **HDRIs:** shanghai_bund_2k (window backplate), unfinished_office_night_1k (lighting).
+- **Procedural:** desks, keyboards, mugs, the screen bezel, slats, the window frame and the blueprint canvas.
+- Source pages: `https://polyhaven.com/a/<id>`.
+
+## Screen stills
+
+- Tour frames 1–3 all show personal text:
+  - workspace names "seshat", "ptah-extension" and "nx-video";
+  - session titles "video about ptah features promo", "before we build the nx video tools itself i w…" and "Session 10/9/2026".
+  - The best app frame (tour-1 at 4.8 s) still shows them. I did not use tour-4.
+- **Fallback used:** the landing hero at `assets/live-demo/landing-scroll.mp4` at 2.4 s, the "ON YOUR DESKTOP / ONE RAIL. NINE RUNNING. ONE BELL." section with its app mockup. It is saved as `assets/live-demo/stills/landing-app.png` (1920 × 904, git-ignored). It contains only marketing demo data. Candidate frames are in `snapshots/screen/`.
+- The screen is a MeshBasic panel with its colour ×1.55, so it stays bright after tone mapping. Its largest text reads in shot a.
+
+## Render cost
+
+Times are at 1920 × 1080 on headless Chrome WebGL, the mean of 3 timed frames after 2 warm-up frames.
+
+| Shot | Time |
+| --- | --- |
+| workspace-a | 38 ms/frame (run alone) |
+| workspace-b | 39–41 ms/frame |
+| workspace-c | 33–38 ms/frame |
+
+- The first scene in a multi-scene run can spike (213 and 1060 ms seen) from shader compilation or GPU contention from other sessions. Repeat runs settle at about 40 ms.
+- For comparison, office runs at 16 ms and desert at 22–28 ms.
+- About 20 ms of the 40 is GTAO plus bokeh. To cut cost: `ao:false` saves about 12 ms, and shadows are frozen after the first pass.
+
+## Scorecard
+
+Scores follow `tools/skills/video-quality-bar/references/scorecard.md`. They are taken at the 16:9 render size, because episode 6 is a 16:9 cut (commit d20cd83), not the 4:5 crop. Effect: no effect is cued in a static still, so the row is scored on the promised screen glow.
+
+| Frame | Subject | Set dressing | Light | Effect | Text / safe | Continuity | Result |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `snapshots/lookdev/workspace-a.png` | 4 | 4 | 4 | 4 | 5 | 4 | pass |
+| `snapshots/lookdev/workspace-b.png` | 4 | 4 | 4 | 4 | 5 | 4 | pass |
+| `snapshots/lookdev/workspace-c.png` | 5 | 4 | 4 | 4 | 5 | 4 | pass |
+
+Sheet: `snapshots/lookdev/workspace-sheet.jpg` (2880 × 590, three labelled 960 px cells).
+
+- **a:** the screen is about 58% of the frame width, and "ONE RAIL. NINE RUNNING. ONE BELL." is readable. The heads are soft in the lower corners, and nothing important is in the lower 16%.
+- **b:** Codex's face is about 46% of frame height and Claude's about 30% (both at least 22%). The night city shows as bokeh in the window. Warm lamps, shelves and the blueprint give three depth layers.
+- **c:** Codex's face sits wholly above the 84% line. A slice of the screen is upper left, and Claude's ear is a soft sliver at the left edge.
+
+## Verification
+
+- `node lookdev/shoot.mjs office desert` before and after the kit, compared with `ffmpeg psnr`: **PSNR inf (bit-identical)** for both.
+- `node tools/guards/no-media.mjs` passes (443 files, no violations).
+- In the snapshot runs, the only errors are the pre-existing 404 for `assets/audio/cues.json` and its console echo (the cue file is not in this worktree). There are no page errors.
+- Determinism: no `Math.random`, `Date`, `performance.now` or timers in the scene modules. The grain is a seeded hash. Timing lives only in the harness.
+- Not run: `hyperframes check` and render/preview (the brief forbids them). No HyperFrames composition was changed.
+
+## Decisions
+
+- **Side convention:** Codex is at world +x, so it is frame-left in the main shot b. Shot a, from behind, crosses the line, so Codex appears frame-right. Treat a as an establishing shot, or mirror its framing in the edit if the line matters.
+- **Shot c:** the screen sits in front of the robots, so a screen slice and Codex's face share the frame only if Codex swivels toward Claude. The neighbour is therefore a soft foreground sliver, not a background figure.
+- **Shot b camera:** to frame both robots it sits beside the screen (x 1.55), not straight beyond the desks, because the screen blocks a straight-on camera.
+- **Screen still:** the landing mockup replaces the app frames, because every clean app frame carried personal text.
+- **Walnut:** the veneer diffuse averages RGB (115, 109, 107), so the material colour tints it to walnut brown.
+- **Pendant:** shortened to h 0.26, so it hangs above the screen's top edge in shot a.
+- Assumption (AskUserQuestion was unavailable): look-dev stills are 1920 × 1080.
+
+## Open defects
+
+1. **The robot shells read flat white** (b, c). The clearcoat highlights are there, but the form shading is weak. Fix: lower the face light's spill onto the shell, drop the shell albedo toward #DCD6CC and raise the rim spot so each ball gets an edge.
+2. **The screen glow on the faces is subtle in b.** The screen is behind the camera, so the cool tint is weak. Fix: an extra cool RectAreaLight at the screen plane aimed at the faces, or a cool bounce card off camera.
+3. **The right wall in b is dark.** The blueprint and its wash help, but the area still reads as empty. Fix: a floor lamp or a second plant near the blueprint.
+4. **The pendant just touches the screen's top bezel in a.** Fix: move it toward +z by about 0.15, or cut its cord further.
+5. **Timing spikes on the first scene in a run** (213–1060 ms). These are likely shader compilation. The harness could add one more warm-up frame.
+6. **`__lookdevInfo.calls/tris` report 1/1** on the film path, because `renderer.info` resets per pass. This affects only the reported numbers.
+
+## Adopting the kit in the desert and vortex scenes
+
+These files were not touched here; they belong to other lanes.
+
+1. In `look-desert.js` or `look-vortex.js`, return `film: { ...FILM_DEFAULTS, size, tone:'aces', exposure, ao:{radius:0.3,intensity:0.7}, dof:false|{...}, bloom:{strength:0.3,radius:0.6,threshold:0.95}, grade:{vignette:0.3, grain:0.02, ca:0.001, seed:N} }`. Drop the old `bloom` field, because the film chain owns bloom.
+2. Call `environment(renderer, scene, hdri.tex, {intensity, rotation, background:true})` instead of hand-rolled PMREM code.
+3. Call `reshadeRobot(robot, { faceLight: true })` on each robot after `craft.robot`.
+4. Use `contactShadow` decals under props, and push additive effects (cones, sparks, portals) into `scene.userData.noDepth`, so depth of field and AO ignore them.
+5. In compositions that use `src/scene.js`, the set passes `post.film` (plus `post.filmFrame = frame`, which keeps the grain deterministic per frame). Sets without it render unchanged.

@@ -33,11 +33,11 @@ export const LAYOUT = {
 // The three stills. focal in mm (full-frame 36 mm gauge); focus in metres from the camera.
 export const SHOTS = {
   // over the shoulder: behind and above the seated robots, hero screen ~55% of the frame width
-  a: { pos: [0.08, 1.2, 1.95], target: [0, 0.9, -0.9], focal: 30, focus: 2.85, aperture: 0.006, maxblur: 0.009 },
+  a: { pos: [0.06, 1.45, 2.15], target: [0, 0.98, -0.9], focal: 30, focus: 3.1, aperture: 0.006, maxblur: 0.009 },
   // front two-shot: three-quarter from beyond the desks; both faces, screen glow on them, room behind
   b: { pos: [1.55, 1.15, -0.8], target: [-0.05, 0.74, 0.62], focal: 24, focus: 2.25, aperture: 0.004, maxblur: 0.008 },
   // single: MCU of Codex turned toward Claude, Claude's shoulder soft in front, screen slice behind
-  c: { pos: [-0.92, 0.95, 1.42], target: [0.42, 0.74, 0.5], focal: 46, focus: 1.66, aperture: 0.012, maxblur: 0.012 },
+  c: { pos: [-0.42, 0.98, 1.77], target: [0.37, 0.7, 0.47], focal: 35, focus: 1.2, aperture: 0.012, maxblur: 0.012 },
 };
 
 function blueprintTexture() {
@@ -293,7 +293,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   scene.add(shadows(plantBig));
   const plantFloor = fit(await M('potted_plant_02'), { h: 0.55, at: [1.85, 0, -0.55] });
   scene.add(shadows(plantFloor));
-  const pendant = fit(await M('modern_ceiling_lamp_01'), { h: 0.42, at: [0, R.ceil - 0.42, 0.35] });
+  const pendant = fit(await M('modern_ceiling_lamp_01'), { h: 0.26, at: [0, R.ceil - 0.26, 0.35] });
   pendant.traverse((o) => { if (o.isMesh && /globe/.test(o.material.name)) { o.material = o.material.clone(); o.material.emissive = new THREE.Color('#FFC890'); o.material.emissiveIntensity = 3; } });
   scene.add(pendant);
 
