@@ -262,6 +262,696 @@
       "licence": "CC0-1.0",
       "changes": "None",
       "sha256": "d1c4d610811b7b94328d67fa48fc107078af21318197e5b937310c825d72074d"
+    },
+    {
+      "path": "assets/third-party/hdri/qwantani_dusk_2_puresky_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/qwantani_dusk_2_puresky_2k.hdr",
+      "title": "Qwantani Dusk 2 (Pure Sky) (qwantani_dusk_2_puresky_2k.hdr)",
+      "author": "Greg Zaal, Jarod Guest",
+      "source": "https://polyhaven.com/a/qwantani_dusk_2_puresky",
+      "licence": "CC0-1.0",
+      "changes": "Rotated in scene",
+      "sha256": "440d1b5d29c79bea0985a13777642df6829e80399602a9d5f39bc20203ae6d1b"
+    },
+    {
+      "path": "assets/third-party/hdri/kiara_8_sunset_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/kiara_8_sunset_2k.hdr",
+      "title": "Kiara 8 Sunset (kiara_8_sunset_2k.hdr)",
+      "author": "Greg Zaal",
+      "source": "https://polyhaven.com/a/kiara_8_sunset",
+      "licence": "CC0-1.0",
+      "changes": "Rotated in scene",
+      "sha256": "74842b3235b3c044d653718b1021beb32bd857618073258213da999113e4d57d"
+    },
+    {
+      "path": "assets/third-party/textures/ph/large_sandstone_blocks/large_sandstone_blocks_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/large_sandstone_blocks/large_sandstone_blocks_diff_1k.jpg",
+      "title": "Large Sandstone Blocks (large_sandstone_blocks_diff_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/large_sandstone_blocks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "2ad242551c841b0c3227bdaec693acc4a4fff3fee6a9576aa501310af2595ee9"
+    },
+    {
+      "path": "assets/third-party/textures/ph/large_sandstone_blocks/large_sandstone_blocks_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/large_sandstone_blocks/large_sandstone_blocks_nor_gl_1k.jpg",
+      "title": "Large Sandstone Blocks (large_sandstone_blocks_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/large_sandstone_blocks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "7b258af6729615a78aff76ceaa153b23011bd1df39b370b7a7e06ad6193b5d82"
+    },
+    {
+      "path": "assets/third-party/textures/ph/large_sandstone_blocks/large_sandstone_blocks_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/large_sandstone_blocks/large_sandstone_blocks_arm_1k.jpg",
+      "title": "Large Sandstone Blocks (large_sandstone_blocks_arm_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/large_sandstone_blocks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "dddb167a8616b8a280a104014ab7a8bc761b3af3b18d88df315944405389f1cf"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_cracks/sandstone_cracks_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_cracks/sandstone_cracks_diff_1k.jpg",
+      "title": "Sandstone Cracks (sandstone_cracks_diff_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "cf381bbcf60aac570ce895719025a2b7adae7c03369b3d545b4f52f94e57e0e9"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_cracks/sandstone_cracks_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_cracks/sandstone_cracks_nor_gl_1k.jpg",
+      "title": "Sandstone Cracks (sandstone_cracks_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "cb983540cae33979e79862fe27b4ec23a5d41c627230d3730e9d5ff6671859f9"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_cracks/sandstone_cracks_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_cracks/sandstone_cracks_arm_1k.jpg",
+      "title": "Sandstone Cracks (sandstone_cracks_arm_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "94697b622aeb94acb38b474c96dce2e548a1b4c706f84a340764142e17a0e697"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sand_01/sand_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sand_01/sand_01_diff_1k.jpg",
+      "title": "Sand 01 (sand_01_diff_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sand_01",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "a73b90eaa6d675ef57e7d48a8cf23e1f412e353ab2e29cf73930b8ecd4e76875"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sand_01/sand_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sand_01/sand_01_nor_gl_1k.jpg",
+      "title": "Sand 01 (sand_01_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sand_01",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "73984aecdc35b1ffbc322d64b7f8d8165b06970d11f37dd47010609fcb532704"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sand_01/sand_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sand_01/sand_01_arm_1k.jpg",
+      "title": "Sand 01 (sand_01_arm_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sand_01",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "7a331aae0c26cfdba9096fc4fd0b8601d556b3e3ab92ddf4832a1c6a24a7292c"
+    },
+    {
+      "path": "assets/third-party/textures/ph/wood_planks/wood_planks_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_diff_1k.jpg",
+      "title": "Wood Planks (wood_planks_diff_1k.jpg)",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "3b0669f683e4bf10f5a55a381cfa9669a7b8dfd921901829daa3b35acc2bbdec"
+    },
+    {
+      "path": "assets/third-party/textures/ph/wood_planks/wood_planks_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_nor_gl_1k.jpg",
+      "title": "Wood Planks (wood_planks_nor_gl_1k.jpg)",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "d02abf113e17a8abe97e1be3e9d6d88add242e8c2291e2200d37aa8c68909f25"
+    },
+    {
+      "path": "assets/third-party/textures/ph/wood_planks/wood_planks_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_planks/wood_planks_arm_1k.jpg",
+      "title": "Wood Planks (wood_planks_arm_1k.jpg)",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/wood_planks",
+      "licence": "CC0-1.0",
+      "changes": "Tiled; tinted in scene",
+      "sha256": "42ffe7f755e1a74c051342e8e5d48e573b6640f4313549f04ea127f19248babd"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_01/namaqualand_cliff_01_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/namaqualand_cliff_01/namaqualand_cliff_01_1k.gltf",
+      "title": "Namaqualand Cliff 01 (namaqualand_cliff_01_1k.gltf)",
+      "author": "Jenelle van Heerden, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_01",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "cd225f3d1e088bd358fe5c426963d335eda9d8b78f084c555abf809b32b8cc85"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_01/textures/namaqualand_cliff_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_01/namaqualand_cliff_01_nor_gl_1k.jpg",
+      "title": "Namaqualand Cliff 01 (namaqualand_cliff_01_nor_gl_1k.jpg)",
+      "author": "Jenelle van Heerden, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "0a7f41c277c963a4300a83fe63adf2f7b74642e6285ea7c7db159b8e9a184a4d"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_01/namaqualand_cliff_01.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/namaqualand_cliff_01/namaqualand_cliff_01.bin",
+      "title": "Namaqualand Cliff 01 (namaqualand_cliff_01.bin)",
+      "author": "Jenelle van Heerden, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "401ecb3bcd3cdb655fa971a3db3a460055911fb35a3b18eaaeae0d860358ddda"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_01/textures/namaqualand_cliff_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_01/namaqualand_cliff_01_diff_1k.jpg",
+      "title": "Namaqualand Cliff 01 (namaqualand_cliff_01_diff_1k.jpg)",
+      "author": "Jenelle van Heerden, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "188303dfc45530c2ed4d73be4b3c4fb3257c5fdbae9bc32a60af3688bf58162d"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_01/textures/namaqualand_cliff_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_01/namaqualand_cliff_01_arm_1k.jpg",
+      "title": "Namaqualand Cliff 01 (namaqualand_cliff_01_arm_1k.jpg)",
+      "author": "Jenelle van Heerden, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "42accffb1ad7d9a4faa8caada34427220ed3d90bf65eafcdd1bbed420d8dae2a"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_02/namaqualand_cliff_02_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/namaqualand_cliff_02/namaqualand_cliff_02_1k.gltf",
+      "title": "Namaqualand Cliff 02 (namaqualand_cliff_02_1k.gltf)",
+      "author": "Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_02",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "025d245c7bbd0dfeb061c95a03a79699b5e39c9b3b04e7f0c8f729d2b99830cf"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_02/textures/namaqualand_cliff_02_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_02/namaqualand_cliff_02_diff_1k.jpg",
+      "title": "Namaqualand Cliff 02 (namaqualand_cliff_02_diff_1k.jpg)",
+      "author": "Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "872afb18d20b90da0fb24946f2fe6b55a09fffae3fe803ae86bb153fcd3aacd7"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_02/textures/namaqualand_cliff_02_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_02/namaqualand_cliff_02_nor_gl_1k.jpg",
+      "title": "Namaqualand Cliff 02 (namaqualand_cliff_02_nor_gl_1k.jpg)",
+      "author": "Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "bb4ead8fcfea7063d64df2cb08d655498d6730d46ea7381f5a55bf510cb10f74"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_02/namaqualand_cliff_02.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/namaqualand_cliff_02/namaqualand_cliff_02.bin",
+      "title": "Namaqualand Cliff 02 (namaqualand_cliff_02.bin)",
+      "author": "Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "da05a038b3a1f3b46cd8cf074d20b8d3e2b2148d30806e1feb0309e941200595"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_cliff_02/textures/namaqualand_cliff_02_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_cliff_02/namaqualand_cliff_02_arm_1k.jpg",
+      "title": "Namaqualand Cliff 02 (namaqualand_cliff_02_arm_1k.jpg)",
+      "author": "Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_cliff_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "c48be80f40db3c64500b9289c92fd2492e51069270f9e041e540aaa0af207667"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_02/namaqualand_boulder_02_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/namaqualand_boulder_02/namaqualand_boulder_02_1k.gltf",
+      "title": "Namaqualand Boulder 02 (namaqualand_boulder_02_1k.gltf)",
+      "author": "Greg Zaal, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "3c41b5946cd5b208673ec481a3969047665688b2fab1de99b57a7b4eedde099b"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_02/namaqualand_boulder_02.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/namaqualand_boulder_02/namaqualand_boulder_02.bin",
+      "title": "Namaqualand Boulder 02 (namaqualand_boulder_02.bin)",
+      "author": "Greg Zaal, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "0f6daa7ec9b1a92207c0b09b737ff1eec904aebc1c1eada778afa6e5eacd55c0"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_02/textures/namaqualand_boulder_02_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_02/namaqualand_boulder_02_nor_gl_1k.jpg",
+      "title": "Namaqualand Boulder 02 (namaqualand_boulder_02_nor_gl_1k.jpg)",
+      "author": "Greg Zaal, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "2407a9915ea0cf42b164d42f548618145da892b948327fff67bef6123790a5d7"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_02/textures/namaqualand_boulder_02_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_02/namaqualand_boulder_02_arm_1k.jpg",
+      "title": "Namaqualand Boulder 02 (namaqualand_boulder_02_arm_1k.jpg)",
+      "author": "Greg Zaal, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "e67643f5de3e2bfdd07fae1137eff0b9d86745a8c60ccac7e64b62e85ae9cee0"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_02/textures/namaqualand_boulder_02_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_02/namaqualand_boulder_02_diff_1k.jpg",
+      "title": "Namaqualand Boulder 02 (namaqualand_boulder_02_diff_1k.jpg)",
+      "author": "Greg Zaal, Rico Cilliers",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "e567620fa04906e023e3d3b49860dd32db39b368d72ecfc10ad005945fd4034d"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_05/namaqualand_boulder_05_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/namaqualand_boulder_05/namaqualand_boulder_05_1k.gltf",
+      "title": "Namaqualand Boulder 05 (namaqualand_boulder_05_1k.gltf)",
+      "author": "Jenelle van Heerden, Dario Barresi",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_05",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "f8e5fd8fd981e889d621ba4e53170a52c47cd3053b8748ee7025ed1083f36a5f"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_05/textures/namaqualand_boulder_05_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_05/namaqualand_boulder_05_arm_1k.jpg",
+      "title": "Namaqualand Boulder 05 (namaqualand_boulder_05_arm_1k.jpg)",
+      "author": "Jenelle van Heerden, Dario Barresi",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_05",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "1466c8467188f54c2fb655b05f9e1d0a9a93a366f3cd45878bcf6905487c5f3e"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_05/textures/namaqualand_boulder_05_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_05/namaqualand_boulder_05_nor_gl_1k.jpg",
+      "title": "Namaqualand Boulder 05 (namaqualand_boulder_05_nor_gl_1k.jpg)",
+      "author": "Jenelle van Heerden, Dario Barresi",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_05",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "027359a8a79febee925cc29af3106cc12bdeed5bc91cb26f1d88f589c77f448d"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_05/namaqualand_boulder_05.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/namaqualand_boulder_05/namaqualand_boulder_05.bin",
+      "title": "Namaqualand Boulder 05 (namaqualand_boulder_05.bin)",
+      "author": "Jenelle van Heerden, Dario Barresi",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_05",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "a60ade71de8612c873f9112159ed5d93dcba58979007a0915bc10d551a9ed03c"
+    },
+    {
+      "path": "assets/third-party/models/ph/namaqualand_boulder_05/textures/namaqualand_boulder_05_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/namaqualand_boulder_05/namaqualand_boulder_05_diff_1k.jpg",
+      "title": "Namaqualand Boulder 05 (namaqualand_boulder_05_diff_1k.jpg)",
+      "author": "Jenelle van Heerden, Dario Barresi",
+      "source": "https://polyhaven.com/a/namaqualand_boulder_05",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "58d1fba55e16a56fe2d6e016ac75bcddfbc3bb2273ca8c9127f1de497c54db2a"
+    },
+    {
+      "path": "assets/third-party/models/ph/sand_rocks_small_01/sand_rocks_small_01_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/sand_rocks_small_01/sand_rocks_small_01_1k.gltf",
+      "title": "Sand Rocks Small 01 (sand_rocks_small_01_1k.gltf)",
+      "author": "Rob Tuytel, Rico Cilliers",
+      "source": "https://polyhaven.com/a/sand_rocks_small_01",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "8d5dd6fc49f00646f3df1cee18c731c72b843fc9d448830bac5f151180a63d0e"
+    },
+    {
+      "path": "assets/third-party/models/ph/sand_rocks_small_01/textures/sand_rocks_small_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/sand_rocks_small_01/sand_rocks_small_01_nor_gl_1k.jpg",
+      "title": "Sand Rocks Small 01 (sand_rocks_small_01_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel, Rico Cilliers",
+      "source": "https://polyhaven.com/a/sand_rocks_small_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "764d7d9aa1229c0b4716da35b0e0d6cc769c2ce25e4854cc7bbd480dba42cc6c"
+    },
+    {
+      "path": "assets/third-party/models/ph/sand_rocks_small_01/textures/sand_rocks_small_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/sand_rocks_small_01/sand_rocks_small_01_diff_1k.jpg",
+      "title": "Sand Rocks Small 01 (sand_rocks_small_01_diff_1k.jpg)",
+      "author": "Rob Tuytel, Rico Cilliers",
+      "source": "https://polyhaven.com/a/sand_rocks_small_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "86f57a6fefdc145dd1a386917ae8a73dbcc9230e2eed276df03e930310cd1cd6"
+    },
+    {
+      "path": "assets/third-party/models/ph/sand_rocks_small_01/sand_rocks_small_01.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/sand_rocks_small_01/sand_rocks_small_01.bin",
+      "title": "Sand Rocks Small 01 (sand_rocks_small_01.bin)",
+      "author": "Rob Tuytel, Rico Cilliers",
+      "source": "https://polyhaven.com/a/sand_rocks_small_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "77ea63c7cb39654b3e804f3b3a3dafdb5a39ff828192465276908dc3a963a44e"
+    },
+    {
+      "path": "assets/third-party/models/ph/sand_rocks_small_01/textures/sand_rocks_small_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/sand_rocks_small_01/sand_rocks_small_01_arm_1k.jpg",
+      "title": "Sand Rocks Small 01 (sand_rocks_small_01_arm_1k.jpg)",
+      "author": "Rob Tuytel, Rico Cilliers",
+      "source": "https://polyhaven.com/a/sand_rocks_small_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "6b80000330bfe8710fca1210d1f4a6080f6abb3634294f834810da8e83b5d27b"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_ladder/wooden_ladder_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/wooden_ladder/wooden_ladder_1k.gltf",
+      "title": "Wooden Ladder (wooden_ladder_1k.gltf)",
+      "author": "Miroslav Turura",
+      "source": "https://polyhaven.com/a/wooden_ladder",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "ad20acb57354f726ef0970ba8e1e02ac12028581173d02b941a8dcf0325c333c"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_ladder/textures/wooden_ladder_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_ladder/wooden_ladder_nor_gl_1k.jpg",
+      "title": "Wooden Ladder (wooden_ladder_nor_gl_1k.jpg)",
+      "author": "Miroslav Turura",
+      "source": "https://polyhaven.com/a/wooden_ladder",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "4539a49d3834e423b0940d1f04c06704acb56025c5fda24a5451ea7120efac50"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_ladder/textures/wooden_ladder_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_ladder/wooden_ladder_diff_1k.jpg",
+      "title": "Wooden Ladder (wooden_ladder_diff_1k.jpg)",
+      "author": "Miroslav Turura",
+      "source": "https://polyhaven.com/a/wooden_ladder",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "c4219c7c0516099c04a1620e74967d358e70438dda042eb99a18cf8471462cfb"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_ladder/textures/wooden_ladder_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_ladder/wooden_ladder_arm_1k.jpg",
+      "title": "Wooden Ladder (wooden_ladder_arm_1k.jpg)",
+      "author": "Miroslav Turura",
+      "source": "https://polyhaven.com/a/wooden_ladder",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "ed5fc0f9b1f053dbb43adbfb1e8db0429c42f01af49da117499a44f743db5a91"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_ladder/wooden_ladder.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/4k/wooden_ladder/wooden_ladder.bin",
+      "title": "Wooden Ladder (wooden_ladder.bin)",
+      "author": "Miroslav Turura",
+      "source": "https://polyhaven.com/a/wooden_ladder",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "a86818f7a4a6fbedf147d413cc761983fa03b2d5b88dfdda346ffb3ed71698ef"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_crate_01/wooden_crate_01_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/wooden_crate_01/wooden_crate_01_1k.gltf",
+      "title": "Wooden Crate 01 (wooden_crate_01_1k.gltf)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_crate_01",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "fd9c6073acfc671e12b64666053f2805ae33aff5d3dbbcfe5c97c08c06644927"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_crate_01/textures/wooden_crate_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_01/wooden_crate_01_diff_1k.jpg",
+      "title": "Wooden Crate 01 (wooden_crate_01_diff_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_crate_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "16653f4abaf4c1d9bca94bde3bd8c54d0ea9a5298d1648abcf57de1f7ecc34cc"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_crate_01/textures/wooden_crate_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_01/wooden_crate_01_nor_gl_1k.jpg",
+      "title": "Wooden Crate 01 (wooden_crate_01_nor_gl_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_crate_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "f4ea44c7dc1686123d337039cb713d74e8a2dbc6d1bd2beeac276d06f5df3fab"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_crate_01/wooden_crate_01.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/wooden_crate_01/wooden_crate_01.bin",
+      "title": "Wooden Crate 01 (wooden_crate_01.bin)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_crate_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "85f381f8035f7a6f2f3b848640894c6d3333b261946dd8a338c0fe19e0bea21e"
+    },
+    {
+      "path": "assets/third-party/models/ph/wooden_crate_01/textures/wooden_crate_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wooden_crate_01/wooden_crate_01_arm_1k.jpg",
+      "title": "Wooden Crate 01 (wooden_crate_01_arm_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/wooden_crate_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "cd0b031c3924905e16ffd78ead062c2cc274148c4104d09635310097738b4679"
+    },
+    {
+      "path": "assets/third-party/models/ph/ceramic_vase_02/ceramic_vase_02_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/ceramic_vase_02/ceramic_vase_02_1k.gltf",
+      "title": "Ceramic Vase 02 (ceramic_vase_02_1k.gltf)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/ceramic_vase_02",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "1bda047833b68c2c1b190ee53a55b1aa42d30748c84739909b6ca65b2f2d76c9"
+    },
+    {
+      "path": "assets/third-party/models/ph/ceramic_vase_02/textures/ceramic_vase_02_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_vase_02/ceramic_vase_02_nor_gl_1k.jpg",
+      "title": "Ceramic Vase 02 (ceramic_vase_02_nor_gl_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/ceramic_vase_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "29fc2dc6f236d29d403367517249a32c87eb7ce4b70d79ba9ee22d7571eb153f"
+    },
+    {
+      "path": "assets/third-party/models/ph/ceramic_vase_02/textures/ceramic_vase_02_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_vase_02/ceramic_vase_02_diff_1k.jpg",
+      "title": "Ceramic Vase 02 (ceramic_vase_02_diff_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/ceramic_vase_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "12320e404c744095945b164293e522baadb6a0b393648f5908bfea2903f7fcc0"
+    },
+    {
+      "path": "assets/third-party/models/ph/ceramic_vase_02/ceramic_vase_02.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/ceramic_vase_02/ceramic_vase_02.bin",
+      "title": "Ceramic Vase 02 (ceramic_vase_02.bin)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/ceramic_vase_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "b8e13a9fc140b563526afd11bb233d3a838f03abc779824504d89186dfaacd3a"
+    },
+    {
+      "path": "assets/third-party/models/ph/ceramic_vase_02/textures/ceramic_vase_02_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/ceramic_vase_02/ceramic_vase_02_rough_1k.jpg",
+      "title": "Ceramic Vase 02 (ceramic_vase_02_rough_1k.jpg)",
+      "author": "James Ray Cock",
+      "source": "https://polyhaven.com/a/ceramic_vase_02",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "137ffbd61551654d94aebfd5f0b18fe9d85ed5c1515d32cca65c9db62fccd01b"
+    },
+    {
+      "path": "assets/third-party/models/ph/stone_fire_pit/stone_fire_pit_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/stone_fire_pit/stone_fire_pit_1k.gltf",
+      "title": "Stone Fire Pit (stone_fire_pit_1k.gltf)",
+      "author": "Sebastian Platen",
+      "source": "https://polyhaven.com/a/stone_fire_pit",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "40034b326d28c06f25cf1cdb39a5ab3f3b1d1a9415d490af39621efe6c31cee6"
+    },
+    {
+      "path": "assets/third-party/models/ph/stone_fire_pit/stone_fire_pit.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/4k/stone_fire_pit/stone_fire_pit.bin",
+      "title": "Stone Fire Pit (stone_fire_pit.bin)",
+      "author": "Sebastian Platen",
+      "source": "https://polyhaven.com/a/stone_fire_pit",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "83528a314ac1ff67a583a59640612e7f8dca803dbb581188b8226d9b661ef0d6"
+    },
+    {
+      "path": "assets/third-party/models/ph/stone_fire_pit/textures/stone_fire_pit_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/stone_fire_pit/stone_fire_pit_diff_1k.jpg",
+      "title": "Stone Fire Pit (stone_fire_pit_diff_1k.jpg)",
+      "author": "Sebastian Platen",
+      "source": "https://polyhaven.com/a/stone_fire_pit",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "3f2a2340a7dc7207d5b24deb7697c11c43bbd1963533b8f7c41644d32872d1ff"
+    },
+    {
+      "path": "assets/third-party/models/ph/stone_fire_pit/textures/stone_fire_pit_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/stone_fire_pit/stone_fire_pit_nor_gl_1k.jpg",
+      "title": "Stone Fire Pit (stone_fire_pit_nor_gl_1k.jpg)",
+      "author": "Sebastian Platen",
+      "source": "https://polyhaven.com/a/stone_fire_pit",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "6ba240fbdc1ab6dac4b06ac342e7fca9fa6064c7d4f98e75cfccad44214c533a"
+    },
+    {
+      "path": "assets/third-party/models/ph/stone_fire_pit/textures/stone_fire_pit_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/stone_fire_pit/stone_fire_pit_arm_1k.jpg",
+      "title": "Stone Fire Pit (stone_fire_pit_arm_1k.jpg)",
+      "author": "Sebastian Platen",
+      "source": "https://polyhaven.com/a/stone_fire_pit",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "9812f7511ccbddcb8340fd47a6fffcf3897820fad31004241639d6d2ea523e2c"
+    },
+    {
+      "path": "assets/third-party/models/ph/wicker_basket_01/wicker_basket_01_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/wicker_basket_01/wicker_basket_01_1k.gltf",
+      "title": "Wicker Basket 01 (wicker_basket_01_1k.gltf)",
+      "author": "Kuutti Siitonen",
+      "source": "https://polyhaven.com/a/wicker_basket_01",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "9ad86c33f00f46a18c9bc8bfc28c0036090ee819f7270d0028ec408512c04094"
+    },
+    {
+      "path": "assets/third-party/models/ph/wicker_basket_01/textures/wicker_basket_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wicker_basket_01/wicker_basket_01_arm_1k.jpg",
+      "title": "Wicker Basket 01 (wicker_basket_01_arm_1k.jpg)",
+      "author": "Kuutti Siitonen",
+      "source": "https://polyhaven.com/a/wicker_basket_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "5150638cbcd8f1bc07b76af3b60b31a4c5e7d38ce66ac8906b9c3192f3283b9a"
+    },
+    {
+      "path": "assets/third-party/models/ph/wicker_basket_01/textures/wicker_basket_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wicker_basket_01/wicker_basket_01_nor_gl_1k.jpg",
+      "title": "Wicker Basket 01 (wicker_basket_01_nor_gl_1k.jpg)",
+      "author": "Kuutti Siitonen",
+      "source": "https://polyhaven.com/a/wicker_basket_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "d06024a37ef330d05bf128b8488f72769af05e72d266ffbc810d7f09ea2b32f9"
+    },
+    {
+      "path": "assets/third-party/models/ph/wicker_basket_01/textures/wicker_basket_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/wicker_basket_01/wicker_basket_01_diff_1k.jpg",
+      "title": "Wicker Basket 01 (wicker_basket_01_diff_1k.jpg)",
+      "author": "Kuutti Siitonen",
+      "source": "https://polyhaven.com/a/wicker_basket_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "15156c7855d5642f6bb594edfad5bcdcfe11f87f3e109956cb9e8fdb15fef921"
+    },
+    {
+      "path": "assets/third-party/models/ph/wicker_basket_01/wicker_basket_01.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/wicker_basket_01/wicker_basket_01.bin",
+      "title": "Wicker Basket 01 (wicker_basket_01.bin)",
+      "author": "Kuutti Siitonen",
+      "source": "https://polyhaven.com/a/wicker_basket_01",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "8e96025ffcdc64a7e75d1aa980f2491b1219912a4554272cd1e192a966c399f8"
+    },
+    {
+      "path": "assets/third-party/models/ph/dead_quiver_trunk/dead_quiver_trunk_1k.gltf",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/dead_quiver_trunk/dead_quiver_trunk_1k.gltf",
+      "title": "Dead Quiver Trunk (dead_quiver_trunk_1k.gltf)",
+      "author": "James Ray Cock, Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/dead_quiver_trunk",
+      "licence": "CC0-1.0",
+      "changes": "Loaded as is; scaled and placed in scene",
+      "sha256": "c130bce552d608057143e7f131f36e9c4e06a9b780947c85d4e5eb1cacfedbaf"
+    },
+    {
+      "path": "assets/third-party/models/ph/dead_quiver_trunk/dead_quiver_trunk.bin",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/dead_quiver_trunk/dead_quiver_trunk.bin",
+      "title": "Dead Quiver Trunk (dead_quiver_trunk.bin)",
+      "author": "James Ray Cock, Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/dead_quiver_trunk",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "2f2a74458c071801cde2287970a396d503ffe0ebf4dedc3c5f3b39024186c00a"
+    },
+    {
+      "path": "assets/third-party/models/ph/dead_quiver_trunk/textures/dead_quiver_trunk_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dead_quiver_trunk/dead_quiver_trunk_arm_1k.jpg",
+      "title": "Dead Quiver Trunk (dead_quiver_trunk_arm_1k.jpg)",
+      "author": "James Ray Cock, Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/dead_quiver_trunk",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "7aa714956b606c2d4a929d4ab76490db4a45f23a1ec24c66f088867ef363f37a"
+    },
+    {
+      "path": "assets/third-party/models/ph/dead_quiver_trunk/textures/dead_quiver_trunk_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dead_quiver_trunk/dead_quiver_trunk_nor_gl_1k.jpg",
+      "title": "Dead Quiver Trunk (dead_quiver_trunk_nor_gl_1k.jpg)",
+      "author": "James Ray Cock, Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/dead_quiver_trunk",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "b3d987eba87112005529664455a82809da2325420021d494832dd8ba860eb62c"
+    },
+    {
+      "path": "assets/third-party/models/ph/dead_quiver_trunk/textures/dead_quiver_trunk_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dead_quiver_trunk/dead_quiver_trunk_diff_1k.jpg",
+      "title": "Dead Quiver Trunk (dead_quiver_trunk_diff_1k.jpg)",
+      "author": "James Ray Cock, Dario Barresi, Rico Cilliers",
+      "source": "https://polyhaven.com/a/dead_quiver_trunk",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "53015f7dc3cc9a5ad360439b63c72d90402314201255495684bf6a6499aef7e0"
     }
   ]
 }
