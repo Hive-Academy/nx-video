@@ -499,3 +499,15 @@ Decisions (SPEC.md "Direction v3" is the binding text):
 - Voice generation is now allowed. Started a Codex lane for audio and timing v4 (running
   order, six new takes, tour windows, interim build) → `notes/lane-c-v4-audio.md`. The tour
   clips are re-cut and masked by a later footage lane, once the line lengths are known.
+- 2026-11-13, user (verbatim): "also i think for the initial lines about the name i think we
+  need to just pronounce it correctly and let codex describe it normally like its called
+  patah and named after ancient egyptian god or something like that". Script v4.1 in
+  `SPEC.md`: the mispronunciation joke is cut (S2 and the "pterodactyl" line); N5 becomes
+  "It's called Ptah. Named after the ancient Egyptian god of builders."; O1 becomes Claude's
+  "That's a big name for an app."; D1 becomes "You said my name. Now look at what I build."
+  The three wordings are mine. I steered the running audio lane `bc5656a0` with the
+  amendment instead of waiting for approval of the exact words, because the pronunciation
+  can only be judged by ear: the lane also makes two alternate N5 takes ("Patah", "P'tah")
+  beside the film take ("Puh-TAH"). New takes: eight, plus the two alternates.
+- Not changed: the episode title "The P Is Not Silent" and the title wall. Flagged to the
+  user, since the joke that set up the title is gone.

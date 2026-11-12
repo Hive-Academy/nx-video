@@ -144,6 +144,31 @@ means the hero screen. No new line contains the word "Ptah" (TTS mispronounces i
 
 D3 is cut. Each tour clip is retimed to the length of its line plus 0.8 s.
 
+### Script v4.1 (the user's change of 2026-11-13; overrides the v4 table where they differ)
+
+The user, verbatim: "also i think for the initial lines about the name i think we need to
+just pronounce it correctly and let codex describe it normally like its called patah and
+named after ancient egyptian god or something like that".
+
+The mispronunciation joke is removed. The name is said correctly the first time and
+explained. Running order: N1 N2 N3 N4 N5 O1 O3 (workspace), then O4 D1 D2 F1 F2 F3 F4 D5 D6
+(desert). S2 and the "pterodactyl" line are cut.
+
+| id | speaker | line | take |
+| --- | --- | --- | --- |
+| N1–N4 | Codex, Claude | unchanged | existing |
+| N5 | Codex | "It's called Ptah. Named after the ancient Egyptian god of builders." | new; TTS spells the name phonetically ("Puh-TAH"), caption shows "Ptah" |
+| O1 | Claude | "That's a big name for an app." | new |
+| O3 | Codex | "Honestly? It sounds… old." | existing |
+| O4 | Ptah | "Old." | existing |
+| D1 | Ptah | "You said my name. Now look at what I build." | new, replaces the v4 wording |
+
+N5, O1 and D1 are the orchestrator's wording ("or something like that") and wait for the
+user's ear: the name's pronunciation can only be judged from the take. Two alternate takes
+of N5 with other phonetic spellings are generated for the user to compare. The rule "no new
+line contains the word Ptah" now has this one exception. The episode title and the title
+wall are unchanged.
+
 ## Direction v3 (set by the user on 2026-11-12 — overrides any conflicting text above and below)
 
 The user's review of the 16:9 draft (`renders/preview-v2-draft.mp4`), verbatim:
