@@ -13,6 +13,7 @@ export const COLOSSUS_SHOTS = {
   'head-front': { cam: [0, 22.3, 7.5], at: [0, 22.1, 0], fov: 26, state: { eyeGlow: 0, voice: 0 } },
   'head-34': { cam: [-5.2, 22.3, 5.4], at: [0, 22.1, 0.3], fov: 28, state: { eyeGlow: 0, voice: 0 } },
   'colossus-c': { cam: [-12, 16.8, 14], at: [0.6, 18.9, 0], fov: 34, state: { eyeGlow: 1, voice: 0.25, sceptreTilt: 0.22, headYaw: -0.14 } },
+  'colossus-d': { cam: [1.3, 22.55, 6.0], at: [0, 22.55, 0.9], fov: 24, state: { eyeGlow: 1, voice: 0.5 } },
 };
 
 export async function buildColossusLook(assets, renderer, shot = 'colossus-a', { quality = 'high' } = {}) {

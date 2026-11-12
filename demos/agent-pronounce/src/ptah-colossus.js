@@ -124,7 +124,7 @@ for (let a = 0; a < 8; a++) for (const bit of [1, 2, 4]) if (!(a & bit)) EDGES.p
 
 // f(x,y,z) -> signed distance (negative inside). box = [x0,y0,z0,x1,y1,z1].
 // paint(x,y,z,nx,ny,nz,out) fills out = [sand, inlay, glow, r, g, b].
-function polygonize(f, box, cell, paint, C = 4) {
+function polygonize(f, box, cell, paint, C = 4, aoR = 0) {
   const [x0, y0, z0, x1, y1, z1] = box;
   const nx = Math.ceil((x1 - x0) / cell / C) * C + 1;
   const ny = Math.ceil((y1 - y0) / cell / C) * C + 1;
@@ -248,6 +248,18 @@ function polygonize(f, box, cell, paint, C = 4) {
     nrm[v * 3] = nx_; nrm[v * 3 + 1] = ny_; nrm[v * 3 + 2] = nz_;
     out[0] = 0; out[1] = 1; out[2] = 1; out[3] = 1; out[4] = 1; out[5] = 1;
     paint(x, y, z, nx_, ny_, nz_, out);
+    if (aoR > 0) {
+      // SDF ambient occlusion: how much surface crowds the normal within aoR; darkens and fills recesses with sand
+      let occ = 0;
+      for (let q = 1; q <= 3; q++) {
+        const sd = aoR * q / 3;
+        occ += max(0, sd - f(x + nx_ * sd, y + ny_ * sd, z + nz_ * sd)) / sd / q;
+      }
+      const ao = clamp01(1 - 0.9 * occ);
+      const dk = 0.5 + 0.5 * ao;
+      out[3] *= dk; out[4] *= dk; out[5] *= dk;
+      out[0] = clamp01(out[0] + 0.7 * (1 - ao) * sstep(0.25, 0.8, ny_));
+    }
     paintA[v * 3] = out[0]; paintA[v * 3 + 1] = out[1]; paintA[v * 3 + 2] = out[2];
     col[v * 3] = out[3]; col[v * 3 + 1] = out[4]; col[v * 3 + 2] = out[5];
   }
@@ -276,7 +288,7 @@ function polygonize(f, box, cell, paint, C = 4) {
 const EYE = { x: 0.37, y: 1.735, z: 0.925 };
 const capEdge = (z) => 1.05 + 1.17 * sstep(-0.35, 0.55, z);
 const HEAD_CHIPS = [
-  [0.2, -0.76, 0.9, 0.07], [-0.21, -0.74, 0.62, 0.06], [0.33, 2.25, 0.96, 0.05], [-0.62, 2.2, 0.78, 0.045],
+  [0.2, -0.76, 0.9, 0.07], [-0.21, -0.74, 0.62, 0.06],
   [1.1, 2.0, -0.08, 0.06], [-1.08, 1.25, 0.1, 0.05], [0.09, 1.31, 1.34, 0.03], [-0.55, 2.9, -0.4, 0.09],
   [0.75, 2.6, -0.75, 0.08],
 ];
@@ -303,21 +315,21 @@ function beardSDF(x, y, z) {
 function headSDF(x, y, z) {
   const ax = abs(x);
   const base = headBase(x, y, z);
-  let d = smin(base, taper(x, y, z, 0, -1.1, -0.15, 0, 0.9, -0.15, 0.74, 0.62), 0.3);
+  let d = smin(base, taper(x, y, z, 0, -1.1, -0.12, 0, 0.9, -0.15, 0.86, 0.76), 0.35); // stocky neck
   if (z > 0.15 && y > 0.25 && y < 2.45 && ax < 1.0) {
     d = smin(d, ell(x, y, z, 0, 0.58, 0.78, 0.3, 0.2, 0.22), 0.18); // chin
     d = smin(d, ell(ax, y, z, 0.47, 1.42, 0.7, 0.32, 0.28, 0.3), 0.25); // cheekbones
-    d = smin(d, ell(ax, y, z, 0.37, 1.955, 0.86, 0.34, 0.07, 0.1), 0.07); // brow band
-    d = smax(d, -ell(ax, y, z, 0.37, 1.735, 1.04, 0.27, 0.15, 0.17), 0.07); // socket
-    d = smin(d, ell(ax, y, z, 0.37, 1.8, 0.955, 0.25, 0.065, 0.1), 0.03); // upper lid
-    d = smin(d, ell(ax, y, z, 0.37, 1.672, 0.94, 0.22, 0.045, 0.08), 0.03); // lower lid
+    d = smin(d, ell(ax, y, z, 0.37, 1.95, 0.84, 0.36, 0.08, 0.1), 0.14); // brow band
+    d = smax(d, -ell(ax, y, z, 0.37, 1.745, 1.04, 0.27, 0.14, 0.17), 0.13); // socket
+    d = smin(d, ell(ax, y, z, 0.37, 1.83, 0.945, 0.25, 0.06, 0.1), 0.06); // upper lid
+    d = smin(d, ell(ax, y, z, 0.37, 1.648, 0.925, 0.22, 0.04, 0.075), 0.07); // lower lid
     d = smin(d, taper(x, y, z, 0, 1.86, 0.98, 0, 1.32, 1.22, 0.075, 0.12), 0.1); // nose bridge
     d = smin(d, ell(x, y, z, 0, 1.25, 1.2, 0.15, 0.115, 0.13), 0.06); // nose tip
     d = smin(d, ell(ax, y, z, 0.15, 1.24, 1.09, 0.1, 0.09, 0.1), 0.05); // nostril wings
     d = smax(d, -ell(ax, y, z, 0.075, 1.155, 1.16, 0.045, 0.03, 0.05), 0.02); // nostrils
-    d = smin(d, ell(x, y, z, 0, 0.975, 1.02, 0.31, 0.095, 0.14), 0.05); // upper lip
-    d = smin(d, ell(x, y, z, 0, 0.85, 1.0, 0.27, 0.1, 0.14), 0.05); // lower lip
-    d = smax(d, -ell(x, y, z, 0, 0.912, 1.12, 0.27, 0.016, 0.1), 0.02); // mouth line
+    d = smin(d, ell(x, y, z, 0, 0.975, 1.015, 0.3, 0.095, 0.14), 0.06); // upper lip
+    d = smin(d, ell(x, y, z, 0, 0.852, 0.995, 0.26, 0.1, 0.14), 0.06); // lower lip
+    d = smax(d, -ell(x, y, z, 0, 0.912, 1.08, 0.27, 0.014, 0.1), 0.02); // mouth line
     d = smax(d, -ell(ax, y, z, 0.285, 0.915, 0.97, 0.04, 0.035, 0.05), 0.02); // mouth corners
   }
   // skull cap: an offset shell of the head mass above the cap line
@@ -342,18 +354,18 @@ function headPaint(x, y, z, nx, ny, nz, out) {
   let gold = 1;
   if (z > 0.45 && y > 1.5 && y < 2.1) {
     const ex = (ax - EYE.x) / 0.235, ey = (y - EYE.y) / 0.1;
-    const rim = abs((sqrt(ex * ex + ey * ey) - 1) * 0.1) - 0.012;
-    const [cl, ch] = seg2(ax, y, 0.58, 1.735, 0.87, 1.705);
-    const line = cl - (0.022 - 0.008 * ch);
-    const b1 = seg2(ax, y, 0.13, 1.93, 0.37, 1.99)[0], b2 = seg2(ax, y, 0.37, 1.99, 0.62, 1.94)[0], b3 = seg2(ax, y, 0.62, 1.94, 0.82, 1.87)[0];
-    const brow = min(b1, b2, b3) - 0.024;
+    // thin liner on the upper lid edge only, running out into the cosmetic line
+    const rim = max(abs((sqrt(ex * ex + ey * ey) - 1) * 0.1) - 0.008, 1.76 - y);
+    const [cl, ch] = seg2(ax, y, 0.58, 1.76, 0.86, 1.735);
+    const line = cl - (0.013 - 0.004 * ch);
+    // brow: an arc that sits on the crest of the carved brow band (centre y 1.955)
+    const bt = (ax - 0.37) / 0.4;
+    const browY = 1.975 - 0.07 * bt * bt - 0.015 * bt;
+    const brow = ax > 0.13 && ax < 0.72 ? abs(y - browY) * 0.9 - 0.011 : 1;
     gold = min(rim, line, brow);
   }
   out[1] = Math.max(-0.04, Math.min(0.04, gold));
-  // mouth seam field: lights with the voice
-  out[2] = 1;
-  // mouth seam distance: continuous over the whole front of the face (no region edge to show)
-  if (z > 0.5) out[2] = Math.max(-0.04, Math.min(1, seg2(x, y, -0.255, 0.912, 0.255, 0.912)[0] - 0.01 + 1.5 * Math.max(0, 0.95 - z)));
+  out[2] = 1; // no glow lines on the face: the lips stay stone
   // tint: dark granite cap with lapis traces; sandstone face with patchy weathering
   const onCap = y > capEdge(z) - 0.01 && headBase(x, y, z) > 0.015;
   const w = 0.9 + 0.12 * fbm(x * 1.3, y * 1.3, z * 1.3, 21);
@@ -373,8 +385,8 @@ const BODY_KEYS = [
   [0.0, 1.15, 1.2, 0.42, 2.6], [0.7, 1.2, 1.22, 0.38, 2.5], [1.4, 1.12, 0.98, 0.04, 2.3],
   [4.0, 1.3, 1.02, 0.0, 2.3], [6.0, 1.38, 1.02, -0.02, 2.3], [9.0, 1.72, 1.12, 0.0, 2.4],
   [11.0, 1.98, 1.25, 0.05, 2.5], [12.5, 2.04, 1.28, 0.08, 2.5], [14.0, 2.22, 1.4, 0.14, 2.6],
-  [15.6, 2.56, 1.42, 0.14, 2.7], [16.8, 2.68, 1.25, 0.05, 2.9], [17.5, 2.32, 1.0, 0.05, 2.6],
-  [17.9, 1.75, 0.9, 0.05, 2.3], [18.2, 1.0, 0.75, 0.1, 2.1], [18.7, 0.72, 0.62, 0.15, 2.0],
+  [15.6, 2.58, 1.4, 0.14, 3.0], [16.8, 2.72, 1.24, 0.05, 3.6], [17.45, 2.62, 1.08, 0.05, 3.5],
+  [17.85, 2.08, 0.98, 0.05, 2.7], [18.2, 1.18, 0.92, 0.12, 2.2], [18.7, 0.84, 0.78, 0.2, 2.1],
 ];
 const BODY_LUT_STEP = 0.02;
 const BODY_LUT = (() => {
@@ -398,7 +410,12 @@ const BODY_LUT = (() => {
 const COLLAR_C = [0, 18.12, 0.15];
 const COLLAR_R0 = 1.02, COLLAR_ROW = 0.17;
 // worn pigment of the bead rows, inner to outer: gold, lapis, carnelian, turquoise, gold, ...
-const COLLAR_ROWS = ['gold', [0.42, 0.5, 0.78], [0.92, 0.55, 0.42], [0.5, 0.78, 0.72], 'gold', [0.42, 0.5, 0.78], [0.92, 0.55, 0.42], 'gold'];
+// worn pigment of the bead rows, inner to outer; gold rows are gilded beads. Then a row of gold drop beads.
+const COLLAR_ROWS = ['gold', [0.34, 0.44, 0.8], [0.9, 0.5, 0.38], [0.44, 0.76, 0.7], 'gold', [0.34, 0.44, 0.8], [0.44, 0.76, 0.7], [0.9, 0.5, 0.38]];
+const COLLAR_BEAD = [0.09, 0.15, 0.12, 0.15, 0.09, 0.15, 0.12, 0.15]; // bead length along each row
+const COLLAR_EDGE = COLLAR_R0 + COLLAR_ROWS.length * COLLAR_ROW;
+const COLLAR_LINES = [1, 4, 7]; // row boundaries that carry a thin glowing inlay line
+const COLLAR_DROP = 0.16;
 const BODY_CHIPS = [
   ...chipsAlong('bchip-sh', 6, [-2.6, 17.0, 0.2], [2.6, 17.0, 0.2], 0.08, 0.2, 0.6),
   ...chipsAlong('bchip-ft', 5, [-1.0, 0.75, 1.55], [1.0, 0.75, 1.55], 0.07, 0.16, 0.3),
@@ -423,69 +440,142 @@ function torsoSDF(x, y, z) {
   if (y > 12.8 && y < 17.6) {
     const sx = x < 0 ? -1 : 1;
     const wy = sx < 0 ? 14.55 : 13.85;
-    let arm = taper(ax, y, z, 2.08, 16.6, 0.05, 2.02, 14.5, 0.4, 0.62, 0.55);
-    arm = smin(arm, taper(ax, y, z, 2.02, 14.5, 0.4, 0.62, wy, 1.5, 0.55, 0.36), 0.4);
-    d = smin(d, arm, 0.7);
+    let arm = taper(ax, y, z, 2.05, 16.4, 0.05, 2.0, 14.5, 0.4, 0.5, 0.46);
+    arm = smin(arm, taper(ax, y, z, 2.0, 14.5, 0.4, 0.62, wy, 1.5, 0.46, 0.34), 0.4);
+    d = smin(d, arm, 0.8);
   }
   d = max(d, -y);
-  d = smax(d, y - 18.95, 0.2);
+  d = smax(d, y - 18.6, 0.2);
   return d;
 }
-function collarSDF(x, y, z, torso) {
+// Broad collar: its own fine mesh. Rows of tube beads on a shell 0.15 m proud of the torso, with
+// V grooves between the beads and a scalloped row of drop beads at the outer edge.
+function collarField(x, y, z, res) {
   const dx = x - COLLAR_C[0], dy = y - COLLAR_C[1], dz = z - COLLAR_C[2];
   const rho = sqrt(dx * dx + dy * dy + dz * dz);
-  if (rho > 2.7) return 1;
-  const phi = atan2(x, z - 0.15);
-  const rc = 2.28 + 0.075 * sqrt(abs(cos(phi * 19)));
-  let c = smax(torso - 0.15, rho - rc, 0.03);
-  c = smax(c, 0.92 - rho, 0.04); // open ring: the neck rises clear of the collar
-  c = smax(c, y - 18.3, 0.06);
-  // bead-row grooves at the row boundaries, and a beaded texture along each row
-  const g = 0.5 + 0.5 * cos((2 * Math.PI * (rho - COLLAR_R0)) / COLLAR_ROW);
-  c += 0.026 * pow(g, 12) * sstep(0.95, 1.1, rho);
-  c += 0.008 * pow(0.5 + 0.5 * cos(phi * (40 + 14 * floor((rho - COLLAR_R0) / COLLAR_ROW))), 4) * sstep(1.0, 1.2, rho);
+  const rh = max(sqrt(dx * dx + dz * dz), 0.3);
+  const phi = atan2(dx, dz);
+  const u = (rho - COLLAR_R0) / COLLAR_ROW;
+  const ri = floor(u), fr = u - ri;
+  let bump = 0.034, drop = 1;
+  if (ri >= 0 && ri < COLLAR_ROWS.length) {
+    const L = COLLAR_BEAD[ri];
+    const sa = (phi * rh) / L + 0.5 * (ri & 1);
+    const fs = sa - floor(sa);
+    const tu = (abs(fr - 0.5) * 2) / 0.9, ts = (abs(fs - 0.5) * 2) / 0.88;
+    const e = pow(pow(tu, 4) + pow(ts, 4), 0.25);
+    bump = 0.034 - 0.034 * min(1, 1.6 * max(0, 1 - e * e));
+  }
+  const du = rho - COLLAR_EDGE;
+  if (du > -0.05 && du < 0.3) {
+    const sa = (phi * rh) / COLLAR_DROP;
+    const ds = (sa - floor(sa) - 0.5) * COLLAR_DROP;
+    const t = clamp01((du + 0.01) / 0.15);
+    const qy = du - (-0.01 + 0.15 * t);
+    drop = sqrt(ds * ds + qy * qy) - (0.022 + 0.034 * t * t);
+  }
+  if (res) { res.rho = rho; res.ri = ri; res.bump = bump; res.drop = drop; }
+  return { rho, bump, drop };
+}
+function collarSDF(x, y, z) {
+  if (y < 15.2 || y > 18.6) return 1;
+  const dx = x - COLLAR_C[0], dy = y - COLLAR_C[1], dz = z - COLLAR_C[2];
+  const r2 = dx * dx + dy * dy + dz * dz;
+  if (r2 > 2.85 * 2.85 || r2 < 0.75 * 0.75) return 1;
+  const { rho, bump, drop } = collarField(x, y, z);
+  const dropBump = 0.03 * sstep(-0.035, 0, drop);
+  const torso = torsoSDF(x, y, z);
+  let c = torso - 0.15 + (drop < 0 ? dropBump : bump);
+  c = max(c, -torso - 0.05); // a shell, so the cut faces stay thin and hidden under the torso
+  c = max(c, -0.45 - z); // front and sides only: the back pillar hides the rest
+  c = smax(c, min(rho - COLLAR_EDGE + 0.006, drop), 0.012);
+  c = smax(c, 0.92 - rho, 0.03); // open ring: the neck rises clear of the collar
+  c = smax(c, y - 18.3, 0.04);
   return c;
+}
+const COLLAR_RES = {};
+function collarPaint(x, y, z, nx, ny, nz, out) {
+  collarField(x, y, z, COLLAR_RES);
+  const { rho, ri, bump, drop } = COLLAR_RES;
+  const w = 0.9 + 0.1 * fbm(x * 0.6, y * 0.6, z * 0.6, 41);
+  out[3] = w; out[4] = w * 0.98; out[5] = w * 0.95;
+  let gold = 0.04;
+  const onBead = drop < 0 ? 1 : 1 - sstep(0.012, 0.024, bump);
+  if (drop < 0.004) gold = drop + 0.004; // gold drop beads
+  else if (ri >= 0 && ri < COLLAR_ROWS.length) {
+    const row = COLLAR_ROWS[ri];
+    if (row === 'gold') gold = (bump - 0.016) * 2;
+    else {
+      const wear = (0.82 + 0.1 * sstep(-0.3, 0.3, fbm(x * 2.1, y * 2.1, z * 2.1, 42))) * onBead;
+      for (let c = 0; c < 3; c++) out[3 + c] = out[3 + c] * (1 - wear) + row[c] * w * wear;
+    }
+  }
+  // thin inlay lines in the grooves between some rows: gold when dark, they carry the voice glow
+  let line = 1;
+  for (const k of COLLAR_LINES) line = min(line, abs(rho - (COLLAR_R0 + k * COLLAR_ROW)) - 0.0075);
+  gold = min(gold, line);
+  out[1] = max(-0.04, min(0.04, gold));
+  out[2] = line;
+  out[0] = clamp01(0.08 + 0.6 * sstep(0.02, 0.034, bump) * max(ny, 0) * (1 - onBead * 0.8));
 }
 function backPillar(x, y, z) {
   return rbox(x, y, z, 0, 8.8, -1.35, 0.95, 8.8, 0.5, 0.06);
 }
+// incised inscription column down the front of the wrapping, and a few weathering cracks
+const CRACKS = [
+  [-1.35, 9.1, -0.75, 10.5, 0.03], [-0.75, 10.5, -0.9, 11.6, 0.025], [-0.9, 11.6, -0.55, 12.3, 0.02],
+  [0.95, 3.6, 1.15, 5.1, 0.03], [1.15, 5.1, 0.95, 5.9, 0.024],
+  [-2.25, 16.9, -1.95, 16.1, 0.022], [-1.95, 16.1, -2.05, 15.3, 0.02],
+];
+function glyph2(u, v, k, k2, sc) {
+  u /= sc; v /= sc;
+  let g;
+  if (k < 0.3) g = max(abs(u) - (0.08 + 0.08 * k2), abs(v) - 0.17);
+  else if (k < 0.5) g = sqrt(u * u + v * v) - (0.11 + 0.05 * k2);
+  else if (k < 0.7) g = max(abs(u) - 0.18, abs(v) - (0.05 + 0.04 * k2));
+  else if (k < 0.85) g = min(max(abs(u) - 0.05, abs(v) - 0.18), max(abs(u) - 0.16, abs(v - 0.1) - 0.05));
+  else g = abs(sqrt(u * u + v * v) - 0.12) - 0.04;
+  return g * sc;
+}
+function carve(d, g2, depth, k) { return smax(d, min(-g2, d + depth), k); }
 function bodySDF(x, y, z) {
   const torso = torsoSDF(x, y, z);
   let d = torso;
-  if (y > 15.0) d = min(d, collarSDF(x, y, z, torso));
   if (z < -0.6 && abs(x) < 1.2) d = smin(d, backPillar(x, y, z), 0.12);
-  // tight wrapping bands below the collar
-  if (y < 16.2) {
-    const w = 0.5 + 0.5 * cos((2 * Math.PI * y) / 0.62 + 0.6 * sin(x * 0.7));
-    d += 0.012 * w * w * w * w * sstep(0.2, 1.0, y);
+  const front = z > 0.4;
+  const inBand = front && abs(x) < 0.36 && y > 1.5 && y < 12.6;
+  // tight mummiform wrapping: overlapping sawtooth bands below the collar, not over the inscription
+  if (y < 16.4 && y > 0.9) {
+    const p = y / 0.55 + 0.05 * sin(x * 0.8 + z * 0.5);
+    const f = p - floor(p);
+    const band = sstep(0.0, 0.85, f) * (1 - sstep(0.86, 1.0, f));
+    d += 0.01 * band * sstep(0.9, 1.6, y) * (inBand ? sstep(0.3, 0.36, abs(x)) : 1);
   }
-  d += 0.03 * fbm(x * 0.9, y * 0.9, z * 0.9, 31) + 0.009 * fbm(x * 3.6, y * 3.6, z * 3.6, 32, 2);
+  d += 0.022 * fbm(x * 0.9, y * 0.9, z * 0.9, 31) + 0.006 * fbm(x * 3.6, y * 3.6, z * 3.6, 32, 2);
+  if (inBand) {
+    // border grooves of the column, then one glyph per 0.48 m cell
+    d = carve(d, abs(abs(x) - 0.31) - 0.018, 0.03, 0.01);
+    if (abs(x) < 0.27 && y > 1.7 && y < 12.4) {
+      const cy = floor((y - 1.7) / 0.48);
+      const v = y - 1.7 - (cy + 0.5) * 0.48;
+      d = carve(d, glyph2(x, v, hash('bglyph', cy, 0), hash('bglyph2', cy, 0), 0.95), 0.035, 0.008);
+    }
+  }
+  if (front || abs(x) > 1.6) {
+    for (const [ax, ay, bx, by, w] of CRACKS) {
+      if (y < min(ay, by) - 0.2 || y > max(ay, by) + 0.2) continue;
+      const j = 0.03 * vnoise(x * 6, y * 6, z * 6, 71);
+      d = carve(d, seg2(x + j, y, ax, ay, bx, by)[0] - w * 0.5, 0.06, 0.006);
+    }
+  }
   d = applyChips(d, x, y, z, BODY_CHIPS, 0.03);
   return d;
 }
 function bodyPaint(x, y, z, nx, ny, nz, out) {
-  out[0] = 0.5 + 0.4 * sstep(1.2, 0.1, y);
-  const dx = x - COLLAR_C[0], dy = y - COLLAR_C[1], dz = z - COLLAR_C[2];
-  const rho = sqrt(dx * dx + dy * dy + dz * dz);
-  let gold = 1;
+  out[0] = 0.45 + 0.4 * sstep(1.2, 0.1, y);
   const w = 0.88 + 0.14 * fbm(x * 0.35, y * 0.35, z * 0.35, 41) - 0.12 * sstep(3, 0, y);
   out[3] = w; out[4] = w * 0.98; out[5] = w * 0.95;
-  if (y > 15.0 && rho < 2.45 && rho > 0.95 && torsoSDF(x, y, z) > 0.03) { // on the collar shell, not the shroud
-    const ri = floor((rho - COLLAR_R0) / COLLAR_ROW);
-    const fr = (rho - COLLAR_R0) / COLLAR_ROW - ri;
-    const row = COLLAR_ROWS[min(max(ri, 0), COLLAR_ROWS.length - 1)];
-    const edge = min(fr, 1 - fr) * COLLAR_ROW; // metres to the row boundary
-    if (row === 'gold') gold = 0.012 - edge;
-    else {
-      const wear = 0.5 + 0.3 * sstep(-0.3, 0.3, fbm(x * 1.7, y * 1.7, z * 1.7, 42));
-      for (let c = 0; c < 3; c++) out[3 + c] = out[3 + c] * (1 - wear) + row[c] * w * wear;
-    }
-    // outermost row: gold pendant drops
-    const phi = atan2(x, z - 0.15);
-    const drop = max(abs(rho - 2.3) - 0.05, 0.25 - sqrt(abs(cos(phi * 19))));
-    gold = min(gold, drop);
-  }
-  out[1] = max(-0.04, min(0.04, gold));
+  out[1] = 1;
   out[2] = 1;
 }
 
@@ -507,26 +597,47 @@ function fistsSDF(x, y, z) {
   d = smin(d, taper(x, y, z, -0.34, 0.6, 0.0, 0.0, 0.6, 0.3, 0.1, 0.085), 0.1);
   return d;
 }
+function sdPoly(px, py, pts) {
+  let d = 1e9, sgn = 1;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [ax, ay] = pts[j], [bx, by] = pts[i];
+    const ex = bx - ax, ey = by - ay, wx = px - ax, wy = py - ay;
+    const h = clamp01((wx * ex + wy * ey) / (ex * ex + ey * ey));
+    const qx = wx - ex * h, qy = wy - ey * h;
+    d = min(d, qx * qx + qy * qy);
+    const c1 = py >= ay, c2 = py < by, c3 = ex * wy > ey * wx;
+    if ((c1 && c2 && c3) || (!c1 && !c2 && !c3)) sgn = -sgn;
+  }
+  return sgn * sqrt(d);
+}
+// was head in profile (z forward, y up): a flat, stylised animal head with a long angled snout
+const WAS_HEAD = [[-0.07, 2.5], [0.05, 2.5], [0.08, 2.58], [0.39, 2.63], [0.47, 2.665], [0.45, 2.705], [0.12, 2.75], [0.0, 2.78], [-0.11, 2.74], [-0.12, 2.62]];
+const WAS_EARS = [
+  [[-0.11, 2.72], [-0.04, 2.75], [-0.1, 2.9], [-0.15, 2.9]],
+  [[-0.02, 2.75], [0.05, 2.76], [0.02, 2.91], [-0.03, 2.91]],
+];
 function sceptreGold(x, y, z) {
   let g = cylY(x, y, z, 0, 0, 0.205, 0.8, 0.9, 0.01); // band above the fists
-  g = min(g, rbox(x, y, z, 0, 1.29, 0, 0.42, 0.07, 0.1, 0.03)); // ankh crossbar
-  const ex = x / 0.25, ey = (y - 1.72) / 0.36;
-  const e = (sqrt(ex * ex + ey * ey) - 1) * 0.28;
-  g = min(g, sqrt(e * e + z * z) - 0.075); // ankh loop
-  g = min(g, cylY(x, y, z, 0, 0, 0.215, 3.22, 3.32, 0.02)); // abacus band
+  g = min(g, rbox(x, y, z, 0, 1.1, 0, 0.36, 0.055, 0.075, 0.02)); // ankh crossbar
+  const ex = x / 0.19, ey = (y - 1.41) / 0.25;
+  const e = (sqrt(ex * ex + ey * ey) - 1) * 0.2;
+  g = min(g, sqrt(e * e + z * z) - 0.062); // ankh loop
+  g = min(g, cylY(x, y, z, 0, 0, 0.19, 2.41, 2.47, 0.012)); // abacus band under the was neck
   return g;
 }
 function sceptreStone(x, y, z) {
-  let s = cylY(x, y, z, 0, 0, 0.16, -1.0, 1.3, 0.02); // staff through the fists into the ankh
-  s = smin(s, taper(x, y, z, 0, 2.1, 0, 0, 2.26, 0, 0.23, 0.17), 0.04); // djed foot
-  s = min(s, cylY(x, y, z, 0, 0, 0.17, 2.1, 3.3, 0.02)); // djed column
-  for (let i = 0; i < 4; i++) s = min(s, cylY(x, y, z, 0, 0, 0.36 - i * 0.012, 2.6 + i * 0.15, 2.7 + i * 0.15, 0.03)); // djed discs
-  s = min(s, cylY(x, y, z, 0, 0, 0.11, 3.28, 3.52, 0.02)); // was neck
-  s = smin(s, taper(x, y, z, 0, 3.46, -0.1, 0, 3.66, 0.38, 0.14, 0.07), 0.05); // was head
-  s = min(s, rbox(abs(x), y, z, 0.07, 3.66, -0.06, 0.035, 0.08, 0.05, 0.02)); // ears
+  let s = cylY(x, y, z, 0, 0, 0.15, -1.0, 1.2, 0.02); // staff through the fists into the ankh
+  s = min(s, cylY(x, y, z, 0, 0, 0.2, 1.66, 1.76, 0.012)); // djed foot
+  s = min(s, cylY(x, y, z, 0, 0, 0.145, 1.7, 2.42, 0.01)); // djed column
+  for (let i = 0; i < 4; i++) s = min(s, cylY(x, y, z, 0, 0, 0.3, 2.0 + i * 0.105, 2.058 + i * 0.105, 0.006)); // four flat tiers
+  s = min(s, cylY(x, y, z, 0, 0, 0.08, 2.44, 2.62, 0.01)); // was neck
+  // flat head and two forked ears, extruded across x
+  const p = sdPoly(z, y, WAS_HEAD);
+  s = smin(s, max(p, abs(x) - 0.07) - 0.008, 0.02);
+  for (const ear of WAS_EARS) s = min(s, max(sdPoly(z, y, ear), abs(x) - 0.045) - 0.004);
   return s;
 }
-const SCEPTRE_CHIPS = [[0.36, 3.12, 0.22, 0.06], [-0.3, 2.86, -0.18, 0.05], [0.42, -0.6, 0.3, 0.06], [-0.38, 0.62, 0.36, 0.05]];
+const SCEPTRE_CHIPS = [[0.42, -0.6, 0.3, 0.06], [-0.38, 0.62, 0.36, 0.05]];
 function sceptreSDF(x, y, z) {
   let d = min(fistsSDF(x, y, z), sceptreStone(x, y, z));
   d = min(d, sceptreGold(x, y, z));
@@ -700,13 +811,18 @@ uniform float uScale; uniform float uNormalScale; uniform float uInlayGlow; unif
 uniform vec3 uInlayColor; uniform vec3 uVoiceColor; uniform vec3 uSand; uniform vec3 uGold;
 varying vec3 vPaint; varying vec3 vObjPos; varying vec3 vObjN; varying vec3 vAx; varying vec3 vAy; varying vec3 vAz;
 vec3 triW; vec2 tuvX; vec2 tuvY; vec2 tuvZ;
-vec4 tri(sampler2D t) { return texture2D(t, tuvX) * triW.x + texture2D(t, tuvY) * triW.y + texture2D(t, tuvZ) * triW.z; }`)
+vec4 tri(sampler2D t) { return texture2D(t, tuvX) * triW.x + texture2D(t, tuvY) * triW.y + texture2D(t, tuvZ) * triW.z; }
+vec4 triB(sampler2D t, float b) { return texture2D(t, tuvX, b) * triW.x + texture2D(t, tuvY, b) * triW.y + texture2D(t, tuvZ, b) * triW.z; }`)
       .replace('#include <map_fragment>', `
 vec3 on = normalize(vObjN);
 triW = pow(abs(on), vec3(4.0)); triW /= (triW.x + triW.y + triW.z);
 vec3 sp = vObjPos * uScale;
 tuvX = sp.zy; tuvY = sp.xz + vec2(0.37, 0.61); tuvZ = sp.xy + vec2(0.13, 0.29);
 vec3 alb = tri(tDiff).rgb;
+// keep the scan's micro detail but drop its large dark blotches (they read as dirt): divide by a blurred lookup
+vec3 albBlur = max(triB(tDiff, 7.0).rgb, vec3(0.04));
+float macroC = texture2D(tDisp, vObjPos.xz * 0.018 + vec2(vObjPos.y * 0.021, 0.3)).r;
+alb = vec3(0.56, 0.5, 0.43) * pow(alb / albBlur, vec3(0.65)) * (0.86 + 0.3 * macroC);
 float gH = tri(tDisp).r;
 float gAO = tri(tAO).r;
 float gR = tri(tRough).r;
@@ -737,16 +853,15 @@ diffuseColor.rgb = mix(diffuseColor.rgb, uGold * (0.8 + 0.3 * gH), gGold);`)
   normal = normalize(pn.x * vAx + pn.y * vAy + pn.z * vAz) * faceDirection;
 }`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-totalEmissiveRadiance += uInlayColor * uInlayGlow * gGold;
+// glow lives only in the thin inlay lines (vPaint.z < 0); the lips and the rest of the gold stay unlit
 float fwG = max(fwidth(vPaint.z), 1e-4);
-float seam = 1.0 - smoothstep(-fwG * 1.5, fwG * 1.5, vPaint.z);
-seam += 0.35 * exp(-max(vPaint.z, 0.0) / 0.025);
-totalEmissiveRadiance += uVoiceColor * uVoiceGlow * seam;`)
+float lineM = (1.0 - smoothstep(-fwG, fwG, vPaint.z)) * (1.0 - sandM);
+totalEmissiveRadiance += uInlayColor * uInlayGlow * lineM + uVoiceColor * uVoiceGlow * lineM;`)
       .replace('#include <aomap_fragment>', `#include <aomap_fragment>
 reflectedLight.indirectDiffuse *= mix(gAO, 1.0, 0.3);
 reflectedLight.indirectSpecular *= gAO;`);
   };
-  m.customProgramCacheKey = () => 'ptah-colossus-stone-v1';
+  m.customProgramCacheKey = () => 'ptah-colossus-stone-v3';
   return m;
 }
 
@@ -763,18 +878,83 @@ function radialTexture(stops, size = 128) {
   return t;
 }
 
-// The eye inlay: an almond lens, pointed at the outer corner.
+// The carved eye: a stone eyeball dome under the lids with a recessed, circular iris bowl.
+// Two draw groups: 0 = eyeball (stone material), 1 = iris (the eye material, the only part that glows).
+const IRIS_R = 0.064, IRIS_DEPTH = 0.024, IRIS_UP = 0.012;
 function eyeGeometry(side) {
-  const g = new THREE.SphereGeometry(1, 48, 24);
-  const p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-    const outer = x * side > 0 ? 1.08 : 0.95;
-    y *= 1 - 0.38 * x * x;
-    const X = x * outer * 0.205;
-    // follow the curve of the face so the outer corner sinks into the socket
-    p.setXYZ(i, X, y * 0.092, z * 0.06 - 1.5 * X * X);
+  const SEG = 72, RI = 7, RE = 18;
+  const pos = [], uv = [], paint = [], col = [], idxI = [], idxE = [];
+  const face = (X, Y, Z) => [X, Y, Z - 1.5 * X * X]; // follow the curve of the face
+  const vert = (p, u, v, iris) => {
+    pos.push(...p); uv.push(u, v);
+    paint.push(0, 1, 1); // no sand, no gold, no glow line
+    const t = iris ? 0.5 : 1.06; col.push(t, t * 0.985, t * 0.95);
+    return pos.length / 3 - 1;
+  };
+  const bound = (th) => {
+    const c = cos(th), sn = sin(th);
+    const outer = c * side > 0 ? 1.08 : 0.95;
+    return [c * outer * 0.205, sn * 0.092 * (1 - 0.38 * c * c)];
+  };
+  // iris bowl: flat floor, steep wall up to the rim (rings 0..RI), circular at true size
+  const rings = [];
+  for (let r = 0; r <= RI; r++) {
+    const f = r / RI;
+    const row = [];
+    for (let k = 0; k < SEG; k++) {
+      const th = (k / SEG) * Math.PI * 2;
+      const rr = f * IRIS_R;
+      const z = 0.055 - IRIS_DEPTH * (1 - sstep(0.72, 1.0, f));
+      row.push(vert(face(cos(th) * rr, sin(th) * rr + IRIS_UP, z), 0.5 + 0.5 * f * cos(th), 0.5 + 0.5 * f * sin(th), true));
+    }
+    rings.push(row);
   }
+  // duplicate the rim so the eyeball and iris have separate normals and materials
+  const rimE = [];
+  for (let k = 0; k < SEG; k++) {
+    const th = (k / SEG) * Math.PI * 2;
+    rimE.push(vert(face(cos(th) * IRIS_R, sin(th) * IRIS_R + IRIS_UP, 0.055), 0.5, 0.5, false));
+  }
+  const eRings = [rimE];
+  for (let r = 1; r <= RE + 2; r++) {
+    const row = [];
+    for (let k = 0; k < SEG; k++) {
+      const th = (k / SEG) * Math.PI * 2;
+      const [bx, by] = bound(th);
+      let x, y, z;
+      if (r <= RE) {
+        const f = r / RE;
+        x = cos(th) * IRIS_R + (bx - cos(th) * IRIS_R) * f;
+        y = sin(th) * IRIS_R + IRIS_UP + (by - sin(th) * IRIS_R - IRIS_UP) * f;
+        z = 0.055 * (1 - f * f) - 0.02 * f;
+      } else { // skirt back into the socket so no gap shows at the lids
+        const sk = r === RE + 1 ? 0.97 : 0.9;
+        x = bx * sk; y = by * sk; z = r === RE + 1 ? -0.05 : -0.09;
+      }
+      row.push(vert(face(x, y, z), 0.5, 0.5, false));
+    }
+    eRings.push(row);
+  }
+  const strip = (A, B, out) => {
+    for (let k = 0; k < SEG; k++) {
+      const k1 = (k + 1) % SEG;
+      out.push(A[k], B[k], B[k1], A[k], B[k1], A[k1]);
+    }
+  };
+  for (let k = 0; k < SEG; k++) { // iris centre fan
+    const k1 = (k + 1) % SEG;
+    idxI.push(rings[0][0], rings[1][k], rings[1][k1]);
+  }
+  for (let r = 1; r < RI; r++) strip(rings[r], rings[r + 1], idxI);
+  for (let r = 0; r < eRings.length - 1; r++) strip(eRings[r], eRings[r + 1], idxE);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('aPaint', new THREE.Float32BufferAttribute(paint, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex([...idxE, ...idxI]);
+  g.addGroup(0, idxE.length, 0);
+  g.addGroup(idxE.length, idxI.length, 1);
   g.computeVertexNormals();
   return g;
 }
@@ -860,25 +1040,24 @@ function buildGeometry(quality) {
   const q = quality === 'draft' ? 1.7 : 1;
   const bodyF = (x, y, z) => bodySDF(x, y - Y0, z);
   const bodyP = (x, y, z, nx, ny, nz, o) => bodyPaint(x, y - Y0, z, nx, ny, nz, o);
+  const collarF = (x, y, z) => collarSDF(x, y - Y0, z);
+  const collarP = (x, y, z, nx, ny, nz, o) => collarPaint(x, y - Y0, z, nx, ny, nz, o);
   const geos = {
-    plinth: polygonize(plinthSDF, [-4.75, -0.3, -4.25, 4.75, 3.15, 4.25], 0.095 * q, plinthPaint),
-    bodyLower: polygonize(bodyF, [-3.0, Y0 - 0.1, -2.0, 3.0, Y0 + 13.3, 2.3], 0.1 * q, bodyP),
-    bodyUpper: polygonize(bodyF, [-3.2, Y0 + 13.0, -2.0, 3.2, Y0 + 19.1, 2.2], 0.055 * q, bodyP),
-    head: polygonize(headSDF, [-1.25, -1.15, -1.4, 1.25, 3.15, 1.5], 0.024 * q, headPaint),
-    sceptre: polygonize(sceptreSDF, [-1.25, -1.0, -1.15, 1.25, 3.85, 0.65], 0.03 * q, sceptrePaint),
+    plinth: polygonize(plinthSDF, [-4.75, -0.3, -4.25, 4.75, 3.15, 4.25], 0.08 * q, plinthPaint, 4, 0.45),
+    bodyLower: polygonize(bodyF, [-3.0, Y0 - 0.1, -2.0, 3.0, Y0 + 13.3, 2.3], 0.06 * q, bodyP, 4, 0.35),
+    bodyUpper: polygonize(bodyF, [-3.2, Y0 + 13.0, -2.0, 3.2, Y0 + 19.1, 2.2], 0.045 * q, bodyP, 4, 0.4),
+    collar: polygonize(collarF, [-2.85, Y0 + 15.2, -0.6, 2.85, Y0 + 18.5, 2.3], 0.024 * q, collarP, 4, 0.08),
+    head: polygonize(headSDF, [-1.25, -1.15, -1.4, 1.25, 3.15, 1.5], 0.019 * q, headPaint, 4, 0.12),
+    sceptre: polygonize(sceptreSDF, [-1.25, -1.0, -1.15, 1.25, 3.05, 0.65], 0.022 * q, sceptrePaint, 4, 0.1),
     staff: staffGeometry(),
     drift: sandDriftGeometry(),
     eyeR: eyeGeometry(-1), eyeL: eyeGeometry(1),
   };
   const dust = {
     body: [
-      ...[-1.05, -0.7, -0.35, 0, 0.35, 0.7, 1.05].map((a) => projectTo(bodyF, sin(a) * 2.3, Y0 + 16.6 + 0.5 * abs(sin(a)), 1.7 * cos(a))),
+      ...[-1.15, -0.85, 0.85, 1.15].map((a) => projectTo(bodyF, sin(a) * 2.3, Y0 + 16.6 + 0.5 * abs(sin(a)), 1.7 * cos(a))),
       projectTo(bodyF, -2.55, Y0 + 17.2, 0.1), projectTo(bodyF, 2.55, Y0 + 17.2, 0.1),
       ...[-3.2, -1.6, 0, 1.6, 3.2].map((x) => projectTo(plinthSDF, x, 2.62, 3.85)),
-    ],
-    head: [
-      projectTo(headSDF, 0, -0.8, 0.8), projectTo(headSDF, 0.5, 2.27, 0.95), projectTo(headSDF, -0.5, 2.27, 0.95),
-      projectTo(headSDF, 1.1, 1.25, 0.0), projectTo(headSDF, -1.1, 1.25, 0.0),
     ],
   };
   const out = { geos, dust };
@@ -904,9 +1083,9 @@ export async function createPtahColossus(assets, opts = {}) {
   const { geos, dust } = buildGeometry(quality);
   const maps = { diff, nor, rough, ao, disp };
   const shared = glowUniforms();
-  const stone = makeStoneMaterial(maps, shared, { tint: '#EBD4B0', scale: 0.42 });
-  const fine = makeStoneMaterial(maps, shared, { tint: '#EBD4B0', scale: 1.05, normalScale: 0.55 });
-  const granite = makeStoneMaterial(maps, shared, { tint: '#E0C6A6', scale: 0.3, normalScale: 0.9 });
+  const stone = makeStoneMaterial(maps, shared, { tint: '#EBD4B0', scale: 0.2, normalScale: 0.38 });
+  const fine = makeStoneMaterial(maps, shared, { tint: '#EBD4B0', scale: 0.42, normalScale: 0.3 });
+  const granite = makeStoneMaterial(maps, shared, { tint: '#E0C6A6', scale: 0.17, normalScale: 0.5 });
   const eyeCol = new THREE.Color(eyeColor);
   shared.uVoiceColor.value.copy(eyeCol);
 
@@ -921,7 +1100,7 @@ export async function createPtahColossus(assets, opts = {}) {
   };
   const plinth = mk(geos.plinth, granite, 'plinth');
   root.add(plinth);
-  root.add(mk(geos.bodyLower, stone, 'body-lower'), mk(geos.bodyUpper, stone, 'body-upper'));
+  root.add(mk(geos.bodyLower, stone, 'body-lower'), mk(geos.bodyUpper, stone, 'body-upper'), mk(geos.collar, fine, 'collar'));
   if (drift) {
     const sandMat = new THREE.MeshStandardMaterial({ color: '#E4C08C', roughness: 1, normalMap: sNor, roughnessMap: sRough, normalScale: new THREE.Vector2(0.4, 0.4) });
     const d = mk(geos.drift, sandMat, 'sand-drift');
@@ -936,25 +1115,20 @@ export async function createPtahColossus(assets, opts = {}) {
   head.rotation.order = 'YXZ';
   root.add(head);
   head.add(mk(geos.head, fine, 'head'));
+  // iris: dark polished stone; the glow is an inner light confined to the iris ring, pupil stays dark
   const eyeMat = new THREE.MeshStandardMaterial({
-    color: '#0A0807', roughness: 0.5, metalness: 0.0, envMapIntensity: 0.12, emissive: eyeCol, emissiveIntensity: 0,
-    emissiveMap: radialTexture([[0, '#FFFFFF'], [0.35, '#E8FFFC'], [1, '#6A8F8C']], 64),
+    color: '#1A1512', roughness: 0.35, metalness: 0.0, envMapIntensity: 0.2, emissive: eyeCol, emissiveIntensity: 0,
+    emissiveMap: radialTexture([[0, '#0A1414'], [0.3, '#123232'], [0.48, '#9FF5EC'], [0.72, '#FFFFFF'], [0.9, '#6FBFB8'], [1, '#1E3A38']], 128),
   });
-  const glowTex = radialTexture([[0, 'rgba(255,255,255,1)'], [0.18, 'rgba(160,255,245,0.55)'], [0.5, 'rgba(80,230,220,0.12)'], [1, 'rgba(80,230,220,0)']]);
   const eyes = [], flares = [];
   for (const side of [-1, 1]) {
-    const e = new THREE.Mesh(side < 0 ? geos.eyeR : geos.eyeL, eyeMat);
+    const e = new THREE.Mesh(side < 0 ? geos.eyeR : geos.eyeL, [fine, eyeMat]);
     e.name = side < 0 ? 'eye-right' : 'eye-left';
     e.position.set(side * EYE.x, EYE.y, EYE.z);
     e.rotation.y = side * 0.4;
+    e.castShadow = false; e.receiveShadow = true;
     head.add(e);
     eyes.push(e);
-    const fl = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: eyeCol, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
-    fl.position.set(side * EYE.x, EYE.y, EYE.z + 0.12);
-    fl.scale.setScalar(0.9);
-    fl.visible = false;
-    head.add(fl);
-    flares.push(fl);
   }
 
   // sceptre and hands on the grip pivot
@@ -966,10 +1140,8 @@ export async function createPtahColossus(assets, opts = {}) {
 
   // dust
   const bodyDust = dustPoints(dust.body, 'dust-body');
-  const headDust = dustPoints(dust.head, 'dust-head');
-  bodyDust.visible = headDust.visible = false;
+  bodyDust.visible = false;
   root.add(bodyDust);
-  head.add(headDust);
 
   const k = height / NATIVE_HEIGHT;
   group.scale.setScalar(k);
@@ -978,7 +1150,7 @@ export async function createPtahColossus(assets, opts = {}) {
   const anchors = {
     eyes: new THREE.Vector3(0, HEAD_PIVOT.y + EYE.y, HEAD_PIVOT.z + EYE.z).multiplyScalar(k),
     chest: new THREE.Vector3(0, Y0 + 15.8, 1.6).multiplyScalar(k),
-    sceptreTop: new THREE.Vector3(0, GRIP.y + 3.7, GRIP.z).multiplyScalar(k),
+    sceptreTop: new THREE.Vector3(0, GRIP.y + 2.91, GRIP.z).multiplyScalar(k),
     plinthTop: new THREE.Vector3(0, 2.7, 0).multiplyScalar(k),
     plinthFront: new THREE.Vector3(0, 0, 3.8).multiplyScalar(k),
   };
@@ -994,18 +1166,13 @@ export async function createPtahColossus(assets, opts = {}) {
     head.rotation.x = state.headPitch;
     sceptre.rotation.z = -state.sceptreTilt;
     sceptre.rotation.x = 0.12 * abs(state.sceptreTilt);
-    eyeMat.emissiveIntensity = eg * (2.4 + 2.2 * v);
-    eyeMat.color.setRGB(0.08 * (1 - eg) + 0.03, 0.07 * (1 - eg) + 0.03, 0.06 * (1 - eg) + 0.03);
-    for (const fl of flares) {
-      fl.visible = eg > 0.01;
-      fl.material.opacity = eg * (0.5 + 0.5 * v);
-      fl.scale.setScalar(0.75 + 0.35 * eg + 0.35 * v);
-    }
-    inlay.uInlayGlow.value = 0.06 * eg + 0.4 * v * (0.4 + 0.6 * eg);
-    inlay.uVoiceGlow.value = 1.6 * v * eg;
-    bodyDust.visible = headDust.visible = v > 0.01;
+    // restrained: even at eyeGlow 1 and voice 1 the iris ring stays inside the lids
+    eyeMat.emissiveIntensity = eg * (0.55 + 0.45 * v);
+    // the collar inlay lines carry the voice; no mouth glow
+    inlay.uInlayGlow.value = 0.08 * eg + 1.1 * v * (0.35 + 0.65 * eg);
+    inlay.uVoiceGlow.value = 0;
+    bodyDust.visible = v > 0.01;
     bodyDust.material.uniforms.uVoice.value = v;
-    headDust.material.uniforms.uVoice.value = v;
   }
   setState();
 
