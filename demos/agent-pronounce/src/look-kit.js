@@ -27,6 +27,11 @@
 //
 // Helpers: environment(renderer, scene, hdriTex, opts)  HDRI -> PMREM env (+ optional backdrop)
 //          reshadeRobot(robot, opts)                   clearcoat shell, glossy visor, lit face light
+//                    opts: env, faceLight, eyeBoost, shell (hex), envMap (texture for shell/feet/visor),
+//                          faceBoost (emissive multiplier on the visor; 1 = unchanged)
+//          roomProbe(renderer, scene, { position, size, near, far, sigma, hide })
+//                                                      PMREM cube of the set itself (call after
+//                                                      whenTexturesReady); `hide` objects are left out
 //          screenLight(w, h, color, intensity)         RectAreaLight sized to a screen
 //          practical(kind, opts)                       warm/cool Spot or Point light, soft shadows
 //          contactShadow(w, d, opacity)                soft decal under furniture (noDepth)
@@ -197,13 +202,17 @@ export function environment(renderer, scene, hdriTex, { intensity = 0.4, rotatio
 // Re-shade a createRobot() rig in place: clearcoat shell, glossy visor, brighter eyes, and a small
 // agent-coloured point light in front of the face (the face lights the desk a little).
 // faceLight: candela (0..1.5 at this scale); env: shell envMapIntensity (0.6..1.4).
-export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, shell = null } = {}) {
+// envMap (optional): a roomProbe() texture so the shell reflects the real room and screen.
+// faceBoost (optional, default 1): multiplies the visor's emissive colour so dark-tinted faces
+// (e.g. #D97757 at the rig's 0.24 tint) read as their agent colour under film tone mapping.
+export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, shell = null, envMap = null, faceBoost = 1 } = {}) {
   const m = robot.mats;
   const phys = (src, extra) => {
     const p = new THREE.MeshPhysicalMaterial({
       name: src.name, color: src.color.clone(), roughness: src.roughness, metalness: src.metalness,
       emissive: src.emissive.clone(), emissiveIntensity: src.emissiveIntensity, map: src.map, envMapIntensity: env, ...extra,
     });
+    if (envMap) p.envMap = envMap;
     return p;
   };
   const swap = {
@@ -219,6 +228,7 @@ export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, 
   // apply() rewrites emissiveIntensity every pose, so brighten through the emissive colour instead
   m.eyes.emissive.multiplyScalar(eyeBoost);
   m.glow.emissive.multiplyScalar(1.3);
+  if (faceBoost !== 1) m.screen.emissive.multiplyScalar(faceBoost);
   let light = null;
   if (faceLight > 0) {
     light = new THREE.PointLight(robot.color, faceLight, 1.2, 2);
@@ -227,6 +237,22 @@ export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, 
   }
   if (robot.blob) robot.blob.visible = false; // seated: GTAO gives the contact
   return { light };
+}
+
+// A reflection probe of the built room (PMREM of a cube render from `position`), for materials
+// that should mirror the real set: robot shells, glossy desks. Objects in `hide` (e.g. the robots
+// themselves) are left out of the capture. Call once, after the set is built. Returns a texture
+// for `material.envMap` (it does not replace scene.environment).
+export function roomProbe(renderer, scene, { position = new THREE.Vector3(0, 1, 0), size = 256, near = 0.05, far = 30, sigma = 0, hide = [] } = {}) {
+  const pm = new THREE.PMREMGenerator(renderer);
+  const vis = hide.map((o) => o.visible);
+  hide.forEach((o) => { o.visible = false; });
+  const restoreND = hideNoDepth(scene);
+  let rt;
+  try { rt = pm.fromScene(scene, sigma, near, far, { size, position }); } finally {
+    restoreND(); hide.forEach((o, i) => { o.visible = vis[i]; }); pm.dispose();
+  }
+  return rt.texture;
 }
 
 // ------------------------------------------------------------------ lights

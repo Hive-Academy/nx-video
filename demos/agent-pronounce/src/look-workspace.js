@@ -9,8 +9,8 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { assetUrl } from './assets.js';
-import { V, glb, tex, hdri, fit, shadows, robot, canvas2d, canvasTex } from './craft.js';
-import { environment, reshadeRobot, screenLight, practical, contactShadow } from './look-kit.js';
+import { V, glb, tex, hdri, fit, shadows, robot, canvas2d, canvasTex, whenTexturesReady } from './craft.js';
+import { environment, reshadeRobot, screenLight, practical, contactShadow, roomProbe } from './look-kit.js';
 import { hash } from './util.js';
 
 export const K = 0.63;
@@ -35,7 +35,7 @@ export const SHOTS = {
   // over the shoulder: behind and above the seated robots, hero screen ~55% of the frame width
   a: { pos: [0.06, 1.45, 2.15], target: [0, 0.98, -0.9], focal: 30, focus: 3.1, aperture: 0.006, maxblur: 0.009 },
   // front two-shot: three-quarter from beyond the desks; both faces, screen glow on them, room behind
-  b: { pos: [1.55, 1.15, -0.8], target: [-0.05, 0.74, 0.62], focal: 24, focus: 2.25, aperture: 0.004, maxblur: 0.008 },
+  b: { pos: [1.5, 1.38, -0.84], target: [-0.06, 0.7, 0.6], focal: 24, focus: 2.25, aperture: 0.004, maxblur: 0.008 },
   // single: MCU of Codex turned toward Claude, Claude's shoulder soft in front, screen slice behind
   c: { pos: [-0.42, 0.98, 1.77], target: [0.37, 0.7, 0.47], focal: 35, focus: 1.2, aperture: 0.012, maxblur: 0.012 },
 };
@@ -206,9 +206,13 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   hero.position.set(...sc.at);
   scene.add(shadows(hero, true, false));
   panel.castShadow = false;
-  const sl = screenLight(sc.w, sc.h, '#C8DAFF', 12);
+  const sl = screenLight(sc.w, sc.h, '#C2D6FF', 28);
   sl.position.set(sc.at[0], sc.at[1], sc.at[2] + 0.03); sl.lookAt(0, sc.at[1] - 0.15, 2);
   scene.add(sl);
+  // cool screen spill: reads on the screen-facing sides of the heads and on the desk tops
+  const spill = new THREE.SpotLight('#9FC2FF', 3.2, 4.5, 0.75, 0.8, 1.6);
+  spill.position.set(sc.at[0] + 0.5, sc.at[1] + 0.05, sc.at[2] + 0.15); spill.target.position.set(0, 0.8, 0.45);
+  scene.add(spill, spill.target);
 
   // console under the screen
   const cab = fit(await M('modern_wooden_cabinet'), { w: 1.9, at: [0, 0, R.zFront + 0.27] });
@@ -246,11 +250,12 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
       obj.position.copy(p); obj.rotation.y += dk.rotation.y + yaw; scene.add(obj); return obj;
     };
     onDesk(keyboard(), 0, 0.12, 0);
-    const lamp = shadows(fit(lampSrc.clone(true), { h: side > 0 ? 0.36 : 0.42 }));
+    const lamp = shadows(fit(lampSrc.clone(true), { h: side > 0 ? 0.32 : 0.42 }));
+    const lx = side > 0 ? -0.42 : -0.44; // desk-local x: Codex inner back, Claude outer back
     lamp.traverse((o) => { if (o.isMesh && /light/.test(o.material.name)) { o.material = o.material.clone(); o.material.emissive = new THREE.Color('#FFC27A'); o.material.emissiveIntensity = 6; } });
-    onDesk(lamp, side * 0.44, -0.22, side > 0 ? Math.PI * 0.75 : Math.PI * 0.25);
-    const spot = practical('spot', { color: '#FFB46B', intensity: 1.6, distance: 2.2, angle: 0.75, penumbra: 0.9, shadow: 1024 });
-    const lampHead = new THREE.Vector3(side * 0.3, L.desk.top + 0.33, -0.08).applyAxisAngle(V(0, 1, 0), dk.rotation.y).add(dk.position);
+    onDesk(lamp, lx, -0.22, side > 0 ? Math.PI * 0.25 : Math.PI * 0.25);
+    const spot = practical('spot', { color: '#FFB46B', intensity: 1.15, distance: 2.2, angle: 0.75, penumbra: 0.9, shadow: 1024 });
+    const lampHead = new THREE.Vector3(lx * 0.7, L.desk.top + 0.3, -0.08).applyAxisAngle(V(0, 1, 0), dk.rotation.y).add(dk.position);
     spot.position.copy(lampHead);
     spot.target.position.copy(dk.position).add(V(side * 0.05, L.desk.top, 0.05));
     scene.add(spot, spot.target);
@@ -276,12 +281,13 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
     raycaster.set(V(seatAt.x, 2, seatAt.z - 0.02), V(0, -1, 0));
     const hit = raycaster.intersectObject(ch, true)[0];
     const seatY = hit ? hit.point.y : 0.27;
-    const at = V(side * L.seat.x, seatY - 0.01, L.seat.z);
+    const at = V(side * L.seat.x, seatY + 0.05, L.seat.z - 0.06);
     const turned = shot === 'c' && name === 'Codex';
     const look = turned ? V(-0.9, 0, 0.95) : V(0, 0, sc.at[2]);
-    const pose = name === 'Codex' ? { nod: turned ? -0.05 : -0.1, headYaw: 0 } : { nod: -0.08, headYaw: shot === 'b' ? 0.12 : 0 };
+    const lean = -0.14; // ball pitched toward the keyboard (rig faces +X; negative pitch = forward)
+    const pose = name === 'Codex' ? { pitch: lean, nod: turned ? -0.02 : -0.08, headYaw: shot === 'b' ? -0.3 : 0 } : { pitch: lean, nod: -0.06, headYaw: shot === 'b' ? -0.38 : 0 };
     const r = robot(assets, name, at, look, { pose });
-    reshadeRobot(r, { faceLight: 0.35 });
+    reshadeRobot(r, { faceLight: 0.3, shell: '#CDC6BA', env: 0.7, faceBoost: name === 'Claude' ? 3.6 : 2.6 });
     scene.add(r.root);
     robots[name] = r;
   }
@@ -298,7 +304,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   scene.add(pendant);
 
   // ---------------------------------------------------------------- lights
-  const bulb = practical('point', { color: '#FFC58A', intensity: 0.55, distance: 3.5, shadow: 512 });
+  const bulb = practical('point', { color: '#FFC58A', intensity: 0.4, distance: 3.5, shadow: 512 });
   bulb.position.set(0, R.ceil - 0.36, 0.35); scene.add(bulb);
   // city light through the window: cool key from behind the robots, gives the rim
   const moon = new THREE.DirectionalLight('#8EA6E8', 0.55);
@@ -314,6 +320,20 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   wash.position.set(1.2, R.ceil - 0.05, 1.6); wash.target.position.set(1.35, 0.5, R.zBack); scene.add(wash, wash.target);
   const slatWash = practical('spot', { color: '#FFB067', intensity: 1.4, distance: 2.5, angle: 1.0, penumbra: 1, shadow: 0 });
   slatWash.position.set(0, R.ceil - 0.05, R.zFront + 0.45); slatWash.target.position.set(0, 0.2, R.zFront); scene.add(slatWash, slatWash.target);
+
+  // soft bounce: a warm uplight scallop on Claude's side wall and a dim ceiling fill
+  const up = practical('spot', { color: '#FFB878', intensity: 2.6, distance: 2.4, angle: 0.55, penumbra: 1, shadow: 0 });
+  up.position.set(-R.x + 0.25, 0.06, 0.25); up.target.position.set(-R.x, 1.6, 0.25); scene.add(up, up.target);
+  const ceilFill = practical('point', { color: '#D8C8B8', intensity: 0.35, distance: 3.2, shadow: 0 });
+  ceilFill.position.set(-0.9, R.ceil - 0.25, 0.4); scene.add(ceilFill);
+
+  // reflection probe of the finished room: the shells and desk tops mirror the real hero screen
+  await whenTexturesReady();
+  const probe = roomProbe(renderer, scene, { position: V(0, 0.82, 0.25), hide: Object.values(robots).map((r) => r.root) });
+  for (const r of Object.values(robots)) for (const k of ['shell', 'feet', 'screen']) { r.mats[k].envMap = probe; r.mats[k].needsUpdate = true; }
+  // night window glass mirrors the room: the bright hero screen reflects into the two-shot
+  glass.material = new THREE.MeshStandardMaterial({ color: '#2E3A4E', metalness: 1, roughness: 0.05, envMap: probe, envMapIntensity: 0.6, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  walnut.envMap = probe; walnut.envMapIntensity = 1.0; walnut.clearcoat = 0.5; walnut.clearcoatRoughness = 0.22; walnut.needsUpdate = true;
 
   // ---------------------------------------------------------------- camera
   const camera = new THREE.PerspectiveCamera(35, 16 / 9, 0.03, 40);

@@ -33,7 +33,8 @@ The scene is an evening workspace in a "2026 stylised short" style: a warm inter
 1. A look returns `film: { size:[w,h], tone:'aces'|'agx'|'neutral', exposure, msaa, ao:{radius,intensity}|false, dof:{focus,aperture,maxblur}|false, bloom:{strength,radius,threshold}|false, grade:{vignette,grain,ca,lift,seed} }`. That opts the look in. A look without `film` renders exactly as before.
 2. `renderFilm(renderer, scene, camera, film, w, h, frame)` runs the chain, cached per `film` object: RenderPass (freezes the shadow maps after the colour pass), GTAO, Bokeh, bloom, OutputPass tone mapping, then the grade. Objects in `scene.userData.noDepth` are hidden from the depth passes.
 3. `environment(renderer, scene, hdriTex, {intensity, rotation, background, backgroundTex, backgroundIntensity, backgroundBlurriness})`.
-4. `reshadeRobot(robot, {env, faceLight, eyeBoost, shell})`. It acts only on a robot from `createRobot` and never rebuilds the rig.
+4. `reshadeRobot(robot, {env, faceLight, eyeBoost, shell, envMap, faceBoost})`. It acts only on a robot from `createRobot` and never rebuilds the rig. Round 2 added `envMap` (a texture set on the shell, feet and visor materials; default none) and `faceBoost` (multiplies the visor emissive colour; default 1). Both are additive: with the defaults, behaviour matches b353830.
+4a. `roomProbe(renderer, scene, {position, size=256, near=0.05, far=30, sigma=0, hide=[]})` is new in round 2. It returns a PMREM texture of the set rendered from `position`, with the `hide` objects and the `noDepth` objects hidden. Call it after `await whenTexturesReady()`.
 5. `screenLight(w, h, color, intensity)`, `practical('spot'|'point', {color, intensity, distance, angle, penumbra, shadow, radius, bias})` and `contactShadow(scene, w, d, opacity)`.
 
 Wiring:
@@ -131,11 +132,24 @@ Sheet: `snapshots/lookdev/workspace-sheet.jpg` (2880 × 590, three labelled 960 
 - **Pendant:** shortened to h 0.26, so it hangs above the screen's top edge in shot a.
 - Assumption (AskUserQuestion was unavailable): look-dev stills are 1920 × 1080.
 
+## Round 2: parent feedback on workspace-b
+
+| # | Feedback | What changed | Result |
+|---|---|---|---|
+| 1 | The shells clip to flat white | Shell albedo #CDC6BA (was #E9E4DA), env 0.7, a room probe as the shell envMap, face light 0.3 | Shell peaks at 235–244 RGB, not 255. There is side shading and a cool window rim. It is still bright ceramic. |
+| 2 | No screen light | Screen RectAreaLight 12 → 28, a cool spill spot (#9FC2FF, 3.2) from the screen edge, lamp spots 1.6 → 1.15. The window glass is now a dark metal mirror (#2E3A4E, rough 0.05, probe env 0.6, additive). | The hero screen's reflection shows as a cool panel in the window, frame-left. That motivates the light, because the screen itself is behind the lens in b. The cool glow on the heads is subtle; the warm desk lamps still lead. |
+| 3 | Balls resting on chairs | Robots raised by +0.05 and moved 0.06 toward the desk, pitch −0.14 (lean to the keyboard), heads turned in b (Codex yaw −0.3, Claude −0.38) | They lean in and turn toward each other. **Limitation:** the `cute_robot` rig has no arms, hands or torso, and the rules forbid rebuilding a character. "Body above the desk line" is the ball plus its collar ring. |
+| 4 | The lamp cuts across Codex and the bottom edge | Lamps moved to the back corners of the desks (Codex inner-back, Claude outer-back), h 0.32/0.42 | Nothing crosses a robot. The lower 16 % of the frame holds no faces in a, b or c. |
+| 5 | The right wall and the ceiling are black | Warm uplight scallop (#FFB878) on Claude's side wall, a dim ceiling fill point light, a blueprint wash | Wall ~78 RGB, the ceiling shows the fixture glow |
+| 6 | The Claude face is a flat brown disc | `faceBoost` 3.6 for Claude, 2.6 for Codex (the visor emissive is tint × 0.6 × boost). The colour is #D97757 from the cast. | It reads as an emissive terracotta, matching the green one. ACES pushes it slightly toward salmon. |
+
+Render cost after round 2 (SwiftShader-free GPU, 1920×1080): a ~38–64 ms, b ~35–61 ms, c ~34–61 ms per frame. The first scene in a run spikes to 100–450 ms (shader compilation). Office and desert are unchanged: PSNR inf against the pre-kit baselines.
+
 ## Open defects
 
-1. **The robot shells read flat white** (b, c). The clearcoat highlights are there, but the form shading is weak. Fix: lower the face light's spill onto the shell, drop the shell albedo toward #DCD6CC and raise the rim spot so each ball gets an edge.
-2. **The screen glow on the faces is subtle in b.** The screen is behind the camera, so the cool tint is weak. Fix: an extra cool RectAreaLight at the screen plane aimed at the faces, or a cool bounce card off camera.
-3. **The right wall in b is dark.** The blueprint and its wash help, but the area still reads as empty. Fix: a floor lamp or a second plant near the blueprint.
+1. **The shells stay bright** in b and c. They no longer clip, but a lower key would add more form.
+2. **The cool screen glow on the faces is subtle in b.** The warm lamps still dominate the desk tops. A stronger spill would turn the shells blue.
+3. **No arms or hands** (rig limitation, see round 2 point 3).
 4. **The pendant just touches the screen's top bezel in a.** Fix: move it toward +z by about 0.15, or cut its cord further.
 5. **Timing spikes on the first scene in a run** (213–1060 ms). These are likely shader compilation. The harness could add one more warm-up frame.
 6. **`__lookdevInfo.calls/tris` report 1/1** on the film path, because `renderer.info` resets per pass. This affects only the reported numbers.
