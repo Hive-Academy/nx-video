@@ -551,3 +551,27 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   repeating stone, visitors standing by empty chairs, peg-doll Ptah. Fix pass requested:
   open desert with a CC0 HDRI sky, seated visitors, staging for the 24 m colossus.
 - No still has gone to the user yet; no v4 animation started.
+
+## 2026-11-13 — session 5 (continued): look rounds closed, three look branches merged
+
+- Colossus round 2 (`0ffbbd4`): accepted for the wide and the head-and-shoulders framings.
+  The face close-up (still d) fails (stepped eyelids, flat lips). Rule for animation: never
+  frame the colossus tighter than head-and-shoulders. It stays procedural; no CC0 Ptah mesh
+  exists.
+- Workspace round 3 (`e8f814a`): the two-shot `workspace-b.png` is the hero frame and is put
+  to the user for approval. Known limits: the series robot rig has no arms; the visor rim
+  steps in close-up c; no city window in b. The child's 4:5 crop concerns are set aside (the
+  film is 16:9).
+- Desert pass 3 (`a0d60ce`): stills b, c and d accepted at 16:9. Open: in still a the robots
+  are larger than the chairs and out of focus; the grey Ptah proxy must become the real
+  colossus; visitors and crews need the workspace shell and visor treatment; a new still
+  `desert4-e` (giant-rises wide) is wanted.
+- The desert child session `5ee5ecde…` was ended by the user (user-stop) before the
+  integration brief was delivered. Its work is committed at `a0d60ce`. A new Opus child takes
+  the integration pass from the merged episode branch.
+- Merged into `demo/ep06-p-is-not-silent`: `bf9cabe` (workspace), `7a288cc` (desert),
+  `6fa9b54` (colossus). Conflicts only in `assets/media.manifest.json` and
+  `assets/CREDITS.media.md`; resolved as a union by path (209 items). Verified:
+  `fetch-media --check` 209/209 ok; `no-media` clean (461 files); `check --json` exit 0,
+  `ok: true`.
+- Still not approved by the user: every look-dev still. No v4 animation has started.
