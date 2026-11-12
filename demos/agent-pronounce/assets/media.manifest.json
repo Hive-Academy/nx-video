@@ -1942,6 +1942,106 @@
       "licence": "CC0-1.0",
       "changes": "None",
       "sha256": "105cffc93bfd78589757875f3b15aaabde608c1ef58844acf787847dbcebc562"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_blocks_08/sandstone_blocks_08_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_08/sandstone_blocks_08_diff_1k.jpg",
+      "title": "Sandstone Blocks 08 (sandstone_blocks_08_diff_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_blocks_08",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "0cac65461ba33003b8a27b03c2b87f3393a824a9a98036c4c8de6182a1449369"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_blocks_08/sandstone_blocks_08_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_08/sandstone_blocks_08_nor_gl_1k.jpg",
+      "title": "Sandstone Blocks 08 (sandstone_blocks_08_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_blocks_08",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "1203d5300dfc717db67220531fcdad75214d48b98d21114a155b3f01d54ab012"
+    },
+    {
+      "path": "assets/third-party/textures/ph/sandstone_blocks_08/sandstone_blocks_08_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_08/sandstone_blocks_08_arm_1k.jpg",
+      "title": "Sandstone Blocks 08 (sandstone_blocks_08_arm_1k.jpg)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_blocks_08",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "4a211353047f52b9f0cf545e669fa8c29ac0d4ca87dd1f74e3a17f13d9a5b50d"
+    },
+    {
+      "path": "assets/third-party/textures/ph/worn_rock_natural_01/worn_rock_natural_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/worn_rock_natural_01/worn_rock_natural_01_diff_1k.jpg",
+      "title": "Worn Rock Natural 01 (worn_rock_natural_01_diff_1k.jpg)",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "ef6c74732c61974c5df7f0f7185e7d6a97308198bf10aec7a0e95e953a617d9e"
+    },
+    {
+      "path": "assets/third-party/textures/ph/worn_rock_natural_01/worn_rock_natural_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/worn_rock_natural_01/worn_rock_natural_01_nor_gl_1k.jpg",
+      "title": "Worn Rock Natural 01 (worn_rock_natural_01_nor_gl_1k.jpg)",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "77a5d3f833aa9613581a5c6ef11422923c04b529f893a16d25704529be7386dc"
+    },
+    {
+      "path": "assets/third-party/textures/ph/worn_rock_natural_01/worn_rock_natural_01_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/worn_rock_natural_01/worn_rock_natural_01_arm_1k.jpg",
+      "title": "Worn Rock Natural 01 (worn_rock_natural_01_arm_1k.jpg)",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "ff0fe650f528379766f96fe874980839bbe6ba55d1cf94ba7d2e3bf2302ca572"
+    },
+    {
+      "path": "assets/third-party/textures/ph/old_sandstone_02/old_sandstone_02_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_sandstone_02/old_sandstone_02_diff_1k.jpg",
+      "title": "Old Sandstone 02 (old_sandstone_02_diff_1k.jpg)",
+      "author": "Dimitrios Savva",
+      "source": "https://polyhaven.com/a/old_sandstone_02",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "a58111224570bb33eba3c348bc7e3207255b5efb07f9cf274209c56b71d6825c"
+    },
+    {
+      "path": "assets/third-party/textures/ph/old_sandstone_02/old_sandstone_02_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_sandstone_02/old_sandstone_02_nor_gl_1k.jpg",
+      "title": "Old Sandstone 02 (old_sandstone_02_nor_gl_1k.jpg)",
+      "author": "Dimitrios Savva",
+      "source": "https://polyhaven.com/a/old_sandstone_02",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "4dcaa85f9de33d77cec4e89e6f63cd1afecb81e436104c1b7eb4b151fe0b7f75"
+    },
+    {
+      "path": "assets/third-party/textures/ph/old_sandstone_02/old_sandstone_02_arm_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/old_sandstone_02/old_sandstone_02_arm_1k.jpg",
+      "title": "Old Sandstone 02 (old_sandstone_02_arm_1k.jpg)",
+      "author": "Dimitrios Savva",
+      "source": "https://polyhaven.com/a/old_sandstone_02",
+      "licence": "CC0-1.0",
+      "changes": "Triplanar-mapped and tinted in scene",
+      "sha256": "12cee13c49ee9050a9287a11146b217ca864ba8a3714d2526a002032095c18fa"
+    },
+    {
+      "path": "assets/third-party/hdri/mpumalanga_veld_puresky_2k.hdr",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/mpumalanga_veld_puresky_2k.hdr",
+      "title": "Mpumalanga Veld (Pure Sky) (mpumalanga_veld_puresky_2k.hdr)",
+      "author": "Greg Zaal, Jarod Guest",
+      "source": "https://polyhaven.com/a/mpumalanga_veld_puresky",
+      "licence": "CC0-1.0",
+      "changes": "Rotated in scene",
+      "sha256": "92ed4f77d7b453e7a94c3198d83af3a7002d04556945c56e1e99d601a499df92"
     }
   ]
 }

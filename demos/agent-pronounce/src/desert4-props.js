@@ -37,12 +37,14 @@ function maps(id) {
   return MAPS.get(id);
 }
 // Poly Haven PBR set (diffuse, GL normal, ARM). Geometry carries metre-scaled UVs.
-export function pbr(id, { color = '#FFFFFF', normal = 1, roughness = 1, ao = 1, env = 1, metal = 0 } = {}) {
+export function pbr(id, { color = '#FFFFFF', normal = 1, roughness = 1, ao = 1, env = 1, metal = 0, spec } = {}) {
   const m = maps(id);
-  return new THREE.MeshStandardMaterial({
+  const p = {
     color, map: m.map, normalMap: m.normalMap, normalScale: new THREE.Vector2(normal, normal),
     aoMap: m.arm, aoMapIntensity: ao, roughnessMap: m.arm, roughness, metalness: metal, envMapIntensity: env,
-  });
+  };
+  // spec < 1: a physical material with damped F0, so wide flat stone does not sheen grey at grazing angles
+  return spec === undefined ? new THREE.MeshStandardMaterial(p) : new THREE.MeshPhysicalMaterial({ ...p, specularIntensity: spec });
 }
 
 // ------------------------------------------------------------------ height fog
@@ -87,7 +89,8 @@ varying vec3 vHfW; uniform vec3 hfSun; uniform vec3 hfSunCol; uniform float hfDe
   gl_FragColor.rgb = mix(gl_FragColor.rgb, hfC, hfF);
 #endif`);
     };
-    mat.customProgramCacheKey = () => 'hf1';
+    const pk = mat.customProgramCacheKey;
+    mat.customProgramCacheKey = () => `hf1|${pk.call(mat)}`;
     mat.needsUpdate = true;
   };
   return { uniforms: U, apply: (root) => root.traverse((o) => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(patch); }) };
@@ -246,7 +249,7 @@ export function ramp(stone, wood, { len = 12, w = 2.6, rise = 3, sleeper = 0.85,
   const sl = planarUV(new RoundedBoxGeometry(w + 0.1, 0.12, 0.22, 1, 0.03), 1.4);
   for (let z = 0.6; z < len - 0.2; z += sleeper) {
     const y = (z / len) * rise;
-    const b = mesh(sl, wood, [hashRange(-0.05, 0.05, seed, z), y + 0.04, z], { rot: [-slope, hashRange(-0.03, 0.03, seed, z, 'y'), 0] });
+    const b = mesh(sl, wood, [hashRange(-0.05, 0.05, seed, z), y + 0.07, z], { rot: [-slope, hashRange(-0.03, 0.03, seed, z, 'y'), 0] });
     g.add(b);
   }
   g.userData = { len, rise, slope, w, heightAt: (z) => Math.max(0, Math.min(1, z / len)) * rise + 0.1 };
