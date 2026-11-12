@@ -490,3 +490,12 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   skeleton) so the child branches merge cleanly. A copy is in
   `D:/tmp/ep06-codex-workspace-leftovers` (patch plus the two files). The rejected sheet is
   kept as `snapshots/lookdev/workspace-sheet-rejected.jpg` (git-ignored).
+- 2026-11-13: I asked the user to approve Ptah's new lines (D1, F1–F4, D5), to confirm chairs
+  instead of the sofa, and to choose between masking the cost figures in the usage clip and
+  another clip. User (verbatim): "approve". My reading: the script v4 and the chairs are
+  approved. The answer does not choose for the cost figures, so I take the safer option and
+  mask them (with the account lines, workspace name and session titles) when the tour clips
+  are re-cut to the new line lengths; the user can reverse that.
+- Voice generation is now allowed. Started a Codex lane for audio and timing v4 (running
+  order, six new takes, tour windows, interim build) → `notes/lane-c-v4-audio.md`. The tour
+  clips are re-cut and masked by a later footage lane, once the line lengths are known.

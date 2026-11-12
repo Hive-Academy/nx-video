@@ -124,7 +124,7 @@ Rules. Items marked (orchestrator) are the orchestrator's reading, not the user'
 7. **Gates.** Look-dev stills for each scene are approved by the user before animation. The
    new lines below are approved by the user before any voice is generated.
 
-### Script v4 (proposed 2026-11-13, waiting for the user's approval)
+### Script v4 (approved by the user on 2026-11-13)
 
 Running order: N1 N2 N3 N4 N5 S2 O1 O3 (workspace), then O4 D1 D2 F1 F2 F3 F4 D5 D6
 (desert). Office lines keep their v3 wording and takes; "laptop" in their directions now
