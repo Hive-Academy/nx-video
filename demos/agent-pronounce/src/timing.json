@@ -2,10 +2,205 @@
   "fps": 30,
   "width": 1920,
   "height": 1080,
-  "total": 82.433,
+  "total": 106.831,
   "rows": {
-    "S2": {
+    "N1": {
       "start": 4,
+      "duration": 2.694,
+      "speaker": "Codex",
+      "scene": "office",
+      "words": [
+        {
+          "word": "I",
+          "start": 0.14,
+          "end": 0.2
+        },
+        {
+          "word": "found",
+          "start": 0.26,
+          "end": 0.52
+        },
+        {
+          "word": "a",
+          "start": 0.58,
+          "end": 0.64
+        },
+        {
+          "word": "new",
+          "start": 0.72,
+          "end": 0.96
+        },
+        {
+          "word": "coding-agent",
+          "start": 1.04,
+          "end": 1.88
+        },
+        {
+          "word": "app.",
+          "start": 2.08,
+          "end": 2.36
+        }
+      ]
+    },
+    "N2": {
+      "start": 7.794,
+      "duration": 2.333,
+      "speaker": "Claude",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Another",
+          "start": 0.086,
+          "end": 0.406
+        },
+        {
+          "word": "one?",
+          "start": 0.534,
+          "end": 0.684
+        },
+        {
+          "word": "What",
+          "start": 0.983,
+          "end": 1.09
+        },
+        {
+          "word": "does",
+          "start": 1.133,
+          "end": 1.283
+        },
+        {
+          "word": "this",
+          "start": 1.325,
+          "end": 1.518
+        },
+        {
+          "word": "one",
+          "start": 1.561,
+          "end": 1.732
+        },
+        {
+          "word": "do?",
+          "start": 1.774,
+          "end": 2.031
+        }
+      ]
+    },
+    "N3": {
+      "start": 11.227,
+      "duration": 5.526,
+      "speaker": "Codex",
+      "scene": "office",
+      "words": [
+        {
+          "word": "It",
+          "start": 0.1,
+          "end": 0.2
+        },
+        {
+          "word": "runs",
+          "start": 0.28,
+          "end": 0.6
+        },
+        {
+          "word": "all",
+          "start": 0.68,
+          "end": 0.84
+        },
+        {
+          "word": "of",
+          "start": 0.88,
+          "end": 0.98
+        },
+        {
+          "word": "us.",
+          "start": 1.06,
+          "end": 1.36
+        },
+        {
+          "word": "Side",
+          "start": 1.38,
+          "end": 2.36
+        },
+        {
+          "word": "by",
+          "start": 2.48,
+          "end": 2.58
+        },
+        {
+          "word": "side.",
+          "start": 2.74,
+          "end": 3.36
+        },
+        {
+          "word": "On",
+          "start": 3.4,
+          "end": 3.4
+        },
+        {
+          "word": "one",
+          "start": 3.4,
+          "end": 4.26
+        },
+        {
+          "word": "plan.",
+          "start": 4.38,
+          "end": 4.78
+        }
+      ]
+    },
+    "N4": {
+      "start": 17.853,
+      "duration": 1.625,
+      "speaker": "Claude",
+      "scene": "office",
+      "words": [
+        {
+          "word": "Huh.",
+          "start": 0.06,
+          "end": 0.26
+        },
+        {
+          "word": "What's",
+          "start": 0.64,
+          "end": 0.8
+        },
+        {
+          "word": "it",
+          "start": 0.84,
+          "end": 0.94
+        },
+        {
+          "word": "called?",
+          "start": 1,
+          "end": 1.3
+        }
+      ]
+    },
+    "N5": {
+      "start": 20.578,
+      "duration": 1.579,
+      "speaker": "Codex",
+      "scene": "office",
+      "words": [
+        {
+          "word": "…That's",
+          "start": 0.16,
+          "end": 0.44
+        },
+        {
+          "word": "the",
+          "start": 0.5,
+          "end": 0.62
+        },
+        {
+          "word": "problem.",
+          "start": 0.66,
+          "end": 1.26
+        }
+      ]
+    },
+    "S2": {
+      "start": 23.257,
       "duration": 3.101,
       "speaker": "Claude",
       "scene": "office",
@@ -43,7 +238,7 @@
       ]
     },
     "O1": {
-      "start": 8.151,
+      "start": 27.458,
       "duration": 2.554,
       "speaker": "Codex",
       "scene": "office",
@@ -76,7 +271,7 @@
       ]
     },
     "O3": {
-      "start": 11.905,
+      "start": 30.512,
       "duration": 2.786,
       "speaker": "Codex",
       "scene": "office",
@@ -104,10 +299,10 @@
       ]
     },
     "O4": {
-      "start": 15.741,
+      "start": 45.398,
       "duration": 1.193,
       "speaker": "Conductor",
-      "scene": "office",
+      "scene": "desert",
       "words": [
         {
           "word": "Old.",
@@ -117,7 +312,7 @@
       ]
     },
     "D1": {
-      "start": 25.267,
+      "start": 48.041,
       "duration": 4.571,
       "speaker": "Conductor",
       "scene": "desert",
@@ -180,7 +375,7 @@
       ]
     },
     "D2": {
-      "start": 30.888,
+      "start": 53.712,
       "duration": 4.598,
       "speaker": "Claude",
       "scene": "desert",
@@ -243,103 +438,75 @@
       ]
     },
     "D3": {
-      "start": 36.536,
-      "duration": 5.732,
+      "start": 59.41,
+      "duration": 8.265,
       "speaker": "Conductor",
       "scene": "desert",
       "words": [
         {
           "word": "Look",
-          "start": 0.12,
-          "end": 0.28
+          "start": 0.14,
+          "end": 0.3
         },
         {
           "word": "around.",
-          "start": 0.36,
-          "end": 0.76
+          "start": 0.38,
+          "end": 0.8
         },
         {
           "word": "Many",
-          "start": 1.14,
-          "end": 1.32
+          "start": 0.8,
+          "end": 1.6
         },
         {
           "word": "crews.",
-          "start": 1.44,
-          "end": 1.82
+          "start": 1.72,
+          "end": 2.16
         },
         {
           "word": "One",
-          "start": 2.18,
-          "end": 2.3
+          "start": 2.32,
+          "end": 2.34
         },
         {
           "word": "plan.",
-          "start": 2.42,
-          "end": 2.78
+          "start": 3.16,
+          "end": 3.54
         },
         {
           "word": "Nothing",
-          "start": 3.24,
-          "end": 3.58
+          "start": 3.62,
+          "end": 4.74
         },
         {
           "word": "goes",
-          "start": 3.62,
-          "end": 3.84
+          "start": 4.76,
+          "end": 4.94
         },
         {
           "word": "up",
-          "start": 3.92,
-          "end": 4.04
+          "start": 5.02,
+          "end": 5.16
         },
         {
           "word": "until",
-          "start": 4.059,
-          "end": 4.32
+          "start": 5.2,
+          "end": 5.66
         },
         {
-          "word": "it's—",
-          "start": 4.38,
-          "end": 4.56
-        }
-      ]
-    },
-    "D4": {
-      "start": 42.468,
-      "duration": 1.667,
-      "speaker": "Cursor",
-      "scene": "desert",
-      "words": [
-        {
-          "word": "—checked!",
-          "start": 0.109,
-          "end": 0.326
+          "word": "it's",
+          "start": 5.7,
+          "end": 5.94
         },
         {
-          "word": "Got",
-          "start": 0.544,
-          "end": 0.674
-        },
-        {
-          "word": "it!",
-          "start": 0.739,
-          "end": 0.805
-        },
-        {
-          "word": "Next",
-          "start": 0.957,
-          "end": 1.131
-        },
-        {
-          "word": "block!",
-          "start": 1.174,
-          "end": 1.435
+          "word": "checked.",
+          "start": 6,
+          "end": 6.46
         }
       ]
     },
     "D5": {
-      "start": 45.185,
+      "start": 68.175,
       "duration": 3.621,
       "speaker": "Conductor",
       "scene": "desert",
@@ -387,7 +554,7 @@
       ]
     },
     "D6": {
-      "start": 66.80600000000001,
+      "start": 91.175,
       "duration": 2.926,
       "speaker": "Codex",
       "scene": "desert",
@@ -420,29 +587,35 @@
       "id": "office",
       "kind": "office",
       "rows": [
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5",
         "S2",
         "O1",
-        "O3",
-        "O4"
+        "O3"
       ],
       "start": 0,
-      "duration": 18.534,
+      "duration": 36.898,
       "cues": {
         "entrance": 4,
-        "tah": 4.83,
-        "spark": 10.351,
-        "dip": 10.551,
-        "bolt": 13.965,
-        "flash": 15.861,
-        "end": 18.534,
-        "crackle": 13.165
+        "landingIn": 10.827,
+        "landingOut": 15.327,
+        "tah": 24.087,
+        "spark": 29.658,
+        "dip": 29.858,
+        "rumble": 33.898,
+        "pull": 35.298,
+        "through": 36.898,
+        "end": 36.898
       }
     },
     {
       "id": "vortex",
       "kind": "vortex",
       "rows": [],
-      "start": 18.567,
+      "start": 36.898,
       "duration": 3.5,
       "cues": {
         "land": 2.6
@@ -452,35 +625,34 @@
       "id": "desert",
       "kind": "desert",
       "rows": [
+        "O4",
         "D1",
         "D2",
         "D3",
-        "D4",
         "D5",
         "D6"
       ],
-      "start": 22.067,
-      "duration": 50.365,
+      "start": 40.398,
+      "duration": 56.403,
       "cues": {
         "sofaLand": 0.3,
         "reveal": 1.8,
-        "rise": 3.2,
-        "pan": 14.589,
-        "stamp": 20.51,
-        "cursorPass": 20.401,
-        "portal": 27.139,
-        "pushIn": 27.139,
-        "showcaseEnd": 43.939,
-        "d6": 44.739,
-        "titleTilt": 48.365,
-        "end": 50.365
+        "rise": 5,
+        "pan": 19.152,
+        "stamp": 25.012,
+        "portal": 29.977,
+        "pushIn": 29.977,
+        "showcaseEnd": 49.977,
+        "d6": 50.777,
+        "titleTilt": 54.403,
+        "end": 56.403
       }
     },
     {
       "id": "intro",
       "kind": "2d",
       "rows": [],
-      "start": 72.433,
+      "start": 96.831,
       "duration": 6,
       "cues": {
         "chisel": 0.6,
@@ -493,7 +665,7 @@
       "id": "endcard",
       "kind": "2d",
       "rows": [],
-      "start": 78.433,
+      "start": 102.831,
       "duration": 4,
       "cues": {
         "end": 4
@@ -502,63 +674,87 @@
   ],
   "captions": [
     {
-      "row": "S2",
+      "row": "N1",
       "start": 4,
-      "end": 7.101,
+      "end": 6.694,
+      "text": "I found a new coding-agent app."
+    },
+    {
+      "row": "N2",
+      "start": 7.794,
+      "end": 10.127,
+      "text": "Another one? What does this one do?"
+    },
+    {
+      "row": "N3",
+      "start": 11.227,
+      "end": 16.753,
+      "text": "It runs all of us. Side by side. On one plan."
+    },
+    {
+      "row": "N4",
+      "start": 17.853,
+      "end": 19.478,
+      "text": "Huh. What's it called?"
+    },
+    {
+      "row": "N5",
+      "start": 20.578,
+      "end": 22.157,
+      "text": "…That's the problem."
+    },
+    {
+      "row": "S2",
+      "start": 23.257,
+      "end": 26.358,
       "text": "Hmm… Tah? The P's silent, right?"
     },
     {
       "row": "O1",
-      "start": 8.151,
-      "end": 10.705,
+      "start": 27.458,
+      "end": 30.012,
       "text": "Has to be. Like pterodactyl."
     },
     {
       "row": "O3",
-      "start": 11.905,
-      "end": 14.691,
+      "start": 30.512,
+      "end": 33.298,
       "text": "Honestly? It sounds… old."
     },
     {
       "row": "O4",
-      "start": 15.741,
-      "end": 16.934,
+      "start": 45.398,
+      "end": 46.591,
       "text": "Old."
     },
     {
       "row": "D1",
-      "start": 25.267,
-      "end": 29.838,
+      "start": 48.041,
+      "end": 52.612,
       "text": "I made the world by speaking its name. Say mine properly."
     },
     {
       "row": "D2",
-      "start": 30.888,
-      "end": 35.486,
+      "start": 53.712,
+      "end": 58.31,
       "text": "Respectfully… why does the god of builders care about coding agents?"
     },
     {
       "row": "D3",
-      "start": 36.536,
-      "end": 42.268,
-      "text": "Look around. Many crews. One plan. Nothing goes up until it's—"
-    },
-    {
-      "row": "D4",
-      "start": 42.468,
-      "end": 44.135,
-      "text": "—checked! Got it! Next block!"
+      "start": 59.41,
+      "end": 67.675,
+      "text": "Look around. Many crews. One plan. Nothing goes up until it's checked."
     },
     {
       "row": "D5",
-      "start": 45.185,
-      "end": 48.806,
+      "start": 68.175,
+      "end": 71.796,
       "text": "Same idea. Now it runs on your desktop."
     },
     {
       "row": "D6",
-      "start": 66.80600000000001,
-      "end": 69.732,
+      "start": 91.175,
+      "end": 94.101,
       "text": "…okay. That's actually cool."
     }
   ]

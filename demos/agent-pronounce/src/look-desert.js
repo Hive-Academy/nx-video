@@ -206,7 +206,7 @@ export async function buildDesertLook(assets, renderer) {
   // work crews: robots haul sleds of stone toward the ramp under their crew banners
   const sled = await glb('desert/sled.glb');
   const blockMat = stoneMaterial('#E6C99B');
-  const crews = [['Claude', '#D97757', V(-9, 0, -26)], ['Cursor', '#8C8CFF', V(-2, 0, -21)], ['Antigravity', '#4F8BF5', V(-15, 0, -34)], ['Codex', '#10A37F', V(4, 0, -17)]];
+  const crews = [['Claude', '#D97757', V(-9, 0, -26)], ['Codex', '#8C8CFF', V(-2, 0, -21)], ['Antigravity', '#4F8BF5', V(-15, 0, -34)], ['Codex', '#10A37F', V(4, 0, -17)]];
   const rampFoot = V(pyr.position.x + pyr.userData.ramp.x, 0, pyr.position.z + pyr.userData.ramp.z0);
   const crewRobots = [], sleds = [], banners = [], rampRobots = [];
   let inspector = null;
@@ -234,7 +234,7 @@ export async function buildDesertLook(assets, renderer) {
     const flag = banner(color, at.clone().addScaledVector(dir, 3.4).add(V(-dir.z, 0, dir.x).multiplyScalar(0.9)));
     scene.add(flag); banners.push(flag);
     if (ci === 1) {
-      // the inspector with the stamp beside Cursor's block
+      // the inspector with the stamp beside the middle crew's block
       const ins = robot(assets, 'Conductor', at.clone().add(V(1.4, 0, 0.4)), at, { scale: 0.32, badge: true, pose: { nod: -0.2 } });
       scene.add(ins.root); inspector = ins;
     }
@@ -244,7 +244,7 @@ export async function buildDesertLook(assets, renderer) {
   for (let k = 0; k < 6; k++) {
     const f = 0.15 + k * 0.13;
     const p = V(pyr.position.x + rmp.x + (k % 2 ? 0.6 : -0.6), Math.sin(rmp.ang) * rmp.len * (1 - f) + 0.3, pyr.position.z + rmp.z0 - Math.cos(rmp.ang) * rmp.len * (1 - f));
-    const name = ['Claude', 'Codex', 'Cursor', 'Antigravity'][k % 4];
+    const name = ['Claude', 'Codex', 'Claude', 'Antigravity'][k % 4];
     const worker = robot(assets, name, p, p.clone().add(V(0, 0, -1)), { scale: 0.3, badge: false });
     scene.add(worker.root); rampRobots.push(worker);
   }
@@ -286,3 +286,5 @@ export async function buildDesertLook(assets, renderer) {
 }
 
 // ------------------------------------------------------------------ vortex
+
+

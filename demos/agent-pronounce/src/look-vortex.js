@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { hash } from './util.js';
 import { V, W, H, glb, fit, shadows, recolor, robot, canvas2d, canvasTex, dust, roomEnvironment } from './craft.js';
-function vortexTexture() {
+export function vortexTexture() {
   const [c, g] = canvas2d(1024, 2048);
   const grad = g.createLinearGradient(0, 0, 1024, 0);
-  grad.addColorStop(0, '#6B3E1E'); grad.addColorStop(0.5, '#C98A48'); grad.addColorStop(1, '#6B3E1E');
+  grad.addColorStop(0, '#21192B'); grad.addColorStop(0.5, '#AD7035'); grad.addColorStop(1, '#342039');
   g.fillStyle = grad;
   g.fillRect(0, 0, 1024, 2048);
   for (let i = 0; i < 260; i++) {
@@ -31,9 +31,9 @@ export async function buildVortexLook(assets, renderer) {
   const scene = new THREE.Scene();
   scene.environment = roomEnvironment();
   scene.environmentIntensity = 0.5;
-  scene.background = new THREE.Color('#1A0D05');
+  scene.background = new THREE.Color('#30203A');
   renderer.toneMappingExposure = 1.05;
-  scene.fog = new THREE.Fog('#5A3216', 14, 70);
+  scene.fog = new THREE.Fog('#5D382D', 14, 70);
   const t = vortexTexture();
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(3, 4);
@@ -51,7 +51,7 @@ export async function buildVortexLook(assets, renderer) {
   tunnel.rotation.x = Math.PI / 2;
   tunnel.position.z = -34;
   scene.add(tunnel);
-  const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(3.6, 64), new THREE.MeshBasicMaterial({ color: '#FFE3A6', toneMapped: false }));
+  const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(3.6, 64), new THREE.MeshBasicMaterial({ color: '#FFC47B', toneMapped: false }));
   sunDisc.position.z = -73;
   scene.add(sunDisc);
   const glow = new THREE.PointLight('#FFC679', 60, 60, 1.2);
@@ -83,10 +83,6 @@ export async function buildVortexLook(assets, renderer) {
   tumble.position.set(0, -0.65, -0.4);
   tumble.rotation.set(0.25, -0.35, 0.42);
   scene.add(tumble);
-  // A remnant of the office floor drops from beneath the sofa as the whiteout clears.
-  const fallingFloor = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.45, 0.09, 48), new THREE.MeshStandardMaterial({ color: '#6B4C36', roughness: 0.85, transparent: true }));
-  fallingFloor.position.set(0, -1.55, -0.4);
-  scene.add(fallingFloor);
   const key = new THREE.DirectionalLight('#FFE0B0', 1.2);
   key.position.set(-2, 3, 4);
   scene.add(key);
@@ -97,6 +93,6 @@ export async function buildVortexLook(assets, renderer) {
   camera.position.copy(cam);
   camera.lookAt(V(0, -0.15, -3));
   camera.rotateZ(-0.12);
-  return { scene, camera, bloom: { strength: 0.5, radius: 0.7, threshold: 0.95 }, exposure: 1.05, handles: { tunnel, sunDisc, glow, streaks, dustPoints, tumble, sofa: sofaG, codex, claude, key, back, fallingFloor } };
+  return { scene, camera, bloom: { strength: 0.5, radius: 0.7, threshold: 0.95 }, exposure: 1.05, handles: { tunnel, sunDisc, glow, streaks, dustPoints, tumble, sofa: sofaG, codex, claude, key, back } };
 }
 

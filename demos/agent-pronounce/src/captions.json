@@ -5,6 +5,26 @@
     "maxWordsPerLine": 6
   },
   "lines": {
+    "N1": {
+      "copy": "I found a new coding-agent app.",
+      "emoji": {}
+    },
+    "N2": {
+      "copy": "Another one? What does this one do?",
+      "emoji": {}
+    },
+    "N3": {
+      "copy": "It runs all of us. Side by side. On one plan.",
+      "emoji": {}
+    },
+    "N4": {
+      "copy": "Huh. What's it called?",
+      "emoji": {}
+    },
+    "N5": {
+      "copy": "…That's the problem.",
+      "emoji": {}
+    },
     "S2": {
       "copy": "Hmm… Tah? The P's silent, right?",
       "emoji": {}
@@ -30,11 +50,7 @@
       "emoji": {}
     },
     "D3": {
-      "copy": "Look around. Many crews. One plan. Nothing goes up until it's—",
-      "emoji": {}
-    },
-    "D4": {
-      "copy": "—checked! Got it! Next block!",
+      "copy": "Look around. Many crews. One plan. Nothing goes up until it's checked.",
       "emoji": {}
     },
     "D5": {

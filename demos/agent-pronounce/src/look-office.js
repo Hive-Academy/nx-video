@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { hash } from './util.js';
-import { V, W, H, glb, tex, fit, shadows, recolor, robot, canvas2d, canvasTex, bolt, roomEnvironment } from './craft.js';
+import { V, W, H, glb, tex, fit, shadows, recolor, robot, canvas2d, canvasTex, roomEnvironment } from './craft.js';
+import { vortexTexture } from './look-vortex.js';
 function duskCity(detailed = false) {
   const [c, g] = canvas2d(2048, 1024);
   const grad = g.createLinearGradient(0, 0, 0, 1024);
@@ -84,6 +85,19 @@ function landingScreen(assets) {
   g.fillStyle = '#1A1208'; g.font = 'bold 22px sans-serif'; g.fillText('Download', 512, 591);
   return canvasTex(c);
 }
+function stormScreen() {
+  const [c,g]=canvas2d(1024,640);
+  const grad=g.createRadialGradient(512,320,20,512,320,700);
+  grad.addColorStop(0,'#E2B364');grad.addColorStop(0.4,'#8E5529');grad.addColorStop(1,'#201728');
+  g.fillStyle=grad;g.fillRect(0,0,1024,640);
+  for(let i=0;i<500;i++){
+    const x=hash('storm-x',i)*1024,y=hash('storm-y',i)*640;
+    g.strokeStyle=i%3?'rgba(242,195,109,0.32)':'rgba(30,22,41,0.5)';
+    g.lineWidth=1+hash('storm-w',i)*5;
+    g.beginPath();g.moveTo(x,y);g.lineTo(x+30+hash('storm-l',i)*110,y-10);g.stroke();
+  }
+  return canvasTex(c);
+}
 
 export async function buildOfficeLook(assets, renderer, { boltMode = false } = {}) {
   const scene = new THREE.Scene();
@@ -158,14 +172,15 @@ export async function buildOfficeLook(assets, renderer, { boltMode = false } = {
   const lapG = shadows(fit(recolor(laptop, { metal: brushed, metalMedium: { color: '#6E6A66', metalness: 0.7, roughness: 0.4 }, metalDark: { color: '#25272C', roughness: 0.5 } }), { s: K * 0.85, at: [0.1, tableTop, -0.48], yaw: Math.PI + 0.2 }));
   scene.add(lapG);
   scene.add(shadows(fit(recolor(lamp, { metal: { color: '#2A2A2E', metalness: 0.7, roughness: 0.35 }, lamp: { color: '#D3B897', emissive: '#C98048', ei: 0.35 } }), { s: K, at: [1.55, 0, -1.75] })));
-  scene.add(shadows(fit(recolor(plant, { wood: { color: '#C7C0B4', roughness: 0.7 }, woodDark: { color: '#3B2E26' }, plant: { color: '#3F7F4E', roughness: 0.8 } }), { s: K, at: [-1.6, 0, -1.9] })));
+  const plantG=shadows(fit(recolor(plant, { wood: { color: '#C7C0B4', roughness: 0.7 }, woodDark: { color: '#3B2E26' }, plant: { color: '#3F7F4E', roughness: 0.8 } }), { s: K, at: [-1.6, 0, -1.9] }));
+  scene.add(plantG);
   scene.add(shadows(fit(recolor(shelf, { wood: walnut }), { s: K, at: [-1.95, 0, -2.0], yaw: Math.PI / 2 })));
   scene.add(shadows(fit(recolor(plantS, { wood: { color: '#C7C0B4' }, plant: { color: '#4E8F5A' } }), { s: K, at: [-0.3, tableTop, -0.35] })));
 
   // the laptop lid shows the Ptah landing page (temple under lightning)
   const lb = new THREE.Box3().setFromObject(lapG);
   const ls = lb.getSize(new THREE.Vector3());
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(ls.x * 0.8, ls.x * 0.8 * 0.6), new THREE.MeshBasicMaterial({ map: landingScreen(assets), toneMapped: false, color: '#CFCFCF' }));
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(ls.x * 0.96, ls.x * 0.67), new THREE.MeshBasicMaterial({ map: landingScreen(assets), toneMapped: true, color: '#D9D2C8', depthTest:false }));
   const lc = lb.getCenter(new THREE.Vector3());
   lapG.updateMatrixWorld(true);
   const probeFrom = V(0.1, 1.32, 2.95); // the office camera (cam, below)
@@ -174,10 +189,13 @@ export async function buildOfficeLook(assets, renderer, { boltMode = false } = {
   if (hit) {
     const n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
     if (n.dot(probeFrom.clone().sub(hit.point)) < 0) n.negate();
-    screen.position.copy(hit.point).addScaledVector(n, 0.006);
+    screen.position.copy(hit.point).addScaledVector(n, 0.025);
     screen.lookAt(hit.point.clone().add(n));
   }
-  scene.add(screen);
+  screen.renderOrder=20;scene.add(screen);
+  const stormScreenMesh=new THREE.Mesh(screen.geometry.clone(),new THREE.MeshBasicMaterial({map:vortexTexture(),transparent:true,opacity:0,depthTest:false,depthWrite:false,toneMapped:true}));
+  stormScreenMesh.position.copy(screen.position).add(new THREE.Vector3(0,0,0.002).applyQuaternion(screen.quaternion));
+  stormScreenMesh.quaternion.copy(screen.quaternion);stormScreenMesh.renderOrder=21;scene.add(stormScreenMesh);
 
   // cast: Codex (left) and Claude (right) on the sofa, turned toward each other and the laptop
   const seat = sofaG.userData.size.y * 0.47;
@@ -213,26 +231,11 @@ export async function buildOfficeLook(assets, renderer, { boltMode = false } = {
   spill.position.copy(lapPos).add(V(0, 0.1, 0.3));
   scene.add(spill);
 
-  const bolts = [];
-  let flash = null;
-  let bloom = { strength: 0.22, radius: 0.5, threshold: 0.95 };
-  if (boltMode) {
-    // the bolt leaves the laptop, forks across the room and hits the ceiling
-    const a = lapPos.clone().add(V(0, 0.08, 0.02));
-    const main = bolt(a, V(-0.6, 3.28, -1.1), 61, { glow: 0.06 });
-    const fork = bolt(main.userData.points[22], V(1.4, 3.28, -1.9), 62, { depth: 5, core: 0.008, glow: 0.04 });
-    scene.add(main, fork);
-    bolts.push(main, fork);
-    flash = new THREE.PointLight('#A8CCFF', 6, 6, 1.6);
-    flash.position.set(-0.3, 2.6, -1.0);
-    scene.add(flash);
-    key.intensity *= 0.35; lampGlow.intensity = 0.8; spill.intensity = 2.2; // the room dips as the bolt fires
-    bloom = { strength: 0.6, radius: 0.5, threshold: 0.93 };
-  }
+  const bloom = { strength: 0.22, radius: 0.5, threshold: 0.95 };
 
   const camera = new THREE.PerspectiveCamera(boltMode ? 46 : 40, W / H, 0.05, 60);
   camera.position.copy(boltMode ? V(0.25, 1.15, 2.9) : cam);
   camera.lookAt(boltMode ? V(0, 1.35, -1.2) : V(0, 0.7, -1.2));
-  return { scene, camera, bloom, exposure: 1.0, handles: { sofa: sofaG, table: tableG, laptop: lapG, laptopScreen: screen, codex, claude, bolts, hemisphere, key, rim, dusk, lampGlow, spill, flash, city, cityOriginalMap, cityDetailedMap, cityLayers, cityBeacons, ceiling: ceil, floor } };
+  return { scene, camera, bloom, exposure: 1.0, handles: { sofa: sofaG, table: tableG, laptop: lapG, laptopScreen: screen, stormScreen:stormScreenMesh, plant:plantG, codex, claude, hemisphere, key, rim, dusk, lampGlow, spill, city, cityOriginalMap, cityDetailedMap, cityLayers, cityBeacons, ceiling: ceil, floor } };
 }
 

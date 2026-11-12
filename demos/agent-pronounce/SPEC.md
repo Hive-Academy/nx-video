@@ -81,14 +81,85 @@ full authority to fetch free GLB models, HDRIs, textures and sounds through the
 6. **Order of work.** Lane A lands the format, timing and `app-window` first.
    Lanes B and C start after that and snapshot at 1920 × 1080.
 
+## Direction v3 (set by the user on 2026-11-12 — overrides any conflicting text above and below)
+
+The user's review of the 16:9 draft (`renders/preview-v2-draft.mp4`), verbatim:
+
+1. "the dialog starts in a very weird way, we need to set the environment and have a
+   real conversation first about coding agent for example one tell the other they
+   found a new coding agent"
+2. "the flash switch at second 17 is weird as well and ptah speaks before it shows"
+3. "when it describe the builders they are moving on top of each others weirdly"
+4. "when claude cut the ptah speaking with one word ( check ) is confusing and not good"
+5. Two new screen recordings (the landing page and a quick tour of Ptah): "utilize
+   them to show bigger screens of ptah and speed them up to be intelligently embedded
+   in the video to make a more of a real stunning and state of the art promo".
+
+Rules. Items marked (orchestrator) are the orchestrator's reading of that feedback,
+not the user's words.
+
+1. **Opening conversation.** After the 4.0 s silent entrance, Codex and Claude talk
+   about a new coding-agent app before anyone reads its name: lines N1–N5 in the
+   script below (orchestrator wrote the lines). No new line contains the word "Ptah";
+   TTS mispronounces it.
+2. **Landing insert (orchestrator).** While Codex says N3, the camera pushes to the
+   laptop and the landing-page recording plays full-bleed for 4.5 s
+   (`assets/live-demo/landing-scroll.mp4`, office cues `landingIn` → `landingOut`).
+   It opens on the hero with the PTAH wordmark, so S2 reads a name the viewer has seen.
+   The camera starts its push 0.8 s before `landingIn`; the overlay cross-fades in and
+   out over 0.3 s; after `landingOut` the camera is back on the two-shot.
+3. **Office → desert transition.** No white flash, no wall bolt, no off-screen voice.
+   After O3 the laptop storm answers the insult: `rumble` (O3 end + 0.6 s: screen
+   lightning grows, room lights dip, low rumble), `pull` (`rumble` + 1.4 s: wind and
+   sand pour out of the screen, the robots grip the sofa, the camera starts a 1.6 s
+   push into the screen), `through` (`pull` + 1.6 s: the storm on the screen fills the
+   frame; the office scene ends here). The vortex continues the same push in the same
+   storm colours, with the sofa tumbling ahead of the camera. Cues `crackle`, `bolt`
+   and `flash` are removed.
+4. **Ptah speaks only on screen.** O4 ("Old.") moves to the desert. The crane-up shows
+   the giant's whole face for at least 1.0 s, his eyes start to glow 0.6 s before
+   `rise`, and `rise` is the start of O4. D1 starts 1.3–1.6 s after O4 ends.
+5. **No interruption.** D4 and Cursor's cameo are cut (orchestrator); `cursorPass` is
+   removed and Cursor does not appear. Ptah finishes his own sentence in D3. The
+   inspector's `stamp` lands on "checked".
+6. **Crews.** Each crew owns one ramp. On a ramp, robots keep at least 1.5 body
+   widths apart along the path. Ramps do not cross. No robot, block or banner passes
+   through another at any frame. At most three robots per crew are visible in the
+   pan, and they fill the middle third of the frame height. Feet stay on the ramp
+   surface. The lane proves it with frames every 0.5 s across the pan.
+7. **Showcase.** From `pushIn` the film plays four clips of 5.0 s each, full-bleed
+   (footage at least 96% of the frame width): `assets/live-demo/tour-1.mp4` …
+   `tour-4.mp4`, cut from the user's recordings. `showcaseEnd` = `pushIn` + 20.0 s,
+   `d6` = `showcaseEnd` + 0.8 s. Each clip is speed-ramped (fast, then near 1× for its
+   last 1.2 s), has one slow punch-in (scale at most 1.6) toward the focus rectangle in
+   `notes/footage-edl-v3.md`, and one label of at most 4 words at 72 px or more.
+   Transitions between clips last at most 0.4 s.
+8. **Footage sources.** Copies of the user's recordings are in
+   `assets/live-demo/source/` (git-ignored). Clips must not show an email address,
+   API key, token, private repository name or anything else personal. Media is never
+   committed.
+9. **Length.** 100–120 s total. The v2 pacing rules (turn gaps 0.9–1.4 s, no shot
+   under 3.0 s) still apply. The title wall (6.0 s) and end card (4.0 s) are unchanged.
+10. **Lane order.** Footage scout and Lane A timing in parallel (neither captures
+    HyperFrames frames); then Lane A overlays; then Lane B office and vortex; then
+    Lane B desert. One capturing lane at a time.
+
 ## Script (line ids are binding)
+
+The v3 running order is N1 N2 N3 N4 N5 S2 O1 O3 (office), then O4 D1 D2 D3 D5 D6
+(desert).
 
 | id | speaker | line | scene |
 | --- | --- | --- | --- |
+| N1 | Codex | (not looking up from the laptop) "I found a new coding-agent app." (**new take**) | office |
+| N2 | Claude | "Another one? What does this one do?" (**new take**) | office |
+| N3 | Codex | (turning the laptop) "It runs all of us. Side by side. On one plan." (**new take**, spoken over the landing insert) | office |
+| N4 | Claude | "Huh. What's it called?" (**new take**) | office |
+| N5 | Codex | (a beat, deadpan) "…That's the problem." (**new take**) | office |
 | S2 | Claude | (leaning in to the laptop, reading the PTAH wordmark) "Hmm… Tah? The P's silent, right?" (**new take**). The opening "Ptah…" was dropped on 2026-11-09: TTS failed it three times ("Pitar", "Potat"), and the wordmark on the laptop already shows the spelling. | office |
 | O1 | Codex | (deadpan) "Has to be. Like pterodactyl." (**new take**) | office |
 | O3 | Codex | "Honestly? It sounds… old." (existing take) | office |
-| O4 | Ptah | "Old." (existing take) | office |
+| O4 | Ptah | "Old." (existing take). Moved to the desert on 2026-11-12: spoken at `rise`, with the giant on screen. | desert |
 
 The script was changed by the user on 2026-11-09. It has **one wrong pronunciation** ("Tah"),
 paid off by D1 ("Say mine properly") and the intro tag. Line O2 (forty-three
@@ -96,8 +167,8 @@ options, Pita, bread) is cut. Line ids S2, O1, O3 and O4 are kept, so the existi
 files and file names still line up.
 | D1 | Ptah | "I made the world by speaking its name. Say mine properly." | desert |
 | D2 | Claude | "Respectfully… why does the god of builders care about coding agents?" | desert |
-| D3 | Ptah | "Look around. Many crews. One plan. Nothing goes up until it's—" | desert |
-| D4 | Cursor | (zipping past with a block, finishing his sentence) "—checked! Got it! Next block!" | desert |
+| D3 | Ptah | "Look around. Many crews. One plan. Nothing goes up until it's checked." (**new take**; the interruption was cut on 2026-11-12) | desert |
+| D4 | — | Cut on 2026-11-12. | — |
 | D5 | Ptah | "Same idea. Now it runs on your desktop." | desert |
 | D6 | Codex | (whisper, deadpan cracking) "…okay. That's actually cool." | desert |
 

@@ -285,3 +285,149 @@ Decisions (written into `demos/agent-pronounce/SPEC.md`, section "Direction v2")
 - The black desert render after the format change was never reproduced; `check` hangs and
   snapshot timeouts came from two lanes capturing at once. Rule: one capturing lane at a time.
 - Preview is a draft-quality render to the git-ignored `renders/` folder.
+
+## 2026-11-12 — session 4, direction v3 (user review of the 16:9 draft)
+
+User feedback on `renders/preview-v2-draft.mp4`: the dialogue starts abruptly and needs a real
+conversation about a new coding agent first; the flash at 17 s is weird and Ptah speaks before
+he is shown; the builder crews move on top of each other; the one-word "checked" interruption is
+confusing; use two new screen recordings (landing page, quick tour) for bigger, sped-up Ptah
+screens.
+
+Decisions (SPEC.md "Direction v3" is the binding text):
+
+- New opening lines N1–N5 (Codex and Claude), written by the orchestrator. None contains "Ptah".
+- Landing-page recording plays full-bleed for 4.5 s under N3 (cues `landingIn`/`landingOut`).
+- The white flash, wall bolt and off-screen "Old." are cut. The office ends with a camera push
+  into the laptop storm (`rumble`, `pull`, `through`), which continues into the vortex.
+- O4 "Old." moves to the desert and is spoken at `rise`, with the giant on screen.
+- D4 and Cursor's cameo are cut; Ptah finishes D3 himself (new take). Orchestrator's choice.
+- Crews: one ramp per crew, spacing rule, no intersections, proven with frames every 0.5 s.
+- Showcase: four full-bleed 5.0 s clips (`tour-1..4.mp4`) cut from the user's recordings.
+- Target length 100–120 s (was 80–95 s).
+- The recordings were copied to `assets/live-demo/source/` (git-ignored, verified with
+  `git check-ignore`). Which file is the landing page and which is the tour is for the footage
+  scout to establish.
+- Lanes: Codex only (weekly 26%; Glm, Kimi at limit; Grok and Antigravity unreadable). Order:
+  footage scout ∥ Lane A timing, then Lane A overlays, Lane B office+vortex, Lane B desert.
+- No document review lane was run for the SPEC amendment; the user reviews the new lines directly.
+
+## 2026-11-12 — direction v3 lane results (running log)
+
+- Lane A timing `8cd8885d`: accepted from its notes. Total 106.831 s (office 36.898, vortex 3.5,
+  desert 56.403, title wall 6, end card 4). Six new takes generated; word timings match. Mix
+  −19.56 LUFS, about 2 dB quieter than v2: level it in the overlay pass. `check` ok.
+- Footage scout `f59137ed`: `rec-2026-11-06` is the landing page, `rec-2026-11-09` is the app
+  tour. `landing-scroll.mp4` accepted from my own four-frame sheet (hero with the lightning, the
+  command centre section, the routing diagram). Tour clips rejected: two were dull settings and
+  skills pages (one ending on a ghost window outline), two were built from the old demo clips,
+  and all were 1920 px wide but taller than 1080.
+- Orchestrator decision: the scout's privacy rule was too strict for the user's own tour of an
+  open-source app. Round 2 (`4a82f53a`, resumed session) may use chat, diff and dashboard views;
+  it still forbids emails, keys, tokens, account identifiers and paths with a user name, and it
+  lists anything borderline under "For the user to confirm". The user sees the draft before
+  anything is published, so the final call on what is shown stays with the user.
+- Lane B office and vortex `6485fa0d` is running (the only frame-capturing lane).
+- Footage scout round 2 `4a82f53a`: accepted from `snapshots/footage-v3/r2-holds.jpg`. All four
+  tour clips come from the user's tour at 1920 × 1080: Command Center, agents in parallel, diff
+  review, analytics. For the user to confirm: dollar figures in tour-4, two dark masks in tour-2,
+  small chat text in tour-1 that names other products.
+- Lane B office and vortex `6485fa0d`: partly accepted from its contact sheet. Good: new lines
+  play with captions, no flash, vortex continues in storm colours and looks strong. Not good
+  enough: the whole talk (15.3–33.9 s) is one static wide two-shot with small robots; the
+  `rumble` is too subtle; the storm on the laptop is a flat streak texture that does not match
+  the vortex at the cut (36.8 → 36.95 s); no grip acting. A second office round is needed after
+  the overlay and desert lanes.
+- Lane A overlays `976c0237` started 20:41 UTC (fresh lane; the resume was refused for idle
+  time). It is the only frame-capturing lane now.
+- Lane A overlays `976c0237`: accepted from its contact sheet (22 frames). The landing insert
+  fills the screen from 10.827 to 15.327 s with the N3 caption on top; the showcase plays the
+  four tour clips edge to edge with slow punch-ins and gold labels ("One Command Center",
+  "Agents In Parallel", "Review Every Change", "Track Every Run"); no old window frame is left.
+  Mix −16.89 LUFS, −1.41 dBTP. Not good enough: loudness range 18.5 LU (was 9.3), because the
+  20 s showcase has only wind and two swells under it; and the frame at 70.2 s is a wide desert
+  shot with no doorway, so the entry into the showcase is a wash over an unrelated shot.
+- Grok has room again (weekly 1%). Orchestrator decision: run two lanes in parallel, because
+  only one of them captures frames.
+  - Lane B desert `0987dd94` (Codex, started 20:55 UTC): remove Cursor and dead cues, crews per
+    SPEC v3 item 6, Ptah on screen at `rise`, camera push to the doorway before `pushIn`, eased
+    title slab. Write set: `src/set-desert.js`, `src/look-desert.js`.
+  - Lane C audio `7a4e93ed` (Grok, started 20:56 UTC): music bed and cut accents under the
+    showcase, range at or below 11 LU, same loudness targets. It may not run the HyperFrames CLI
+    while the desert lane captures frames.
+- Still to do after these: office round 2 (closer framing and angle changes in the talk,
+  stronger `rumble`, storm texture that matches the vortex, grip acting), draft render, commit.
+- Lane B desert `0987dd94`, first pass: rejected. All 32 desert frames are black with captions
+  on top. The desert rendered in the overlay lane's frames 30 minutes earlier, so the cause is
+  most likely a runtime error in the lane's new code; the lane blamed the shared renderer and
+  did not read the browser error. Resumed the same Codex session as `d5fec5f2` (21:07 UTC) to
+  find the error, fix it, recapture and rescore.
+- Lane C audio `7a4e93ed` (Grok): accepted from its notes; nobody has listened yet. New
+  `showcase-bed.mp3` cut with ffmpeg from the cached `bed.mp3` (no ElevenLabs call), 70.375 to
+  90.675 s, ducked 15 dB under D5, +3 dB lifts on the three clip changes. Mix −16.97 LUFS,
+  −1.41 dBTP, range 9 LU (was 18.5), longest silence 0.6 s. Total still 106.831 s. It re-ran
+  `build-timing.mjs` (new `music-3` element in `index.html`). It did not run `check`.
+- Lane B desert, second pass `d5fec5f2`: accepted as a working base, with a polish round owed.
+  Root cause of the black frames: `ReferenceError: Cannot access 'portalNear' before
+  initialization` in `plan()` of `src/set-desert.js`. From the new 32-frame sheet: Ptah is on
+  screen with glowing eyes before "Old." and holds through D1; three crews stand on three
+  separate ramps with three robots each and nothing overlaps; one approval check lands on a
+  block; the camera pushes into the doorway light before the showcase; Cursor is gone; the
+  title slab fades in. Not good enough yet: the crews stand on flat planks and do not look
+  like builders at work; some robots look washed out at 63–64.6 s; yellow rings sit behind the
+  two robots at 91–95 s; the robots are cropped at the bottom edge at 90.5 s; the D2 two-shot
+  (55–58 s) puts small robots in the lower left. The lane also notes that Ptah's voice runs
+  over the crew pan and the doorway push (D3, D5) with its face off screen; orchestrator
+  reading: SPEC v3 item 4 is about Ptah's first words, and a speaker who has been established
+  on screen may narrate over what it describes, so this stays.
+- `check --json` after the audio and desert lanes: ok, warnings only. Guard: 432 files, clean.
+- Lesson: `node --check` does not catch a runtime ReferenceError; briefs for 3D lanes now ask
+  for one headless load with the page errors read.
+- Grok usage: one audio lane moved its weekly meter from 1% to 32%. Use it sparingly.
+- Running since 21:38 UTC: Lane B office round 2 `c9b4cf11` (Codex, captures frames) and an
+  independent visual review `c875147d` (Grok, read-only, reads the desert and overlay sheets)
+  → `notes/review-grok-v3.md`. The review feeds the desert polish round.
+- Independent review `c875147d` (Grok, `notes/review-grok-v3.md`): harsh, partly overstated
+  (it calls the 96.5 s stone frame a missing title, but the title wall follows it), but these
+  findings stand and go into the desert polish brief: crews haul nothing and look idle; flag
+  poles pass through robots; faces blow out to white near 64.6 s; the stamp beat is cluttered
+  and crops the inspector; the doorway push at 69.5 s crops both robots; the return at 90.5 s
+  leaves them tiny; yellow rings sit behind the robots at 91–95 s; the title slab is a
+  see-through plane with a vertical seam. Showcase: the "One Command Center" label left
+  before the Command Center view ended; orchestrator edit in `src/build-timing.mjs`: labels
+  now hold until 4.75 s of each 5 s clip (was 4.4 s). `build-timing.mjs` is rerun after the
+  office lane finishes capturing.
+- Added to the items for the user to confirm (not secrets, but visible in the tour clips): the
+  workspace name `nx-video`, session titles about this promo, plan lines such as
+  two account lines, a session id fragment, and the cost
+  figures in tour-4.
+
+### 2026-11-12 late — studio preview and the two-desk workspace request
+
+- The user asked to see the film in the HyperFrames studio. Started
+  `node node_modules/hyperframes/dist/cli.js preview --background .` from the demo folder; the
+  studio answers on http://localhost:3002/. Stop it when the user is done.
+- User request (verbatim): "for the studio can u do a new scene where they both in an office
+  with a bigger screen and more wider/realistic view of ptah so the angle appears as 2
+  developers settings near each other in a workspace or a 2 close desks".
+- Decision: treat this as a restage of the opening office scene, not an extra scene. Two robots
+  seated at two close desks, one big hero screen showing a real still of Ptah. Reversible: the
+  sofa office (`src/look-office.js`, `src/set-office.js`) stays in place until the new look is
+  approved.
+- Stopped office round 2 (Codex `c9b4cf11`) because its sofa staging is superseded. It had
+  already written `notes/lane-b-office-v3-r2.md` and a 28-frame sheet; its four files pass
+  `node --check`, so the studio shows a working round-2 office (singles, stronger rumble, storm
+  matched to the vortex texture). That round was not reviewed or accepted.
+- Look-dev gate first (standing rule): lane `253bd857` (Codex, started 22:00 UTC) builds
+  `src/look-workspace.js` and three stills (over-the-shoulder, front two-shot, single) →
+  `notes/lane-b-workspace-lookdev.md`, `snapshots/lookdev/workspace-sheet.jpg`. Screen pictures
+  are frames from the user's recordings, kept in git-ignored `assets/live-demo/stills/`;
+  `tour-4.mp4` is excluded because it shows billing figures. No animation until the user
+  approves the stills.
+- Assumption to confirm with the user: the sofa becomes two office chairs, so the chairs (not
+  a sofa) ride the vortex and land in the desert. This is folded into the office animation lane
+  and the desert polish round.
+- Redacted before the commit: home-directory paths, account lines, a cost figure and a session
+  id fragment in `notes/review-grok-v3.md` and in this log.
+- Committed the accepted v3 work as a restore point (no media): timing, overlays, audio
+  scripts, vortex, desert base, office round 2, notes.

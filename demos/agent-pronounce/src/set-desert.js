@@ -1,15 +1,14 @@
 // Episode 6 desert kind. The approved geometry, materials and hero camera live in
 // look-desert.js (buildDesertLook). This module only animates that look:
-// sofa landing, Ptah's speech glow, crew haul, Cursor's pass, the stamp and
+// sofa landing, Ptah's speech glow, crew haul, the stamp and
 // the pylon portal. src/ptah-god.js (the old wireframe god) is retired: nothing
 // imports it.
 //
 // Every value is a pure function of seek time t. hash / noise1 only.
 import * as THREE from 'three';
 import { dune } from './craft.js';
-import { createRobot } from './robot.js';
 import {
-  tourSpec, speak, listen, idle, anticipate, face, faceToward, glideTo, wordTime, sceneCue,
+  tourSpec, speak, listen, idle, anticipate, face, faceToward, glideTo, sceneCue,
 } from './cribs.js';
 import { keyed } from './cribs-camera.js';
 import { hash, noise1, ease, clamp, lerp, smoothstep, sampleEnvelope, yawToward } from './util.js';
@@ -23,7 +22,6 @@ function sandY(x, z) {
 
 const _aim = new THREE.Vector3();
 const _pos = new THREE.Vector3();
-const _posB = new THREE.Vector3();
 const _side = new THREE.Vector3();
 const _warm = new THREE.Color('#FF8A2A');
 const _white = new THREE.Color('#FFF7EC');
@@ -78,10 +76,6 @@ function findMesh(root, pred) {
   let found = null;
   root.traverse((o) => { if (!found && o.isMesh && pred(o)) found = o; });
   return found;
-}
-
-function forwardOf(yaw, out) {
-  return out.set(Math.cos(yaw), 0, -Math.sin(yaw));
 }
 
 // ---------------------------------------------------------------- build
@@ -271,6 +265,19 @@ async function build(scene, assets, ctx) {
     baseRamp.material.emissiveIntensity = 0.9;
     for (const copy of extraRamps) { copy.scale.copy(baseRamp.scale); copy.material.emissiveIntensity = 0.9; }
   }
+  const crewRamps = [-8.0, -2.8, 2.4].map((x, i) => {
+    const z = -13.5 - i * 1.8;
+    const lane = new THREE.Mesh(
+      new THREE.BoxGeometry(2.0, 0.35, 8.0),
+      baseRamp.material.clone(),
+    );
+    lane.position.set(x, sandY(x, z) + 0.27, z);
+    lane.rotation.x = 0.08;
+    lane.castShadow = lane.receiveShadow = true;
+    lane.visible = false;
+    scene.add(lane);
+    return lane;
+  });
 
   const dustAttr = h.dustPoints.geometry.attributes.position;
   const dustBase = new Float32Array(dustAttr.array);
@@ -325,59 +332,13 @@ async function build(scene, assets, ctx) {
   landPuff.visible = false;
   scene.add(landPuff);
 
-  // Cursor, the series rig, parked beside the inspector until his pass.
+  // Inspector and approval stamp beside the middle crew.
   const inspector = h.inspector;
   inspector.root.scale.multiplyScalar(1.65);
   const insHome = inspector.root.position.clone();
   const gyIns = sandY(insHome.x, insHome.z);
   inspector.root.position.y = insHome.y + gyIns;
-  const faceDir = forwardOf(inspector.root.rotation.y, new THREE.Vector3());
-  const up = new THREE.Vector3(0, 1, 0);
-  const camRight = new THREE.Vector3().crossVectors(up, faceDir).normalize();
-  const passFrom = insHome.clone().add(new THREE.Vector3(0.55, 0, -0.35));
-  const passTo = insHome.clone().add(new THREE.Vector3(2.8, 0, -0.35));
-  passFrom.y = sandY(passFrom.x, passFrom.z);
-  passTo.y = sandY(passTo.x, passTo.z);
-
-  const cursor = createRobot(assets, 'Cursor', { scale: 0.42 });
-  cursor.root.position.copy(passFrom);
-  cursor.root.rotation.y = yawToward(passFrom, insHome.clone().addScaledVector(faceDir, 2.4));
-  const carried = new THREE.Mesh(
-    new THREE.BoxGeometry(0.48, 0.35, 0.42),
-    new THREE.MeshStandardMaterial({ color: '#E4C59A', roughness: 0.82 }),
-  );
-  carried.position.set(0.12, 0.94, 0);
-  carried.castShadow = true;
-  cursor.ballHead.add(carried);
-  scene.add(cursor.root);
-  pinSeat(cursor);
-
-  const lines = new THREE.Group();
-  const streaks = [];
-  const trailShape = new THREE.BufferGeometry();
-  trailShape.setAttribute('position', new THREE.Float32BufferAttribute([0, -0.035, 0, 0, 0.035, 0, -1, 0, 0], 3));
-  trailShape.setAttribute('color', new THREE.Float32BufferAttribute([1, 0.88, 0.5, 1, 0.88, 0.5, 0.15, 0.05, 0.01], 3));
-  trailShape.setIndex([0, 1, 2]);
-  for (let i = 0; i < 6; i++) {
-    const m = new THREE.Mesh(
-      trailShape,
-      new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }),
-    );
-    m.userData.noDepth = true;
-    lines.add(m);
-    streaks.push(m);
-  }
-  scene.add(lines);
-
-  const zipDustGeo = new THREE.BufferGeometry();
-  zipDustGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(36 * 3), 3));
-  const zipDust = new THREE.Points(zipDustGeo, new THREE.PointsMaterial({
-    color: '#E8C8A0', size: 0.16, transparent: true, opacity: 0, depthWrite: false,
-  }));
-  zipDust.userData.noDepth = true;
-  scene.add(zipDust);
-
-  // Stamp rig sits on the block nearest the inspector (Cursor's crew block).
+  // Stamp rig sits on the block nearest the inspector.
   let stampBlock = null;
   let bestD = Infinity;
   for (const b of blocks) {
@@ -390,9 +351,10 @@ async function build(scene, assets, ctx) {
   head.rotation.x = Math.PI / 2;
   stampG.add(head);
   const stampGlyph = new THREE.Group();
-  for (let i = 0; i < 3; i++) {
-    const stroke = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.035), new THREE.MeshBasicMaterial({ color: '#FFF0B0', side: THREE.DoubleSide }));
-    stroke.rotation.z = i * Math.PI / 3;
+  for (const [length, x, y, angle] of [[0.19, -0.13, -0.06, -0.82], [0.42, 0.08, 0.015, 0.82]]) {
+    const stroke = new THREE.Mesh(new THREE.PlaneGeometry(length, 0.045), new THREE.MeshBasicMaterial({ color: '#FFF0B0', side: THREE.DoubleSide }));
+    stroke.position.set(x, y, 0);
+    stroke.rotation.z = angle;
     stampGlyph.add(stroke);
   }
   stampGlyph.position.z = 0.13;
@@ -406,10 +368,10 @@ async function build(scene, assets, ctx) {
   );
   // Put the imprint on the camera-facing face so it reads at phone size.
   seal.rotation.x = 0;
-  for (let i = 0; i < 3; i++) {
-    const glyph = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.055), gold);
-    glyph.rotation.z = i * Math.PI / 3;
-    glyph.position.z = 0.015;
+  for (const [length, x, y, angle] of [[0.22, -0.155, -0.08, -0.82], [0.48, 0.085, 0.015, 0.82]]) {
+    const glyph = new THREE.Mesh(new THREE.PlaneGeometry(length, 0.065), gold);
+    glyph.rotation.z = angle;
+    glyph.position.set(x, y, 0.015);
     seal.add(glyph);
   }
   seal.visible = false;
@@ -425,7 +387,7 @@ async function build(scene, assets, ctx) {
   // View the inspector from the open south side of the work lane. The old
   // camera looked along the sled and put its stone block across the frame.
   const passCam = insHome.clone().add(new THREE.Vector3(0.5, 1.5, 3.5));
-  const passLook = insHome.clone().add(new THREE.Vector3(-0.75, 0.78, -0.15));
+  const passLook = insHome.clone().add(new THREE.Vector3(-0.25, 1.12, -0.15));
 
   // Portal foreground. Spots flank the doorway; face points turn each robot
   // toward the door and three-quarters toward the lens.
@@ -444,14 +406,15 @@ async function build(scene, assets, ctx) {
   portalLook.y = 1.55;
 
   return {
-    robots: { Claude: h.claude, Codex: h.codex, Cursor: cursor },
+    robots: { Claude: h.claude, Codex: h.codex },
+    visitorScales: { Claude: h.claude.root.scale.x, Codex: h.codex.root.scale.x },
     handles: h,
     post: { bloom: look.bloom, exposure: look.exposure, toneMapping: 'aces', shadows: true },
     door, glow, shaft, doorLight, rays, hostMaterials, portalRims, golds, doorWorld, pylonFront, side,
-    crewHomes, crewHaulRopes, scatterBlocks, foot, sledHomes, blockHomes, ropeHomes, banners, extraRamps, baseRamp, rampHomeX,
+    crewHomes, crewHaulRopes, scatterBlocks, foot, sledHomes, blockHomes, ropeHomes, banners, extraRamps, baseRamp, rampHomeX, crewRamps,
     dustAttr, dustBase, sofaRest, landDust, landPuff, dustVel,
-    inspector, stampG, gripLink, seal, stampDust, stampBlock, streaks, zipDust,
-    passFrom, passTo, passCam, passLook, camRight, faceDir,
+    inspector, stampG, gripLink, seal, stampDust, stampBlock,
+    passCam, passLook,
     claudeSpot, codexSpot, claudeFace, codexFace, portalCam, portalLook,
     lookPose: {
       Claude: { eyeSX: 1.35, eyeSY: 1.4, pitch: -0.1, nod: 0.06, headYaw: 0 },
@@ -467,7 +430,6 @@ function plan(world, ctx) {
   const D1 = ctx.row('D1');
   const D2 = ctx.row('D2');
   const D3 = ctx.row('D3');
-  const D4 = ctx.row('D4');
   const D5 = ctx.row('D5');
   const D6 = ctx.row('D6');
   const rows = ctx.rows;
@@ -475,11 +437,10 @@ function plan(world, ctx) {
 
   const sofaLand = sceneCue(ctx, 'sofaLand', 0.3);
   const reveal = sceneCue(ctx, 'reveal', 1.8);
-  const rise = sceneCue(ctx, 'rise', D1 ? D1.localStart : 0.3);
-  const pan = sceneCue(ctx, 'pan', D3 ? wordTime(D3, 'Look', 0, 'start') : 10);
-  const cursorPass = sceneCue(ctx, 'cursorPass', D4 ? D4.localStart : 15);
-  const stamp = sceneCue(ctx, 'stamp', D4 ? wordTime(D4, 'checked', 0, 'start') : cursorPass + 0.1);
-  const portal = sceneCue(ctx, 'portal', D5 ? wordTime(D5, 'desktop', 0.85, 'end') : 20);
+  const rise = sceneCue(ctx, 'rise', 5);
+  const pan = sceneCue(ctx, 'pan', 19.152);
+  const stamp = sceneCue(ctx, 'stamp', 25.012);
+  const portal = sceneCue(ctx, 'portal', 29.977);
   const pushIn = sceneCue(ctx, 'pushIn', portal);
   const showcaseEnd = sceneCue(ctx, 'showcaseEnd', duration - 6);
   const d6 = sceneCue(ctx, 'd6', D6 ? D6.localStart : showcaseEnd + 0.8);
@@ -489,19 +450,18 @@ function plan(world, ctx) {
   // landing so the approved still can match; the low angle starts once that hold
   // is long enough, which is still inside D1.
   const tHero = 0;
-  const tLow = D2 ? D2.localStart : rise + 4;
-  const tTwo = tLow + 3.0;
-  const tPan = Math.max(tTwo + 3, pan);
-  const tPass = cursorPass - 0.5;
+  const tLow = rise + 1.1;
+  const tTwo = D2?.localStart ?? 13.314;
+  const tPan = pan;
+  const tPass = stamp - 0.65;
   const tReturn = showcaseEnd;
-  const tPortal = pushIn;
+  const tPortal = D5?.localStart ?? 27.777;
 
   const claudeSeat = world.robots.Claude.seat;
   const codexSeat = world.robots.Codex.seat;
   const specs = {
     Claude: tourSpec('Claude', claudeSeat, { scale: world.robots.Claude.scale, seedTag: 'desert' }),
     Codex: tourSpec('Codex', codexSeat, { scale: world.robots.Codex.scale, seedTag: 'desert' }),
-    Cursor: tourSpec('Cursor', world.robots.Cursor.seat, { scale: world.robots.Cursor.scale, seedTag: 'desert' }),
   };
 
   const contact = sofaLand;
@@ -519,15 +479,10 @@ function plan(world, ctx) {
     listen(specs, 'Claude', D2);
     face(specs.Claude, D2.localStart - 0.25, claudeSeat.yaw);
   }
-  if (D4) {
-    anticipate(specs.Cursor, D4);
-    speak(specs.Cursor, D4);
-    listen(specs, 'Cursor', D4, { except: ['Claude', 'Codex'] });
-  }
   if (D6) {
     anticipate(specs.Codex, D6);
     speak(specs.Codex, D6, { gain: 0.65 });
-    listen(specs, 'Codex', D6, { except: ['Cursor'] });
+    listen(specs, 'Codex', D6);
     specs.Codex.eyes.push({ t0: D6.localStart, t1: duration + 1, sx: 1.02, sy: 0.58 });
   }
 
@@ -549,11 +504,6 @@ function plan(world, ctx) {
     face(specs.Claude, D6.localStart + 0.55, yawToward(claudeSeat, audience));
     face(specs.Codex, D6.localStart + 0.18, yawToward(codexSeat, audience));
   }
-
-  const zipDur = 1.2;
-  const zipStart = tPass;
-  glideTo(specs.Cursor, zipStart, { x: world.passTo.x, z: world.passTo.z }, zipDur, { face: false, lean: -0.18 });
-  face(specs.Cursor, -0.6, yawToward(world.passFrom, world.passCam));
 
   // --- cameras
   const heroPos = new THREE.Vector3(-1.2, 0.62, 8.2);
@@ -586,35 +536,36 @@ function plan(world, ctx) {
   ];
 
   // Track the actual work lanes in front of the pylon, then reveal the ramp.
-  const panA = new THREE.Vector3(-10.5, 3.7, -7.5);
-  const panLookA = new THREE.Vector3(-5.5, 0.9, -18.0);
-  const panB = new THREE.Vector3(-9.7, 3.7, -7.5);
-  const panLookB = new THREE.Vector3(-5.0, 0.9, -18.0);
-  const panC = new THREE.Vector3(-8.9, 3.7, -7.5);
-  const panLookC = new THREE.Vector3(-4.5, 0.9, -18.0);
+  const panA = new THREE.Vector3(-8.4, 2.2, -5.5);
+  const panLookA = new THREE.Vector3(-7.2, 0.9, -14.2);
+  const panB = new THREE.Vector3(-4.1, 2.2, -6.0);
+  const panLookB = new THREE.Vector3(-2.5, 0.9, -16.0);
+  const panC = new THREE.Vector3(0.1, 2.2, -6.5);
+  const panLookC = new THREE.Vector3(2.5, 0.9, -18.0);
   const panKeys = [
-    { t: tPan, pos: panA, target: panLookA, fov: 56 },
-    { t: lerp(tPan, tPass, 0.48), pos: panB, target: panLookB, fov: 56, ease: ease.sineInOut },
-    { t: tPass, pos: panC, target: panLookC, fov: 56, ease: ease.sineInOut },
+    { t: tPan, pos: panA, target: panLookA, fov: 50 },
+    { t: lerp(tPan, tPass, 0.48), pos: panB, target: panLookB, fov: 50, ease: ease.sineInOut },
+    { t: tPass, pos: panC, target: panLookC, fov: 50, ease: ease.sineInOut },
   ];
 
   const passClose = world.passCam.clone().lerp(world.passLook, 0.12);
   const passKeys = [
     { t: tPass, pos: world.passCam.clone(), target: world.passLook.clone(), fov: 53 },
-    { t: tReturn, pos: passClose, target: world.passLook.clone(), fov: 48, ease: ease.sineInOut },
+    { t: tPortal, pos: passClose, target: world.passLook.clone(), fov: 48, ease: ease.sineInOut },
   ];
 
+  const portalFar = passClose.clone();
+  const portalNear = world.portalCam.clone().addScaledVector(world.pylonFront, -7.0);
   const returnKeys = [
-    { t: tReturn, pos: world.portalCam.clone(), target: world.portalLook.clone(), fov: 46 },
-    { t: d6, pos: new THREE.Vector3(-0.7, 1.52, 8.15), target: new THREE.Vector3(-0.2, 1.9, 0.2), fov: 55, ease: ease.sineInOut },
-    { t: titleTilt, pos: new THREE.Vector3(-0.69, 1.52, 8.1), target: new THREE.Vector3(-0.2, 1.9, 0.2), fov: 55, ease: ease.sineInOut },
+    { t: tReturn, pos: portalNear.clone(), target: world.portalLook.clone(), fov: 42 },
+    { t: d6, pos: new THREE.Vector3(-0.7, 1.52, 7.5), target: new THREE.Vector3(-0.2, 1.75, 1.6), fov: 55, ease: ease.sineInOut },
+    { t: titleTilt, pos: new THREE.Vector3(-0.69, 1.52, 7.5), target: new THREE.Vector3(-0.2, 1.75, 1.6), fov: 55, ease: ease.sineInOut },
   ];
 
-  const portalFar = world.portalCam.clone();
-  const portalNear = world.portalCam.clone().addScaledVector(world.pylonFront, -0.55);
   const portalKeys = [
-    { t: tPortal, pos: portalFar, target: world.portalLook.clone(), fov: 46 },
-    { t: tPortal + 1.2, pos: portalNear, target: world.portalLook.clone(), fov: 42, ease: ease.sineInOut },
+    { t: tPortal, pos: portalFar, target: world.passLook.clone(), fov: 48 },
+    { t: pushIn - 0.1, pos: portalNear, target: world.portalLook.clone(), fov: 42, ease: ease.sineInOut },
+    { t: pushIn, pos: portalNear, target: world.portalLook.clone(), fov: 42 },
   ];
   // A camera-facing, unmarked face sits beyond the pylon front. Keep it hidden
   // until the title move so it cannot alter the earlier wide or doorway views.
@@ -636,7 +587,7 @@ function plan(world, ctx) {
   slabTexture.colorSpace = THREE.SRGBColorSpace;
   slabTexture.wrapS = slabTexture.wrapT = THREE.RepeatWrapping;
   slabTexture.repeat.set(32, 32);
-  const titleSlab = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshBasicMaterial({ map: slabTexture, side: THREE.DoubleSide, toneMapped: false }));
+  const titleSlab = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshBasicMaterial({ map: slabTexture, side: THREE.DoubleSide, toneMapped: false, transparent: true, opacity: 0 }));
   titleSlab.position.set(-0.7, 2.0, 1.15);
   titleSlab.visible = false;
   world.handles.sofa.parent.add(titleSlab);
@@ -670,7 +621,7 @@ function plan(world, ctx) {
     shot('establish', heroKeys, 10, tHero, true),
     shot('claudeTwo', twoKeys, 3.2, tTwo),
     shot('panCrews', panKeys, 24, tPan),
-    shot('cursorStamp', passKeys, 2.8, tPass, true),
+    shot('inspectorStamp', passKeys, 2.8, tPass, true),
     shot('portal', portalKeys, 8, tPortal, true),
     shot('returnTwo', returnKeys, 10, tReturn, true),
     shot('titleWall', titleKeys, 8, titleTilt, true),
@@ -706,22 +657,32 @@ function plan(world, ctx) {
       const destY = name === 'Claude' ? world.claudeSpot.y : world.codexSpot.y;
       const back = smoothstep(clamp((t - showcaseEnd) / 0.7));
       robot.root.position.y = lerp(lerp(robot.seat.y, destY, e), robot.seat.y, back) + (p.lift || 0);
+      robot.root.scale.setScalar(world.visitorScales[name] * (1 + 0.46 * smoothstep(clamp((t - showcaseEnd) / 0.6))));
     }
   }
 
   function update(t, sim) {
     const cam = camAt(t);
-    titleSlab.visible = t >= titleTilt + 0.18;
+    titleSlab.visible = t >= titleTilt - 0.25;
+    titleSlab.material.opacity = smoothstep(clamp((t - titleTilt + 0.25) / 1.2));
     poseVisitors(sim, t);
-    const crewShot = t >= tPan && t < tPass;
+    const hostsVisible = t < pushIn - 0.4 || t >= showcaseEnd + 0.6;
+    h.claude.root.visible = hostsVisible;
+    h.codex.root.visible = hostsVisible;
+    const crewShot = t >= tPan && t < stamp + 1.0;
     world.scatterBlocks.forEach((b) => { b.visible = !crewShot; });
     const twoShot = t >= tTwo && t < tPan;
-    h.ptah.root.visible = !twoShot && t >= rise;
-    h.sceptre.visible = !twoShot && t >= rise;
-    world.extraRamps.forEach((r) => { r.visible = crewShot; });
-    if (world.baseRamp) world.baseRamp.visible = true;
-    world.stampG.visible = !crewShot;
-    world.gripLink.visible = !crewShot;
+    if (twoShot) {
+      faceLens(h.claude, cam);
+      faceLens(h.codex, cam);
+    }
+    h.ptah.root.visible = !twoShot && t >= rise - 0.6;
+    h.sceptre.visible = !twoShot && t >= rise - 0.6;
+    world.extraRamps.forEach((r) => { r.visible = false; });
+    if (world.baseRamp) world.baseRamp.visible = !crewShot;
+    world.crewRamps.forEach((r) => { r.visible = crewShot; });
+    world.stampG.visible = t >= stamp - 0.6;
+    world.gripLink.visible = t >= stamp - 0.6;
     world.banners.forEach((b) => {
       b.mark.visible = crewShot;
       b.group.position.copy(b.home);
@@ -771,6 +732,7 @@ function plan(world, ctx) {
 
     // Ptah: eyes and sceptre on his words, head nods. Body yaw stays the look.
     const rg = ease.power2Out(clamp((t - rise) / 1.35));
+    const eyeLead = smoothstep(clamp((t - rise + 0.6) / 0.6));
     const pulse = ptahPulse(t);
     const talk = clamp(pulse * 2.2);
     h.ptah.apply({
@@ -779,7 +741,7 @@ function plan(world, ctx) {
       pitch: -0.05 * rg,
       glow: 0,
     });
-    const eyeI = 2.4 + 1.15 * rg + 3.4 * pulse;
+    const eyeI = 0.2 + 3.35 * eyeLead + 3.4 * pulse;
     h.ptah.mats.eyes.emissiveIntensity = eyeI;
     h.ptah.mats.screen.emissiveIntensity = 0.3 + 0.25 * pulse;
     h.ptah.mats.glow.emissiveIntensity = 0.6 + 0.8 * pulse;
@@ -792,28 +754,31 @@ function plan(world, ctx) {
     // Crews haul toward the ramp. The inspector's crew (index 1) holds so the stamp reads.
     const leadDelta = new Map();
     for (const c of world.crewHomes) {
-      c.robot.root.visible = !(t >= tPass && t < tReturn);
+      c.robot.root.visible = !crewShot || (c.crew < 3 && c.slot < 3 && t < tPass);
       const dir = haulDir[c.crew * 4 + c.slot] || haulDir[0];
       const trip = 16 + hash('trip', c.crew) * 4;
-      const u = c.crew === 1 ? 0 : (t / trip + c.phase) % 1;
+      const u = crewShot || c.crew === 1 ? 0 : (t / trip + c.phase) % 1;
       const reach = c.crew === 1 ? 0 : 7.5;
       const along = u * reach;
       const wob = c.crew === 1 ? 0 : Math.sin(t * 2.6 + c.phase * 6.2) * 0.1;
       _side.set(-dir.z, 0, dir.x);
       _pos.copy(c.home).addScaledVector(dir, along).addScaledVector(_side, wob);
       if (crewShot && c.crew < 3) {
-        const advance = (t - tPan) * 0.18;
-        _pos.set(-8.2 + c.crew * 3.5 + c.slot * 0.9, 0, -12.5 - c.crew * 2.0 - c.slot * 1.1 - advance);
-        c.robot.root.scale.setScalar(c.crew === 0 ? 0.39 : c.crew === 1 ? 0.31 : 0.25);
+        const advance = (t - tPan) * 0.12;
+        _pos.set(-8.2 + c.crew * 5.2 + c.slot * 0.25, 0, -11.5 - c.crew * 1.8 - c.slot * 2.0 - advance);
+        c.robot.root.scale.setScalar(0.62);
       } else {
         c.robot.root.scale.setScalar(0.3);
       }
       c.robot.root.position.x = _pos.x;
       c.robot.root.position.z = _pos.z;
-      c.robot.root.position.y = crewShot && c.crew < 3 ? sandY(_pos.x, _pos.z) + 0.1 : plant(c.home, _pos.x, _pos.z);
+      if (crewShot && c.crew < 3) {
+        const lane = world.crewRamps[c.crew];
+        c.robot.root.position.y = lane.position.y + 0.175 - Math.sin(0.08) * (_pos.z - lane.position.z);
+      } else c.robot.root.position.y = plant(c.home, _pos.x, _pos.z);
       const ph = t * 2.3 * Math.PI + c.phase * 5;
       c.robot.apply({
-        hop: 0.16 * Math.abs(Math.sin(ph)),
+        hop: crewShot ? 0 : 0.08 * Math.abs(Math.sin(ph)),
         squash: 1,
         roll: 0.1 * Math.sin(ph),
         pitch: 0.16 + 0.04 * Math.sin(ph * 0.5),
@@ -821,13 +786,13 @@ function plan(world, ctx) {
         nod: 0.04 * Math.sin(ph * 0.7),
         glow: 0.15,
       });
-      if (crewShot) c.robot.root.rotation.y = Math.PI; else faceLens(c.robot, cam);
+      faceLens(c.robot, cam);
       if (c.slot === 0) leadDelta.set(c.crew, { x: _pos.x - c.home.x, z: _pos.z - c.home.z, y: c.robot.root.position.y - c.home.y });
     }
     for (const s of world.sledHomes) {
       const d = leadDelta.get(s.crew) || { x: 0, z: 0, y: 0 };
       s.sled.position.set(s.home.x + d.x, s.baseY + d.y, s.home.z + d.z);
-      if (crewShot && s.crew < 3) s.sled.position.set(-4.5 + s.crew * 3.5, 0.18, -18.4 - s.crew * 2 - (t - tPan) * 0.18);
+      if (crewShot && s.crew < 3) s.sled.position.set(-4.5 + s.crew * 5.2, 0.18, -19.4 - s.crew * 1.8 - (t - tPan) * 0.12);
     }
     world.crewHaulRopes.forEach((rope, i) => {
       rope.visible = crewShot;
@@ -847,7 +812,7 @@ function plan(world, ctx) {
     for (const b of world.blockHomes) {
       const d = b.sled ? (leadDelta.get(b.sled.crew) || { x: 0, z: 0, y: 0 }) : { x: 0, z: 0, y: 0 };
       b.block.position.set(b.home.x + d.x, b.baseY + d.y, b.home.z + d.z);
-      if (crewShot && b.sled?.crew < 3) b.block.position.set(-4.5 + b.sled.crew * 3.5, 1.08, -18.4 - b.sled.crew * 2 - (t - tPan) * 0.18);
+      if (crewShot && b.sled?.crew < 3) b.block.position.set(-4.5 + b.sled.crew * 5.2, 1.08, -19.4 - b.sled.crew * 1.8 - (t - tPan) * 0.12);
       b.block.visible = !crewShot || (b.sled?.crew < 3 && world.blockHomes.find((candidate) => candidate.sled === b.sled) === b);
     }
     for (const r of world.ropeHomes) {
@@ -860,7 +825,7 @@ function plan(world, ctx) {
     const rmp = h.pyramid.userData.ramp;
     const pyrP = h.pyramid.position;
     h.rampRobots.forEach((robot, k) => {
-      robot.root.visible = !crewShot;
+      robot.root.visible = false;
       const f0 = 0.15 + k * 0.13;
       const along = (1 - f0 + t * 0.05) % 1;
       const sideX = k % 2 ? 0.6 : -0.6;
@@ -906,46 +871,7 @@ function plan(world, ctx) {
     }
     world.dustAttr.needsUpdate = true;
 
-    // Cursor zip: face the lens, trail dust and streaks while he is moving.
-    const cursor = world.robots.Cursor;
-    const cp = sim.robotPose('Cursor', t);
-    cursor.root.position.x = cp.px ?? world.passFrom.x;
-    cursor.root.position.z = cp.pz ?? world.passFrom.z;
-    cursor.root.position.y = sandY(cursor.root.position.x, cursor.root.position.z) + (cp.lift || 0);
-    cursor.apply({ ...cp, squash: 1 });
-    faceLens(cursor, cam);
-    _pos.set(cursor.root.position.x, cursor.root.position.y + 0.45, cursor.root.position.z);
-    const prev = sim.robotPose('Cursor', t - 0.08);
-    _posB.set(prev.px ?? cursor.seat.x, 0, prev.pz ?? cursor.seat.z);
-    const speed = _pos.distanceTo(_posB.set(_posB.x, _pos.y, _posB.z)) / 0.08;
-    const plannedZip = smoothstep(clamp((t - zipStart - 0.05) / 0.12)) * (1 - smoothstep(clamp((t - stamp - 0.12) / 0.22)));
-    const moving = Math.max(speed > 0.4 ? clamp((speed - 0.4) / 2.2) : 0, plannedZip);
-    const dirX = _pos.x - (prev.px ?? cursor.seat.x);
-    const dirZ = _pos.z - (prev.pz ?? cursor.seat.z);
-    const dirL = Math.hypot(dirX, dirZ) || 1;
-    world.streaks.forEach((m, i) => {
-      const back = 0.15 + i * 0.08;
-      const lat = (hash('streak', i) - 0.5) * 0.35;
-      m.position.set(
-        _pos.x - (dirX / dirL) * back + (-dirZ / dirL) * lat,
-        _pos.y + 0.15 + (i % 3) * 0.12,
-        _pos.z - (dirZ / dirL) * back + (dirX / dirL) * lat,
-      );
-      m.lookAt(m.position.x + dirX / dirL, m.position.y, m.position.z + dirZ / dirL);
-      m.scale.set(1, 2.2, 0.35 + moving * 0.7);
-      m.material.opacity = 0.8 * moving * (1 - i / 8);
-    });
-    const zArr = world.zipDust.geometry.attributes.position.array;
-    for (let i = 0; i < 36; i++) {
-      const k = hash('zd', i);
-      const back = 0.2 + k * 1.3;
-      zArr[i * 3] = _pos.x - (dirX / dirL) * back + (hash('zd', i, 'x') - 0.5) * 0.4;
-      zArr[i * 3 + 1] = _pos.y + hash('zd', i, 'y') * 0.6;
-      zArr[i * 3 + 2] = _pos.z - (dirZ / dirL) * back + (hash('zd', i, 'z') - 0.5) * 0.4;
-    }
-    world.zipDust.geometry.attributes.position.needsUpdate = true;
-    world.zipDust.material.opacity = 0.65 * moving;
-
+    // The inspector marks the approved block.
     // Inspector stamp: squash, tool slam, gold seal.
     const su = t - stamp;
     let hop = 0.03 * Math.abs(Math.sin(t * 2.2));
@@ -994,7 +920,7 @@ function plan(world, ctx) {
     }
 
     // Portal: warm, then white, plus a shaft. Bloom picks up the untonemapped plane.
-    const pu = clamp((t - portal) / 1.1) * (1 - smoothstep(clamp((t - showcaseEnd) / 0.7)));
+    const pu = clamp((t - tPortal) / 1.1) * (1 - smoothstep(clamp((t - showcaseEnd) / 0.7)));
     const warm = clamp(pu / 0.12);
     const white = clamp(pu / 0.6);
     const flick = 0.94 + 0.06 * noise1(t * 1.8, 'portal');
@@ -1009,7 +935,7 @@ function plan(world, ctx) {
     world.rays.forEach((ray, i) => { ray.material.opacity = (0.025 + i * 0.008) * pu * flick; });
     world.doorLight.color.copy(_col);
     world.doorLight.intensity = 17 * pu * flick;
-    const silhouette = clamp((t - (portal - 0.15)) / 0.1);
+    const silhouette = clamp((t - (tPortal + 0.1)) / 0.3);
     for (const { m, color, emissive } of world.hostMaterials) {
       m.color.copy(color);
       if (emissive) m.emissive.copy(emissive);
@@ -1024,7 +950,7 @@ function plan(world, ctx) {
     shots,
     update,
     hits: [{ t: stamp, amp: 0.022 }],
-    info: { cues: { sofaLand, rise, pan, cursorPass, stamp, portal, tHero, tLow, tTwo, tPan, tPass, tReturn, tPortal } },
+    info: { cues: { sofaLand, rise, pan, stamp, portal, tHero, tLow, tTwo, tPan, tPass, tReturn, tPortal } },
   };
 }
 
