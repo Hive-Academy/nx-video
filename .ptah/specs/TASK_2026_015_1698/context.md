@@ -511,3 +511,5 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   beside the film take ("Puh-TAH"). New takes: eight, plus the two alternates.
 - Not changed: the episode title "The P Is Not Silent" and the title wall. Flagged to the
   user, since the joke that set up the title is gone.
+- 2026-11-13: the user answered "approved" to the v4.1 lines (N5, O1, D1) and to the note
+  that the title stays. Still open for the user: which of the three N5 pronunciations to use.
