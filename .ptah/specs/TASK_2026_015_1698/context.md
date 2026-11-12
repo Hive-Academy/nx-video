@@ -513,3 +513,13 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   user, since the joke that set up the title is gone.
 - 2026-11-13: the user answered "approved" to the v4.1 lines (N5, O1, D1) and to the note
   that the title stays. Still open for the user: which of the three N5 pronunciations to use.
+- Audio lane `bc5656a0` (Codex, 7 m 45 s) delivered script v4.1: eight new takes plus two
+  alternate N5 takes (ten speech calls), tour windows per F line (7.370, 6.262, 6.421,
+  5.882 s; all longer than the 5 s clips, so the clips must be re-cut), film 106.670 s, mix
+  −17.1 LUFS / −1.36 dBTP / LRA 10.9. I restored forced alignment (the lane had switched new
+  takes to proportional word timing) and removed the showcase labels, which collided with
+  the narration captions and failed `check`. `check --json` is `ok: true`. Details in
+  `notes/lane-c-v4-audio.md`.
+- Interim state of the film: v4.1 voice and timing over the v3 office and desert animation.
+  The mouths and cameras of the old staging do not match the new lines until the scenes are
+  re-animated.

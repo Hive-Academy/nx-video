@@ -61,7 +61,7 @@ function pair(voiceId, bedTest) {
 }
 const showcase = clips.find(c => c.src.replaceAll('\\', '/').endsWith('assets/audio/music/showcase-bed.mp3'));
 const voiceBed = [
-  pair('vo-d5', c => c === showcase),
+  ...['f1','f2','f3','f4'].map(id=>pair('vo-'+id,c=>c===showcase)),
   pair('vo-n1', c => c.src.replaceAll('\\', '/').endsWith('assets/audio/music/office-night-bed.mp3') && c.start < 1),
 ].filter(Boolean);
 let duckDb = null;

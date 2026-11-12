@@ -22,15 +22,11 @@
       "emoji": {}
     },
     "N5": {
-      "copy": "…That's the problem.",
-      "emoji": {}
-    },
-    "S2": {
-      "copy": "Hmm… Tah? The P's silent, right?",
+      "copy": "It's called Ptah. Named after the ancient Egyptian god of builders.",
       "emoji": {}
     },
     "O1": {
-      "copy": "Has to be. Like pterodactyl.",
+      "copy": "That's a big name for an app.",
       "emoji": {}
     },
     "O3": {
@@ -42,19 +38,31 @@
       "emoji": {}
     },
     "D1": {
-      "copy": "I made the world by speaking its name. Say mine properly.",
+      "copy": "You said my name. Now look at what I build.",
       "emoji": {}
     },
     "D2": {
       "copy": "Respectfully… why does the god of builders care about coding agents?",
       "emoji": {}
     },
-    "D3": {
-      "copy": "Look around. Many crews. One plan. Nothing goes up until it's checked.",
+    "F1": {
+      "copy": "One command center. Every coding agent you already pay for, in one window.",
+      "emoji": {}
+    },
+    "F2": {
+      "copy": "Give them one plan. They build in parallel, each in its own lane.",
+      "emoji": {}
+    },
+    "F3": {
+      "copy": "Nothing ships unchecked. You review every change before it lands.",
+      "emoji": {}
+    },
+    "F4": {
+      "copy": "And every run is tracked. Time, tokens and cost.",
       "emoji": {}
     },
     "D5": {
-      "copy": "Same idea. Now it runs on your desktop.",
+      "copy": "Same craft as my builders. Now it runs on your desktop.",
       "emoji": {}
     },
     "D6": {

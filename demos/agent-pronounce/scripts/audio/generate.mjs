@@ -8,8 +8,8 @@ const dir=n=>{const p=path.join(AUDIO,n);ensureDir(p);return p;};
 const voDir=dir('vo'),sfxDir=dir('sfx'),musicDir=dir('music'),alignDir=dir('align');
 const force=process.argv.includes('--force');
 const redoAt=process.argv.indexOf('--redo'),redo=new Set(redoAt>=0?(process.argv[redoAt+1]||'').split(','):[]);
-const d3Alignment=path.join(alignDir,'d3.json');
-if(exists(d3Alignment)&&!JSON.parse(fs.readFileSync(d3Alignment,'utf8')).words?.some(w=>String(w.word).toLowerCase().replace(/[^a-z]/g,'')==='checked'))redo.add('D3');
+const previous=exists(path.join(AUDIO,'voices.json'))?JSON.parse(fs.readFileSync(path.join(AUDIO,'voices.json'),'utf8')).lines||[]:[];
+for(const l of LINES)if(previous.find(x=>x.row===l.row)?.tts!==l.tts)redo.add(l.row);
 fs.writeFileSync(path.join(AUDIO,'voices.json'),JSON.stringify({model_id:MODEL,output_format:OUTPUT_FORMAT,voices:CAST,lines:LINES.map(l=>({row:l.row,speaker:l.speaker,text:l.text,tts:l.tts,voice_id:CAST[l.speaker].voice_id}))},null,2));
 const voice={};
 for(const l of LINES){
@@ -20,16 +20,19 @@ for(const l of LINES){
   fs.writeFileSync(file,await api('POST',`/v1/text-to-speech/${cast.voice_id}`,{query:{output_format:OUTPUT_FORMAT},accept:'audio/mpeg',json:{text:l.tts,model_id:MODEL,voice_settings:{...cast.settings,...l.settings}}}));
  }
  // Forced alignment maps actual audio to caption tokens. Fallback is proportional if API alignment fails.
+ // Slices follow the spoken (TTS) tokens, so a phonetic spelling longer than its caption word does not shift later words.
  const aligned=path.join(alignDir,`${l.row.toLowerCase()}.json`);
  let words;
  if(exists(aligned)&&!force&&!redo.has(l.row)&&fs.statSync(aligned).mtimeMs>=fs.statSync(file).mtimeMs&&Array.isArray(JSON.parse(fs.readFileSync(aligned,'utf8')).words))words=JSON.parse(fs.readFileSync(aligned,'utf8')).words;
  else {
   try {
-   const form=new FormData();form.set('file',new Blob([fs.readFileSync(file)],{type:'audio/mpeg'}),path.basename(file));form.set('text',l.tts.replace(/<break[^>]*\/>/g,' '));
+   const tokens=l.text.split(/\s+/),spoken=l.tts.replace(/<break[^>]*\/>/g,' ').trim().split(/\s+/),said=spoken.length===tokens.length?spoken:tokens;
+   const form=new FormData();form.set('file',new Blob([fs.readFileSync(file)],{type:'audio/mpeg'}),path.basename(file));form.set('text',said.join(' '));
+   console.log('ALIGN',l.row);
    const a=await api('POST','/v1/forced-alignment',{form});
-   const tokens=l.text.split(/\s+/),chars=a.characters||[];
+   const chars=a.characters||[];
    let p=0;
-   words=tokens.map(word=>{const q=p+word.length;const segment=chars.slice(p,q);p=q+1;return {word,start:segment[0]?.start??0,end:segment.at(-1)?.end??0};});
+   words=tokens.map((word,i)=>{const q=p+said[i].length;const segment=chars.slice(p,q);p=q+1;return {word,start:segment[0]?.start??0,end:segment.at(-1)?.end??0};});
   }catch(e){console.warn('alignment fallback',l.row,e.message);const toks=l.text.split(/\s+/),d=duration(file);words=toks.map((word,i)=>({word,start:i*d/toks.length,end:(i+1)*d/toks.length}));}
   fs.writeFileSync(aligned,JSON.stringify({words},null,2));
  }
@@ -46,6 +49,11 @@ for(const l of LINES){
  voice[l.row]={file:rel(final),duration:duration(final),words};
 }
 const L=layout(voice),voices={};
+const n5=LINES.find(l=>l.row==='N5'),candidateDir=path.join(voDir,'candidates');ensureDir(candidateDir);
+for(const [id,token] of [['n5-patah','Patah'],['n5-p-tah',"P'tah"]]){
+ const candidate=path.join(candidateDir,id+'.mp3');
+ if(!exists(candidate)){console.log('TTS candidate',id);const cast=CAST.Codex;fs.writeFileSync(candidate,await api('POST',`/v1/text-to-speech/${cast.voice_id}`,{query:{output_format:OUTPUT_FORMAT},accept:'audio/mpeg',json:{text:n5.tts.replace('Puh-TAH',token),model_id:MODEL,voice_settings:{...cast.settings,...n5.settings}}}));}
+}
 for(const l of LINES){const v=voice[l.row];voices['vo-'+l.row.toLowerCase()]={row:l.row,file:v.file,duration:v.duration,words:v.words,envelope:[],text:l.text,tts:l.tts};}
 const sfx={};
 for(const [id,s] of Object.entries(SFX)){
@@ -90,21 +98,15 @@ run('ffmpeg',['-y','-v','error','-stream_loop','-1','-i',path.join(sfxDir,'night
 // before the quieter break). A 0.6 s fade-in, a 0.8 s fade-out, a −14 dB hold under D5,
 // and +3 dB lifts at the three clip changes are baked in. measure-mix reads only a
 // constant data-volume, so the file has to carry the envelope the render will play.
-const showcaseStart=+(desert.start+desert.cues.pushIn).toFixed(3);
+const showcaseStart=+(desert.start+desert.cues.showcaseStart).toFixed(3);
 const showcaseEndAbs=+(desert.start+desert.cues.showcaseEnd).toFixed(3);
 const bedDur=+(showcaseEndAbs+0.3-showcaseStart).toFixed(3);
-const d5=L.timeline.find(x=>x.row==='D5');
-const duckUntil=+(d5.start+d5.duration-showcaseStart).toFixed(3);
-const riseUntil=+(duckUntil+0.43).toFixed(3);
 const duckLin=(10**(-14/20)).toFixed(4);
-const liftLin=(10**(3/20)).toFixed(4);
-const liftAdd=(liftLin-1).toFixed(4);
-const bump=at=>{const a=at.toFixed(3),b=(at+0.08).toFixed(3),c=(at+0.45).toFixed(3);return `if(between(t,${a},${b}),1+(t-${a})/0.08*${liftAdd},if(between(t,${b},${c}),${liftLin}-(t-${b})/0.37*${liftAdd},1))`;};
-const bedEnv=`if(lt(t,${duckUntil}),${duckLin},if(lt(t,${riseUntil}),${duckLin}+${(1-duckLin).toFixed(4)}*(t-${duckUntil})/0.43,1))*${bump(5)}*${bump(10)}*${bump(15)}`;
+const bedEnv=String(duckLin);
 const showcaseBed=path.join(musicDir,'showcase-bed.mp3');
-const fadeOutAt=(bedDur-0.8).toFixed(3);
+const fadeOutAt=(bedDur-1.1).toFixed(3);
 run('ffmpeg',['-y','-v','error','-i',path.join(musicDir,'bed.mp3'),'-af',`atrim=start=20:end=${20+bedDur},asetpts=PTS-STARTPTS,volume='${bedEnv}':eval=frame,afade=t=in:st=0:d=0.6,afade=t=out:st=${fadeOutAt}:d=0.8,alimiter=limit=0.89`,'-t',String(bedDur),'-c:a','libmp3lame','-b:a','192k',showcaseBed]);
-const showcaseVol=0.28;
+const showcaseVol=0.20;
 const cues={fps:30,total:L.total,voices,sfx,music:null,musicClips:[{file:rel(officeBed),start:office.start,duration:office.duration,volume:.03},{...intro,duration:6,start:L.scenes.find(s=>s.id==='intro').start},{...end,start:L.scenes.find(s=>s.id==='endcard').start},{file:rel(showcaseBed),start:showcaseStart,duration:bedDur,volume:showcaseVol}],timeline:L.timeline,scenes:L.scenes};
 fs.writeFileSync(path.join(AUDIO,'cues.json'),JSON.stringify(cues,null,2));
 console.log('Wrote cues.json',L.total);
