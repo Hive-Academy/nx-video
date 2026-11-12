@@ -25,6 +25,7 @@ import { planTableShots, boothShot, punchShot, sampleShot, activeShot, applyCame
 import { ROBOT } from './robot.js';
 import { clamp, ease, FPS } from './util.js';
 import { TOUR_KINDS, mountTour } from './tour.js';
+import { renderFilm } from './look-kit.js';
 
 const WIDTH = 1920;
 const HEIGHT = 1080;
@@ -120,6 +121,13 @@ function focusChain() {
 
 function renderFrame(scene, camera, dof, post) {
   const { renderer } = sharedRenderer();
+  // opt-in film chain from look-kit.js (AO, DOF, bloom, grade); a post without `film` is unchanged
+  if (post && post.film) {
+    const oldShadows = renderer.shadowMap.enabled;
+    if (post.shadows) renderer.shadowMap.enabled = true;
+    try { renderFilm(renderer, scene, camera, post.film, shared.w, shared.h, post.filmFrame ?? 0); } finally { renderer.shadowMap.enabled = oldShadows; }
+    return;
+  }
   if (post) {
     const old = { toneMapping: renderer.toneMapping, exposure: renderer.toneMappingExposure, shadows: renderer.shadowMap.enabled, shadowType: renderer.shadowMap.type };
     try {
