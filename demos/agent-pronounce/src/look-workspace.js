@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { assetUrl } from './assets.js';
 import { V, glb, tex, hdri, fit, shadows, robot, canvas2d, canvasTex, whenTexturesReady } from './craft.js';
-import { environment, reshadeRobot, screenLight, practical, contactShadow, roomProbe } from './look-kit.js';
+import { environment, reshadeRobot, screenLight, practical, contactShadow, roomProbe, loungeChair } from './look-kit.js';
 import { hash } from './util.js';
 
 export const K = 0.63;
@@ -32,13 +32,15 @@ export const LAYOUT = {
 
 // The three stills. focal in mm (full-frame 36 mm gauge); focus in metres from the camera.
 export const SHOTS = {
-  // over the shoulder: behind and above the seated robots, hero screen ~55% of the frame width
-  a: { pos: [0.06, 1.45, 2.15], target: [0, 0.98, -0.9], focal: 30, focus: 3.1, aperture: 0.006, maxblur: 0.009 },
-  // front two-shot: three-quarter from beyond the desks; both faces, screen glow on them, room behind
-  b: { pos: [1.5, 1.38, -0.84], target: [-0.06, 0.7, 0.6], focal: 24, focus: 2.25, aperture: 0.004, maxblur: 0.008 },
-  // single: MCU of Codex turned toward Claude, Claude's shoulder soft in front, screen slice behind
-  c: { pos: [-0.42, 0.98, 1.77], target: [0.37, 0.7, 0.47], focal: 35, focus: 1.2, aperture: 0.012, maxblur: 0.012 },
+  // over the shoulder, high and back: chair backs and shells frame the hero screen; focus on the screen
+  a: { pos: [0, 1.3, 2.2], target: [0, 0.9, -0.9], focal: 28, subject: [0, 0.99, -0.9], aperture: 0.0025, maxblur: 0.006, pose: 'work' },
+  // two-shot from behind-left at seated eye level: both robots turned to each other, three-quarter faces,
+  // the hero screen between them behind
+  b: { pos: [-0.32, 0.98, 2.24], target: [0.04, 0.72, 0.0], focal: 24, subject: [0, 0.64, 0.72], aperture: 0.005, maxblur: 0.007, pose: 'talk' },
+  // MCU of Codex turned toward Claude (off frame left), the screen soft behind
+  c: { pos: [0.02, 0.8, 1.56], target: [0.68, 0.62, 0.6], focal: 42, subject: [0.62, 0.64, 0.72], aperture: 0.012, maxblur: 0.012, pose: 'talk' },
 };
+export const ROBOT_SCALE = 0.25; // seated figure ~0.85 world (~1.35 m real) to the top of the head; desk 0.47 (0.74 m)
 
 function blueprintTexture() {
   const [c, g] = canvas2d(1024, 1400);
@@ -122,13 +124,13 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const scene = new THREE.Scene();
   scene.userData.noDepth = [];
   const [night, city] = await Promise.all([hdri('hdri/unfinished_office_night_1k.hdr'), hdri('hdri/shanghai_bund_2k.hdr')]);
-  environment(renderer, scene, night.tex, { intensity: 0.45, rotation: 0.6, background: true, backgroundTex: city.tex, backgroundIntensity: 0.3 });
+  environment(renderer, scene, night.tex, { intensity: 0.62, rotation: 0.6, background: true, backgroundTex: city.tex, backgroundIntensity: 0.3 });
   scene.backgroundRotation = new THREE.Euler(0, 4.05, 0);
 
   // ---------------------------------------------------------------- room shell
   const R = L.room;
   const W2 = R.x * 2, D = R.zBack - R.zFront;
-  const parquet = new THREE.MeshStandardMaterial({ ...rep(TX('herringbone_parquet', '2k'), W2 / 1.26, D / 1.26), roughness: 1, envMapIntensity: 0.6 });
+  const parquet = new THREE.MeshStandardMaterial({ ...rep(TX('herringbone_parquet', '2k'), W2 / 1.26, D / 1.26), roughness: 1, envMapIntensity: 0.25 });
   parquet.color.set('#C8B6A2');
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(W2, D), parquet);
   floor.rotation.x = -Math.PI / 2; floor.position.z = (R.zFront + R.zBack) / 2; floor.receiveShadow = true;
@@ -170,8 +172,8 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const walnut = new THREE.MeshPhysicalMaterial({ ...walnutTx, color: '#C27A46', roughness: 1, clearcoat: 0.25, clearcoatRoughness: 0.4, envMapIntensity: 0.45 });
   const slatTx = TX('american_walnut_veneer');
   for (const k of ['map', 'normalMap', 'roughnessMap']) { slatTx[k].repeat.set(0.05, 1.4); }
-  const slatMat = new THREE.MeshStandardMaterial({ ...slatTx, roughness: 1, envMapIntensity: 0.6 });
-  slatMat.color.set('#B89A80');
+  const slatMat = new THREE.MeshStandardMaterial({ ...slatTx, roughness: 1, envMapIntensity: 0.25 });
+  slatMat.color.set('#7A5A40');
   const slatW = 3.1, nSlats = 40;
   const slats = new THREE.InstancedMesh(new THREE.BoxGeometry(0.036, R.ceil, 0.03), slatMat, nSlats);
   const m4 = new THREE.Matrix4();
@@ -197,7 +199,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
   screenMat.color.setScalar(1.55);
   const hero = new THREE.Group();
-  const bezel = new THREE.Mesh(new RoundedBoxGeometry(sc.w + 0.035, sc.h + 0.035, 0.028, 3, 0.008), new THREE.MeshPhysicalMaterial({ color: '#131417', metalness: 0.8, roughness: 0.3, clearcoat: 0.5 }));
+  const bezel = new THREE.Mesh(new RoundedBoxGeometry(sc.w + 0.014, sc.h + 0.014, 0.022, 3, 0.005), new THREE.MeshPhysicalMaterial({ color: '#131417', metalness: 0.8, roughness: 0.3, clearcoat: 0.5 }));
   const panel = new THREE.Mesh(new THREE.PlaneGeometry(sc.w, sc.h), screenMat);
   panel.position.z = 0.0145;
   const lip = new THREE.Mesh(new THREE.BoxGeometry(sc.w * 0.98, 0.006, 0.01), new THREE.MeshStandardMaterial({ color: '#C99A42', metalness: 1, roughness: 0.28 }));
@@ -206,16 +208,31 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   hero.position.set(...sc.at);
   scene.add(shadows(hero, true, false));
   panel.castShadow = false;
-  const sl = screenLight(sc.w, sc.h, '#C2D6FF', 28);
-  sl.position.set(sc.at[0], sc.at[1], sc.at[2] + 0.03); sl.lookAt(0, sc.at[1] - 0.15, 2);
+  const sl = screenLight(sc.w, sc.h, '#C2D6FF', 18);
+  sl.position.set(sc.at[0], sc.at[1] + 0.16, sc.at[2] + 0.08); // forward of the sideboard: its near field would blow the top out sl.lookAt(0, sc.at[1] - 0.15, 2);
   scene.add(sl);
   // cool screen spill: reads on the screen-facing sides of the heads and on the desk tops
   const spill = new THREE.SpotLight('#9FC2FF', 3.2, 4.5, 0.75, 0.8, 1.6);
   spill.position.set(sc.at[0] + 0.5, sc.at[1] + 0.05, sc.at[2] + 0.15); spill.target.position.set(0, 0.8, 0.45);
   scene.add(spill, spill.target);
+  // bias glow off the back of the screen onto the slats, and a cool spill down onto the sideboard top
+  const back = screenLight(sc.w * 0.92, sc.h * 0.85, '#B4C8FF', 2.5);
+  back.position.set(sc.at[0], sc.at[1], sc.at[2] - 0.02); back.lookAt(sc.at[0], sc.at[1], -10);
+  scene.add(back);
+  const sideSpill = practical('spot', { color: '#A8C0FF', intensity: 0.5, distance: 1.6, angle: 0.9, penumbra: 1, shadow: 0 });
+  sideSpill.position.set(0, sc.at[1] - sc.h / 2 + 0.02, sc.at[2] + 0.12); sideSpill.target.position.set(0, 0, sc.at[2] + 0.55);
+  scene.add(sideSpill, sideSpill.target);
+  // the screen is a texture slot: the animation pass swaps in the masked tour clips
+  const setScreenSource = (src) => {
+    const t = src.isTexture ? src : (typeof HTMLVideoElement !== 'undefined' && src instanceof HTMLVideoElement) ? new THREE.VideoTexture(src) : new THREE.CanvasTexture(src);
+    t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
+    screenMat.map = t; screenMat.needsUpdate = true;
+    return t;
+  };
 
   // console under the screen
   const cab = fit(await M('modern_wooden_cabinet'), { w: 1.9, at: [0, 0, R.zFront + 0.27] });
+  cab.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.roughness = Math.max(o.material.roughness, 0.7); o.material.envMapIntensity = 0.5; } });
   scene.add(shadows(cab));
   const vase = fit(await M('ceramic_vase_01'), { h: 0.16, at: [0.78, cab.userData.size.y, R.zFront + 0.25] });
   const books = fit(await M('book_encyclopedia_set_01'), { w: 0.3, at: [-0.72, cab.userData.size.y, R.zFront + 0.25], yaw: 0.1 });
@@ -231,14 +248,12 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
 
   // ---------------------------------------------------------------- desks, chairs, robots
   const steel = new THREE.MeshStandardMaterial({ color: '#1A1B1E', metalness: 0.75, roughness: 0.42 });
-  const chairSrc = await M('mid_century_lounge_chair');
   const lampSrc = await M('desk_lamp_arm_01');
   const pads = await M('office_notepads');
   const stationery = await M('stationery_supplies');
   const cat = await M('concrete_cat_statue');
   const plantSmall = await M('potted_plant_04');
   const robots = {};
-  const raycaster = new THREE.Raycaster();
   for (const [name, side] of [['Codex', 1], ['Claude', -1]]) {
     const dk = desk(walnut, steel);
     dk.position.set(side * L.desk.at, 0, L.desk.z);
@@ -271,23 +286,20 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
       onDesk(c, 0.1, -0.19, -0.5);
     }
     // chair: swivel shell chair, its back to the window
-    const ch = shadows(fit(chairSrc.clone(true), { h: 1.17 * K }));
     const seatAt = V(side * L.seat.x, 0, L.seat.z + 0.1);
+    // work: facing the screen; talk: swivelled toward each other and a little toward the window
+    const look = S.pose === 'talk' ? V(-side * 0.5, 0, 1.6) : V(side * 0.25, 0, sc.at[2]);
+    const ch = await loungeChair({ height: 1.17 * K, cushion: 0.06 });
     ch.position.copy(seatAt);
-    ch.rotation.y = Math.PI + side * 0.18;
+    ch.rotation.y = Math.atan2(-(look.x - seatAt.x), -(look.z - seatAt.z));
     scene.add(ch);
     const cc = contactShadow(scene, 0.7, 0.7, 0.5); cc.position.set(seatAt.x, 0.014, seatAt.z); scene.add(cc);
-    ch.updateMatrixWorld(true);
-    raycaster.set(V(seatAt.x, 2, seatAt.z - 0.02), V(0, -1, 0));
-    const hit = raycaster.intersectObject(ch, true)[0];
-    const seatY = hit ? hit.point.y : 0.27;
-    const at = V(side * L.seat.x, seatY + 0.05, L.seat.z - 0.06);
-    const turned = shot === 'c' && name === 'Codex';
-    const look = turned ? V(-0.9, 0, 0.95) : V(0, 0, sc.at[2]);
-    const lean = -0.14; // ball pitched toward the keyboard (rig faces +X; negative pitch = forward)
-    const pose = name === 'Codex' ? { pitch: lean, nod: turned ? -0.02 : -0.08, headYaw: shot === 'b' ? -0.3 : 0 } : { pitch: lean, nod: -0.06, headYaw: shot === 'b' ? -0.38 : 0 };
-    const r = robot(assets, name, at, look, { pose });
-    reshadeRobot(r, { faceLight: 0.3, shell: '#CDC6BA', env: 0.7, faceBoost: name === 'Claude' ? 3.6 : 2.6 });
+    // the robot sits back on the cushion (its ball against the chair back), body above the desk line
+    const sink = V(look.x - seatAt.x, 0, look.z - seatAt.z).normalize().multiplyScalar(-0.03);
+    const at = V(seatAt.x + sink.x, ch.userData.seatY, seatAt.z + sink.z);
+    const pose = S.pose === 'talk' ? { pitch: -0.04, nod: 0.03, headYaw: 0 } : { pitch: -0.12, nod: -0.06, headYaw: 0 };
+    const r = robot(assets, name, at, look, { pose, scale: ROBOT_SCALE });
+    reshadeRobot(r, { faceLight: 0, shell: '#CCC3B5', env: 0.9, eyeBoost: 2.6, glass: 0.55, faceBoost: name === 'Claude' ? 1.25 : 1, smooth: Math.PI / 4 });
     scene.add(r.root);
     robots[name] = r;
   }
@@ -299,13 +311,13 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   scene.add(shadows(plantBig));
   const plantFloor = fit(await M('potted_plant_02'), { h: 0.55, at: [1.85, 0, -0.55] });
   scene.add(shadows(plantFloor));
-  const pendant = fit(await M('modern_ceiling_lamp_01'), { h: 0.26, at: [0, R.ceil - 0.26, 0.35] });
+  const pendant = fit(await M('modern_ceiling_lamp_01'), { h: 0.26, at: [-1.25, R.ceil - 0.26, 0.95] });
   pendant.traverse((o) => { if (o.isMesh && /globe/.test(o.material.name)) { o.material = o.material.clone(); o.material.emissive = new THREE.Color('#FFC890'); o.material.emissiveIntensity = 3; } });
   scene.add(pendant);
 
   // ---------------------------------------------------------------- lights
   const bulb = practical('point', { color: '#FFC58A', intensity: 0.4, distance: 3.5, shadow: 512 });
-  bulb.position.set(0, R.ceil - 0.36, 0.35); scene.add(bulb);
+  bulb.position.set(-1.25, R.ceil - 0.36, 0.95); scene.add(bulb);
   // city light through the window: cool key from behind the robots, gives the rim
   const moon = new THREE.DirectionalLight('#8EA6E8', 0.55);
   moon.position.set(-0.6, 2.4, 4.2); moon.target.position.set(0, 0.6, 0.4);
@@ -318,9 +330,12 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   // warm wash on the back-wall shelves (warm behind, cool in front)
   const wash = practical('spot', { color: '#FFB067', intensity: 2.2, distance: 3, angle: 0.6, penumbra: 1, shadow: 512 });
   wash.position.set(1.2, R.ceil - 0.05, 1.6); wash.target.position.set(1.35, 0.5, R.zBack); scene.add(wash, wash.target);
-  const slatWash = practical('spot', { color: '#FFB067', intensity: 1.4, distance: 2.5, angle: 1.0, penumbra: 1, shadow: 0 });
+  const slatWash = practical('spot', { color: '#FFB067', intensity: 8, distance: 3, angle: 1.0, penumbra: 1, shadow: 0 });
   slatWash.position.set(0, R.ceil - 0.05, R.zFront + 0.45); slatWash.target.position.set(0, 0.2, R.zFront); scene.add(slatWash, slatWash.target);
 
+  // warm soft key on the two robots (the room's practicals are warm): keeps the shells off-white ceramic
+  const key = practical('spot', { color: '#FFD9B4', intensity: 9, distance: 3, angle: 0.62, penumbra: 1, shadow: 1024 });
+  key.position.set(-0.35, R.ceil - 0.08, 1.45); key.target.position.set(0, 0.62, 0.7); scene.add(key, key.target);
   // soft bounce: a warm uplight scallop on Claude's side wall and a dim ceiling fill
   const up = practical('spot', { color: '#FFB878', intensity: 2.6, distance: 2.4, angle: 0.55, penumbra: 1, shadow: 0 });
   up.position.set(-R.x + 0.25, 0.06, 0.25); up.target.position.set(-R.x, 1.6, 0.25); scene.add(up, up.target);
@@ -333,7 +348,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   for (const r of Object.values(robots)) for (const k of ['shell', 'feet', 'screen']) { r.mats[k].envMap = probe; r.mats[k].needsUpdate = true; }
   // night window glass mirrors the room: the bright hero screen reflects into the two-shot
   glass.material = new THREE.MeshStandardMaterial({ color: '#2E3A4E', metalness: 1, roughness: 0.05, envMap: probe, envMapIntensity: 0.6, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-  walnut.envMap = probe; walnut.envMapIntensity = 1.0; walnut.clearcoat = 0.5; walnut.clearcoatRoughness = 0.22; walnut.needsUpdate = true;
+  walnut.envMap = probe; walnut.envMapIntensity = 0.5; walnut.clearcoat = 0.3; walnut.clearcoatRoughness = 0.22; walnut.needsUpdate = true;
 
   // ---------------------------------------------------------------- camera
   const camera = new THREE.PerspectiveCamera(35, 16 / 9, 0.03, 40);
@@ -345,9 +360,9 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const film = {
     size: [1920, 1080], tone: 'aces', exposure: 0.95,
     ao: { radius: 0.16, thickness: 1, distanceExponent: 1.5, scale: 1, samples: 16, intensity: 0.85 },
-    dof: { focus: S.focus, aperture: S.aperture, maxblur: S.maxblur },
+    dof: { focus: V(...S.pos).distanceTo(V(...S.subject)), aperture: S.aperture, maxblur: S.maxblur },
     bloom: { strength: 0.22, radius: 0.55, threshold: 1.0 },
     grade: { vignette: 0.32, grain: 0.022, ca: 0.0012, lift: [0.003, 0.006, 0.012], seed: 6 },
   };
-  return { scene, camera, bloom: null, exposure: film.exposure, film, handles: { robots, hero, screenMat, screenLight: sl, shot } };
+  return { scene, camera, bloom: null, exposure: film.exposure, film, handles: { robots, hero, screenMat, screenLight: sl, setScreenSource, shot } };
 }

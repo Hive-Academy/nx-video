@@ -145,14 +145,54 @@ Sheet: `snapshots/lookdev/workspace-sheet.jpg` (2880 × 590, three labelled 960 
 
 Render cost after round 2 (SwiftShader-free GPU, 1920×1080): a ~38–64 ms, b ~35–61 ms, c ~34–61 ms per frame. The first scene in a run spikes to 100–450 ms (shader compilation). Office and desert are unchanged: PSNR inf against the pre-kit baselines.
 
+## Round 3: orchestrator review of phase 2 (d0ee888)
+
+Viewed at 1280 px. The 4:5 crops are centre crops (864×1080 out of 1920×1080; c is offset to the face) in `snapshots/lookdev/workspace-45.jpg`. The 16:9 sheet is `workspace-sheet.jpg`.
+
+| # | Review point | What changed | Result |
+|---|---|---|---|
+| 1 | Balls on chairs | `ROBOT_SCALE` 0.38 → 0.25 (ball radius ≈ 0.21, so the head is about one chair-back wide). The chairs come from the new kit helper `loungeChair` with a 6 cm cushion. Each robot is placed at the raycast seat height (`userData.seatY`), sunk 3 cm toward the chair back, and yawed with its chair. Pose `work` (pitch −0.12) in a, `talk` (three-quarter toward camera) in b and c. | b: both robots visibly sit in the chairs, against the backs, above the desk line. **Arms and hands: FAIL.** The rig has no arms, hands or torso, and the rules forbid rebuilding a character. Nothing can reach the keyboard. |
+| 2 | Shell shading | `reshadeRobot` `shell: '#CCC3B5'` (about 0.78 off-white), clearcoat with the room probe as envMap, `env 0.9`, `faceLight: 0` (the agent-colour face light tinted the small shells). `smooth: π/4` rebuilds the normals with crease angles. | Shell peak in c is 194,176,165 (under clip). There is a warm key-to-shadow gradient and a visible probe reflection. **Rim silhouette: FAIL at close-up in c.** Crease normals fix the shading but not the silhouette, and the rig has no subdivision. The inner visor rim still shows polygon steps. |
+| 3 | Faces | `glass: 0.55`: dark glass visor (#07080B, roughness 0.06, clearcoat 1, env × 2.2) with the agent colour as an emissive tint. `eyeBoost 2.6` feeds bloom. Claude gets `faceBoost 1.25`. | Pass. Glossy dark green and terracotta glass with a probe reflection; the eyes bloom slightly. The wall-screen reflection is faint: the probe is baked without the screen content. |
+| 4 | Shot a | Camera (0, 1.3, 2.2) → (0, 0.9, −0.9), 28 mm, focus on the screen, aperture 0.0025. Bezel 7 mm (RoundedBox). The screen rect light (18, cool) sits 8 cm in front of the screen and 16 cm up, plus a back-bias rect and a side spill. The pendant moved to x −1.25, z 0.95. Environment 0.45 → 0.62, warm key spot 9. Slats re-tinted (#7A5A40, env 0.25). | Pass: the screen is sharp and the headline reads at 1280 px. The shells take about 15 % of the frame. The slat wall measures about 34 sRGB (≈ 13 %). The pendant is clear of the screen. Weak: the shells are unfocused backs with no chair backs visible, the desks read red-brown, and the slats pick up a cool grey cast from the screen light. |
+| 5 | Shot b | Three-quarter view from front-left, (−0.32, 0.98, 2.24) → (0.04, 0.72, 0), 24 mm, focus on the robots. | Pass: both robots in three-quarter view and the screen in one frame, Claude frame-left and Codex frame-right (the same in a). **City window: FAIL.** The line rule puts the cameras on the window side, so the window is behind the lens. Its screen reflection is not in b either. The screen headline is soft (depth of field) but readable at 1280 px. The cushion reads as a grey box on the lap. |
+| 6 | Shot c | Kept. Reframed (0.02, 0.8, 1.56) → Codex, 42 mm. The neighbour sliver is gone. | Pass apart from the rim silhouette in point 2. |
+| 7 | Screen slot | `handles.setScreenSource(textureOrVideoOrCanvas)` swaps the screen map (video → `VideoTexture`, canvas → `CanvasTexture`, sRGB). The landing mockup is still the default. | Pass. Not exercised with a video yet. |
+| 8 | Shared chair | `loungeChair({ height, cushion, cushionColor })` in `look-kit.js` loads the same `mid_century_lounge_chair` glTF and returns a Group (origin on the floor under the seat, facing −z, `userData.seatY`). | Pass for the workspace. The vortex and desert scenes are not touched here; they belong to other lanes. |
+
+### Honest scores
+
+A known defect is scored as a fail, not a 4.
+
+| Shot | 16:9 | 4:5 crop |
+|---|---|---|
+| a | Pass on the hero screen, light, focus and framing. Fail: no body or hands visible (the rig). | **Fail.** The centre crop cuts the headline ("E RAIL. NINE") and both robots. 4:5 needs its own camera, not a crop. |
+| b | Fail: no arms (rig) and no window. Otherwise pass: staging, line, seated robots, screen in frame. | **Fail.** The crop keeps Codex's chair and the screen but cuts Claude's face at the edge. |
+| c | Fail: rim silhouette steps at close-up. Otherwise pass: glass visor, shell gradient, depth of field. | Pass apart from the same rim defect. The face fills the crop. |
+
+Not ready for the user. The remaining fails are either rig limits (arms, rim silhouette) or need a separate 4:5 camera per shot.
+
+Render cost (1920×1080, film chain): a 162–286 ms, b 79–194 ms, c 104–165 ms per frame. That is up from about 60 ms in round 2: the extra rect light, the key spot with a 1024 shadow map, and the chair glTF. Office and desert are unchanged: PSNR inf against the pre-kit baselines.
+
+### Kit API changes since ffe3092
+
+- `reshadeRobot` gains `glass` (default 0 = off): a dark glass visor with an agent-colour emissive tint of this strength.
+- `reshadeRobot` gains `smooth` (default 0 = off): a crease angle in radians. It rebuilds the robot meshes' normals once with `toCreasedNormals`.
+- New export `loungeChair({ height = 0.737, cushion = 0, cushionColor = '#3B3733' })` → Promise of a Group with `userData.seatY`.
+- `look-kit.js` now imports `craft.js` (`glb`, `fit`, `shadows`), `RoundedBoxGeometry` and `BufferGeometryUtils`. `craft.js` does not import the kit, so there is no cycle.
+- Workspace only: the handles gain `setScreenSource`, and the module exports `ROBOT_SCALE`.
+
 ## Open defects
 
-1. **The shells stay bright** in b and c. They no longer clip, but a lower key would add more form.
-2. **The cool screen glow on the faces is subtle in b.** The warm lamps still dominate the desk tops. A stronger spill would turn the shells blue.
-3. **No arms or hands** (rig limitation, see round 2 point 3).
-4. **The pendant just touches the screen's top bezel in a.** Fix: move it toward +z by about 0.15, or cut its cord further.
-5. **Timing spikes on the first scene in a run** (213–1060 ms). These are likely shader compilation. The harness could add one more warm-up frame.
-6. **`__lookdevInfo.calls/tris` report 1/1** on the film path, because `renderer.info` resets per pass. This affects only the reported numbers.
+1. **No arms, hands or torso** (rig limitation). Seated reads as "head in a chair". It needs a rig with arms, which is a decision for the parent, not this lane.
+2. **The visor rim silhouette shows polygon steps in c.** Normals cannot fix it. Options: a subdivided copy of the rig, or keep c wider than an MCU.
+3. **4:5 crops fail for a and b.** Each needs its own 4:5 camera.
+4. **No city window in b** (it is behind the camera because of the line rule). Depth comes from the room and the screen instead.
+5. **The screen is not in the probe**, so its reflection in the visor is faint. Re-baking the probe with the screen lit would fix it.
+6. **The slats take a cool grey cast** from the screen light; the desks read red-brown in a.
+7. **The cushion reads as a grey box** in b. Match it to the leather or drop it and raise the seat instead.
+8. **Render cost rose** to 80–290 ms per frame (see above). The first scene in a run still spikes with shader compilation.
+9. **`__lookdevInfo.calls/tris` report 1/1** on the film path, because `renderer.info` resets per pass. This affects only the reported numbers.
 
 ## Adopting the kit in the desert and vortex scenes
 

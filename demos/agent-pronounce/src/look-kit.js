@@ -29,6 +29,9 @@
 //          reshadeRobot(robot, opts)                   clearcoat shell, glossy visor, lit face light
 //                    opts: env, faceLight, eyeBoost, shell (hex), envMap (texture for shell/feet/visor),
 //                          faceBoost (emissive multiplier on the visor; 1 = unchanged)
+//                          glass (0 = off; >0 = dark glass visor, agent-colour emissive tint of that strength),
+//                          smooth (0 = off; crease angle in rad for smoothed normals on this robot's meshes)
+//          loungeChair({ height, cushion, cushionColor })  the shared swivel chair (async), userData.seatY
 //          roomProbe(renderer, scene, { position, size, near, far, sigma, hide })
 //                                                      PMREM cube of the set itself (call after
 //                                                      whenTexturesReady); `hide` objects are left out
@@ -43,9 +46,12 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { contactShadowTexture } from './textures.js';
+import { glb, fit, shadows } from './craft.js';
 
 const TONES = { aces: THREE.ACESFilmicToneMapping, agx: THREE.AgXToneMapping, neutral: THREE.NeutralToneMapping };
 export const FILM_DEFAULTS = {
@@ -205,7 +211,7 @@ export function environment(renderer, scene, hdriTex, { intensity = 0.4, rotatio
 // envMap (optional): a roomProbe() texture so the shell reflects the real room and screen.
 // faceBoost (optional, default 1): multiplies the visor's emissive colour so dark-tinted faces
 // (e.g. #D97757 at the rig's 0.24 tint) read as their agent colour under film tone mapping.
-export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, shell = null, envMap = null, faceBoost = 1 } = {}) {
+export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, shell = null, envMap = null, faceBoost = 1, glass = 0, smooth = 0 } = {}) {
   const m = robot.mats;
   const phys = (src, extra) => {
     const p = new THREE.MeshPhysicalMaterial({
@@ -228,7 +234,17 @@ export function reshadeRobot(robot, { env = 1, faceLight = 0.5, eyeBoost = 1.6, 
   // apply() rewrites emissiveIntensity every pose, so brighten through the emissive colour instead
   m.eyes.emissive.multiplyScalar(eyeBoost);
   m.glow.emissive.multiplyScalar(1.3);
+  if (glass > 0) {
+    // dark glossy glass visor: near-black base, the agent colour only as an emissive tint, mirror clearcoat
+    Object.assign(m.screen, { roughness: 0.06, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: env * 2.2 });
+    m.screen.color.set('#07080B');
+    m.screen.emissive.set(robot.color).multiplyScalar(glass);
+  }
   if (faceBoost !== 1) m.screen.emissive.multiplyScalar(faceBoost);
+  if (smooth > 0) {
+    // crease-angle normals on this robot's own geometry copies: removes faceting at close-up, keeps hard rims
+    robot.root.traverse((o) => { if (o.isMesh && o.geometry.attributes.normal && !o.userData.smoothed) { o.geometry = toCreasedNormals(o.geometry, smooth); o.userData.smoothed = true; } });
+  }
   let light = null;
   if (faceLight > 0) {
     light = new THREE.PointLight(robot.color, faceLight, 1.2, 2);
@@ -258,6 +274,33 @@ export function roomProbe(renderer, scene, { position = new THREE.Vector3(0, 1, 
 // ------------------------------------------------------------------ lights
 let rectInit = false;
 // A screen's emitted light. w, h in metres (match the panel); intensity ~2..12 (nits-like).
+// The shared swivel chair (Poly Haven mid_century_lounge_chair, CC0; the demo manifest fetches it), so the
+// workspace, vortex and desert scenes seat the robots in the identical chair. Returns a Group whose origin
+// is on the floor under the seat, facing -z, with userData.seatY = top of the seat (plus cushion) in world
+// units after fitting. height is world units (real 1.17 m x the scene scale); cushion adds a seat pad.
+export async function loungeChair({ height = 1.17 * 0.63, cushion = 0, cushionColor = '#3B3733' } = {}) {
+  const src = await glb('workspace/mid_century_lounge_chair/mid_century_lounge_chair_1k.gltf');
+  const chair = shadows(fit(src.clone(true), { h: height }));
+  chair.rotation.y = Math.PI;
+  const g = new THREE.Group();
+  g.add(chair);
+  g.updateMatrixWorld(true);
+  const ray = new THREE.Raycaster(new THREE.Vector3(0, height * 2, -0.02), new THREE.Vector3(0, -1, 0));
+  const hit = ray.intersectObject(chair, true)[0];
+  let seatY = hit ? hit.point.y : height * 0.37;
+  if (cushion > 0) {
+    const w = height * 0.46;
+    const pad = new THREE.Mesh(new RoundedBoxGeometry(w, cushion, w * 0.92, 3, cushion * 0.45),
+      new THREE.MeshPhysicalMaterial({ color: cushionColor, roughness: 0.85, sheen: 0.6, sheenRoughness: 0.5, sheenColor: new THREE.Color('#8A817A') }));
+    pad.position.set(0, seatY + cushion * 0.5 - 0.004, 0.0);
+    pad.castShadow = pad.receiveShadow = true;
+    g.add(pad);
+    seatY += cushion - 0.004;
+  }
+  g.userData.seatY = seatY;
+  return g;
+}
+
 export function screenLight(w, h, color = '#CFE0FF', intensity = 6) {
   if (!rectInit) { RectAreaLightUniformsLib.init(); rectInit = true; }
   return new THREE.RectAreaLight(color, intensity, w, h);
