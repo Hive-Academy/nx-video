@@ -2042,6 +2042,56 @@
       "licence": "CC0-1.0",
       "changes": "Rotated in scene",
       "sha256": "92ed4f77d7b453e7a94c3198d83af3a7002d04556945c56e1e99d601a499df92"
+    },
+    {
+      "path": "assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/worn_rock_natural_01/worn_rock_natural_01_diff_2k.jpg",
+      "title": "Worn Rock Natural 01 - Diffuse (albedo)",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Tinted and tiled on the Ptah colossus statue",
+      "sha256": "084e528a8b63684cf6cd9c9c1d44cef32a8f4c9e8404394a4a1a40c70cbf000d"
+    },
+    {
+      "path": "assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/worn_rock_natural_01/worn_rock_natural_01_nor_gl_2k.jpg",
+      "title": "Worn Rock Natural 01 - Normal (GL)",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Tinted and tiled on the Ptah colossus statue",
+      "sha256": "51fb7b64eda0d68babd621c43a06d89300d789f27fbe63d917cd7b6ab93365cb"
+    },
+    {
+      "path": "assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/worn_rock_natural_01/worn_rock_natural_01_rough_2k.jpg",
+      "title": "Worn Rock Natural 01 - Roughness",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Tinted and tiled on the Ptah colossus statue",
+      "sha256": "1aac2cf72392f1207b5dbf880cbe0ef58d4c7eecd9dadc12640f031670969395"
+    },
+    {
+      "path": "assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/worn_rock_natural_01/worn_rock_natural_01_ao_2k.jpg",
+      "title": "Worn Rock Natural 01 - Ambient occlusion",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Tinted and tiled on the Ptah colossus statue",
+      "sha256": "6374bfebfdabb1c9f11f2bcb21bd4fbdb436b9c6b658964b212b4d49f70bbe74"
+    },
+    {
+      "path": "assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_disp_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/worn_rock_natural_01/worn_rock_natural_01_disp_2k.jpg",
+      "title": "Worn Rock Natural 01 - Displacement",
+      "author": "Rob Tuytel, Dimitrios Savva",
+      "source": "https://polyhaven.com/a/worn_rock_natural_01",
+      "licence": "CC0-1.0",
+      "changes": "Tinted and tiled on the Ptah colossus statue",
+      "sha256": "39f2680f1c09926cd6350e4e3e39d6e203c2394708a97559c4ae6536dcbb10ea"
     }
   ]
 }
