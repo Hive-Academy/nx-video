@@ -81,6 +81,69 @@ full authority to fetch free GLB models, HDRIs, textures and sounds through the
 6. **Order of work.** Lane A lands the format, timing and `app-window` first.
    Lanes B and C start after that and snapshot at 1920 × 1080.
 
+## Direction v4 (set by the user on 2026-11-13 — overrides any conflicting text above and below)
+
+The user watched the v3 cut in the studio. Verbatim:
+
+1. "for the studio can u do a new scene where they both in an office with a bigger screen
+   and more wider/realistic view of ptah so the angle appears as 2 developers settings near
+   each other in a workspace or a 2 close desks"
+2. "also rather ptah saying `i made the world by speaking it name ` and the rest of the
+   sentences we can focus on more of having same idea of wide screen and it explain the
+   features we have on ptah while showing the demo and also the agents working in the
+   background , also the caouch drop but the 2 agent is already standing , i reckon you can
+   do that with opus rather using the cli tools, as the output so far is so basic and not
+   what i'm imagining with cutting edge 3d modeling capabilities and also the ability to get
+   free assets online we should deliver more of unqiue experience not that old looking 90s
+   game ?"
+
+Rules. Items marked (orchestrator) are the orchestrator's reading, not the user's words.
+
+1. **Workspace opening.** The sofa office is replaced by a workspace: the two robots sit in
+   office chairs at two close desks, with one big hero screen that shows a real, wide view
+   of Ptah. Lines N1–N5, S2, O1 and O3 play here. The landing insert becomes a push into
+   the hero screen; the storm starts on the hero screen.
+2. **Seats (orchestrator).** The two office chairs replace the sofa in the vortex and in the
+   desert landing.
+3. **Landing continuity.** Nobody stands in the desert before the seats land. The robots
+   arrive in their chairs, land seated, and stand up only when the giant rises.
+4. **Ptah presents the product.** The mythic lines are cut (D1 "I made the world by speaking
+   its name…", D3 "Look around. Many crews…"). Ptah lights a monumental wide screen in the
+   desert (the same wide-screen idea as the workspace), the tour footage plays on it, and
+   he explains one feature per clip (lines F1–F4). Agent crews keep working in the
+   background of these shots, in depth, never crossing each other. The camera may push in
+   until the screen nearly fills the frame, but the 3D world stays visible at the edges;
+   the full-bleed 2D showcase of v3 is retired.
+5. **Look.** The user rejected the look as "that old looking 90s game". Every scene moves
+   to the look kit: detailed CC0 models with PBR textures, image-based lighting, soft and
+   contact shadows, ambient occlusion, depth of field, filmic tone mapping. The series
+   robots stay, re-shaded. Low-poly packs are background filler only.
+6. **Who builds it.** The user asked for Opus instead of CLI lanes for the visual work.
+   Scene work runs in Opus subagents; CLI lanes are kept for audio, timing and independent
+   review.
+7. **Gates.** Look-dev stills for each scene are approved by the user before animation. The
+   new lines below are approved by the user before any voice is generated.
+
+### Script v4 (proposed 2026-11-13, waiting for the user's approval)
+
+Running order: N1 N2 N3 N4 N5 S2 O1 O3 (workspace), then O4 D1 D2 F1 F2 F3 F4 D5 D6
+(desert). Office lines keep their v3 wording and takes; "laptop" in their directions now
+means the hero screen. No new line contains the word "Ptah" (TTS mispronounces it).
+
+| id | speaker | line | take |
+| --- | --- | --- | --- |
+| O4 | Ptah | "Old." | existing |
+| D1 | Ptah | "Say my name properly. Then look at what I build." | new |
+| D2 | Claude | "Respectfully… why does the god of builders care about coding agents?" | existing |
+| F1 | Ptah | "One command center. Every coding agent you already pay for, in one window." | new, over `tour-1` |
+| F2 | Ptah | "Give them one plan. They build in parallel, each in its own lane." | new, over `tour-2` |
+| F3 | Ptah | "Nothing ships unchecked. You review every change before it lands." | new, over `tour-3` |
+| F4 | Ptah | "And every run is tracked. Time, tokens and cost." | new, over `tour-4` |
+| D5 | Ptah | "Same craft as my builders. Now it runs on your desktop." | new |
+| D6 | Codex | "…okay. That's actually cool." | existing |
+
+D3 is cut. Each tour clip is retimed to the length of its line plus 0.8 s.
+
 ## Direction v3 (set by the user on 2026-11-12 — overrides any conflicting text above and below)
 
 The user's review of the 16:9 draft (`renders/preview-v2-draft.mp4`), verbatim:

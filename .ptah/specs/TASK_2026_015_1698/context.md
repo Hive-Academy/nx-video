@@ -431,3 +431,31 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   id fragment in `notes/review-grok-v3.md` and in this log.
 - Committed the accepted v3 work as a restore point (no media): timing, overlays, audio
   scripts, vortex, desert base, office round 2, notes.
+
+### 2026-11-13 — direction v4 (user, after watching v3 in the studio)
+
+- User (verbatim): "also rather ptah saying `i made the world by speaking it name ` and the
+  rest of the sentences we can focus on more of having same idea of wide screen and it
+  explain the features we have on ptah while showing the demo and also the agents working in
+  the background , also the caouch drop but the 2 agent is already standing , i reckon you
+  can do that with opus rather using the cli tools, as the output so far is so basic and not
+  what i'm imagining with cutting edge 3d modeling capabilities and also the ability to get
+  free assets online we should deliver more of unqiue experience not that old looking 90s
+  game ?"
+- Written into `SPEC.md` as "Direction v4" with a proposed script (D1 rewritten, D3 cut, new
+  feature lines F1–F4 over the four tour clips, D5 reworded). The lines are my wording and
+  wait for the user's approval; no voice is generated before that.
+- Executor change, on the user's instruction: visual scene work moves from CLI lanes to Opus
+  subagents. This overrides the global "prefer non-Claude lanes" preference for this task's
+  3D work only (my reading). CLI lanes stay for audio, timing and independent review.
+- Stopped the Codex workspace look-dev lane `253bd857`. Its sheet confirmed the complaint:
+  flat low-poly room, black hero screen, camera inside the monitor in two of three stills.
+  Kept as `snapshots/lookdev/workspace-sheet.jpg` for the before/after.
+- Started an Opus look-dev subagent (workspace stills a/b/c, look kit: CC0 PBR models,
+  HDRI lighting, AO, depth of field, filmic tone mapping, re-shaded series robots, opt-in
+  post path in `scene.js`) → `notes/opus-workspace-lookdev.md`,
+  `snapshots/lookdev/workspace-sheet.jpg`.
+- Next after the user approves the workspace look: desert look-dev (monument screen, Ptah
+  presenting, crews in the background, seated landing), then animation, voice, timing.
+- Seat-drop bug the user reported (seat falls while both robots already stand) is rule 3 of
+  direction v4.
