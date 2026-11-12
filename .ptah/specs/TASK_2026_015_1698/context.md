@@ -473,3 +473,20 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   branch. The look kit comes from the workspace look-dev subagent in the main checkout; when
   it is committed I message the desert child to merge it. Children must not edit
   `scene.js`, `robot.js`, `assets.js` or `lighting.js`.
+- 2026-11-12 22:13 UTC: the Opus workspace look-dev subagent was stopped by the budget
+  monitor at 132,680 context tokens. It finished the research (engine findings, chosen
+  Poly Haven CC0 assets, layout and post-stack plan) and wrote no repository file. Its notes
+  are in `.ptah/subagent-handoffs/toolu_01Lr3JVswDgwnvE612ayu7F6.md`; the handoff record is
+  marked consumed.
+- Replacement: child session `0e86981c` "Ep6 v4 workspace + look kit" (model `opus`, effort
+  medium), branch `demo/ep06-v4-workspace-look`, worktree
+  `.claude-worktrees/demo-ep06-v4-workspace-look-35499056160d`. It continues from those
+  notes in two phases: (1) `src/look-kit.js`, the opt-in `film` post path and `workspace-b`,
+  committed and reported so the desert child can adopt the kit; (2) `workspace-a`,
+  `workspace-c`, the sheet and `notes/opus-workspace-lookdev.md`. So the look kit now comes
+  from a child branch, not from the main checkout.
+- Removed the stopped Codex lane's uncommitted leftovers from the main checkout (lookdev
+  wiring, manifest and credits entries, the rejected `src/look-workspace.js`, a notes
+  skeleton) so the child branches merge cleanly. A copy is in
+  `D:/tmp/ep06-codex-workspace-leftovers` (patch plus the two files). The rejected sheet is
+  kept as `snapshots/lookdev/workspace-sheet-rejected.jpg` (git-ignored).

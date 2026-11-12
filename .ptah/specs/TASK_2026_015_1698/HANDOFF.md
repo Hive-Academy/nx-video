@@ -1,6 +1,6 @@
 # HANDOFF — TASK_2026_015_1698 (Episode 6 "The P Is Not Silent")
 
-Updated 2026-11-12 22:15 UTC (session 4, direction v3). Read `context.md` for the full
+Updated 2026-11-12 22:20 UTC (session 4, direction v4). Read `context.md` for the full
 decision log; this file only records the current state.
 
 ## Goal
@@ -16,9 +16,8 @@ PR #6 (stacked on PR #5). `SPEC.md` in the demo folder is the binding contract; 
   Cursor cut, three separated crews, four full-bleed tour clips, showcase music bed.
 - The user is watching the film in the HyperFrames studio (http://localhost:3002/, started
   with `preview --background .`). Stop it when they are done.
-- New user request: restage the opening as two developers at two close desks with one big,
-  realistic Ptah screen. `SPEC.md` does not describe this yet; update it once the user
-  approves the look.
+- Direction v4 is in SPEC.md (committed as 7e1bf42). Three Opus child sessions build the
+  looks; see the next section.
 
 ## Direction v4 (2026-11-13) and executors
 
@@ -27,13 +26,21 @@ for the visual work. `SPEC.md` section "Direction v4" is binding: workspace open
 desks and a hero screen, chairs instead of the sofa, seated landing, Ptah presenting the
 product on a monumental wide screen with crews working behind, and a look kit for every scene.
 
-1. Running: Opus look-dev subagent for the workspace (stills a/b/c and the look kit) →
-   `notes/opus-workspace-lookdev.md`, `snapshots/lookdev/workspace-sheet.jpg`. The Codex
-   look-dev lane `253bd857` was stopped; its sheet is the rejected baseline.
+1. Running, three Opus child sessions (model opus, effort medium), each on its own branch
+   and worktree under .claude-worktrees/, committing locally and not pushing:
+   - 0e86981c, branch demo/ep06-v4-workspace-look: src/look-kit.js (opt-in film post
+     path), src/look-workspace.js, stills workspace-a/b/c, notes/opus-workspace-lookdev.md.
+     It reports after phase 1 (kit + workspace-b); then message 5ee5ecde to merge the kit.
+   - 5ee5ecde, branch demo/ep06-v4-desert-look: src/look-desert4.js, stills desert4-a..d,
+     notes/opus-desert-lookdev.md.
+   - 3b2b1544, branch demo/ep06-v4-ptah-colossus: src/ptah-colossus.js, stills
+     colossus-a..c, notes/opus-ptah-colossus.md.
+   Verify each still set by eye, merge the branches into demo/ep06-p-is-not-silent, unify
+   the office chair model, push. The Codex lane 253bd857 was stopped; its sheet is the
+   rejected baseline (snapshots/lookdev/workspace-sheet-rejected.jpg).
 2. Waiting on the user: approval of the workspace stills, and of the proposed script v4
    (D1, F1–F4, D5 are new wording; no voice is generated before approval).
-3. Next: Opus desert look-dev (monument screen, seated landing, crews in depth), then
-   animation per scene, then voice (`generate.mjs`), `build-timing.mjs`, `check --json`,
+3. Next, after approval: animation per scene, then voice (`generate.mjs`), `build-timing.mjs`, `check --json`,
    a draft render to `renders/preview-v4-draft.mp4`, commit and push.
 4. The desert list below is superseded where direction v4 changes the scene; keep it as
    a checklist of defects not to repeat.
