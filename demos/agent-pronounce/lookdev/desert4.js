@@ -23,7 +23,7 @@ initCraft(renderer);
     const shot = q.get('shot') || 'b';
     const post = q.get('post') || 'preview';
     const assets = await loadAssets();
-    const look = await buildDesert4Look(assets, renderer, { shot, aspect: W / H });
+    const look = await buildDesert4Look(assets, renderer, { shot, aspect: W / H, ptahQuality: q.get('ptahq') || 'high' });
     const { scene, camera } = look;
     await whenTexturesReady();
     // the look kit's film chain; post=base drops the two costly passes (AO, DOF) for fast iteration

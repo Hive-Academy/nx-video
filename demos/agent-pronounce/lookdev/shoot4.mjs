@@ -31,7 +31,7 @@ const server = createServer(async (req, res) => {
 }).listen(0);
 const port = server.address().port;
 const executablePath = [process.env.CHROME_PATH, 'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome'].filter(Boolean).find((c) => existsSync(c));
-const browser = await puppeteer.launch({ executablePath, headless: true, args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--use-angle=default'] });
+const browser = await puppeteer.launch({ executablePath, headless: true, protocolTimeout: 900000, args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--use-angle=default'] });
 await mkdir(OUT, { recursive: true });
 let failed = 0;
 try {
