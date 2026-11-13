@@ -24,14 +24,14 @@ import * as THREE from 'three';
 import { assetUrl } from './assets.js';
 import { hash } from './util.js';
 
-const NATIVE_HEIGHT = 24.05; // measured: crown of the cap at 24.05
+const NATIVE_HEIGHT = 24.08; // crown of the cap: head pivot 20.07 + 3.04 local x HEAD_SCALE 1.32
 // The figure is sculpted in a figure frame (soles at y 0, about 19 m tall) and mapped to statue space
 // with a non-uniform scale: broader (x 1.3), deeper (z 1.2) and shorter (y 0.833), for monumental mass.
 const FIG = { y0: 5.4, sx: 1.3, sy: 0.8333, sz: 1.2 }; // y0: soles = top of the maat pedestal
 const Y0 = FIG.y0;
 const figY = (y) => FIG.y0 + y * FIG.sy;
-const HEAD_SCALE = 1.2, SCEPTRE_SCALE = 1.3;
-const HEAD_PIVOT = new THREE.Vector3(0, figY(18.0), 0.45 * FIG.sz);
+const HEAD_SCALE = 1.32, SCEPTRE_SCALE = 1.3;
+const HEAD_PIVOT = new THREE.Vector3(0, figY(17.6), 0.45 * FIG.sz); // low enough that the chin and beard sit on the collar
 const GRIP = new THREE.Vector3(0, 15.7, 2.25); // between the fists, in front of the chest
 const PLINTH_TOP = 5.4;
 
@@ -291,8 +291,8 @@ function polygonize(f, box, cell, paint, C = 4, aoR = 0) {
 
 // ---------------------------------------------------------------- the head
 // Local frame: origin at the neck pivot, +Y up, +Z out of the face.
-const EYE = { x: 0.37, y: 1.735, z: 0.925 };
-const capEdge = (z) => 1.05 + 1.17 * sstep(-0.35, 0.55, z);
+const EYE = { x: 0.37, y: 1.735, z: 0.955 }; // eyeballs proud enough to read past the lower lid from a low camera
+const capEdge = (z) => 1.05 + 1.05 * sstep(-0.35, 0.55, z); // front edge at 2.10, just above the carved brow
 const HEAD_CHIPS = [
   [0.2, -0.76, 0.9, 0.07], [-0.21, -0.74, 0.62, 0.06],
   [1.1, 2.0, -0.08, 0.06], [-1.08, 1.25, 0.1, 0.05], [0.09, 1.31, 1.34, 0.03], [-0.55, 2.9, -0.4, 0.09],
@@ -315,41 +315,47 @@ function beardSDF(x, y, z) {
   let d = sqrt(ox * ox + oy * oy + oz * oz) + min(max(qx, qy, qz), 0) - r;
   // plaited bands: narrow horizontal grooves
   const c = 0.5 + 0.5 * cos((2 * Math.PI * (y + 0.02)) / 0.115);
-  d += 0.014 * c * c * c * c * c * c * sstep(0.42, 0.3, y);
+  d += 0.012 * c * c * sstep(0.42, 0.3, y);
+  // a shallow centre parting and soft vertical strands, so the beard reads as plaited hair, not a block
+  d += 0.018 * exp(-(x * x) / 0.0009) * sstep(0.42, 0.3, y) + 0.006 * cos((2 * Math.PI * x) / 0.085);
   return d;
 }
 function headSDF(x, y, z) {
   const ax = abs(x);
   const base = headBase(x, y, z);
-  let d = smin(base, taper(x, y, z, 0, -1.1, -0.12, 0, 0.9, -0.15, 0.86, 0.76), 0.35); // stocky neck
+  let d = smin(base, taper(x, y, z, 0, -1.1, -0.12, 0, 0.9, -0.15, 0.76, 0.64), 0.28); // neck, narrower than the jaw so the jawline casts a shadow
   if (z > 0.15 && y > 0.25 && y < 2.45 && ax < 1.0) {
     d = smin(d, ell(x, y, z, 0, 0.58, 0.78, 0.3, 0.2, 0.22), 0.18); // chin
     d = smin(d, ell(ax, y, z, 0.47, 1.42, 0.7, 0.32, 0.28, 0.3), 0.25); // cheekbones
     d = smin(d, ell(ax, y, z, 0.37, 1.95, 0.84, 0.38, 0.1, 0.12), 0.2); // brow band
     d = smax(d, -ell(ax, y, z, 0.37, 1.745, 1.04, 0.27, 0.14, 0.17), 0.13); // socket
-    d = smin(d, ell(ax, y, z, 0.37, 1.85, 0.945, 0.255, 0.06, 0.1), 0.08); // upper lid
-    d = smin(d, ell(ax, y, z, 0.37, 1.632, 0.925, 0.23, 0.04, 0.075), 0.08); // lower lid
+    d = smin(d, ell(ax, y, z, 0.37, 1.875, 0.945, 0.255, 0.05, 0.1), 0.07); // upper lid: open almond eye, not a slit
+    d = smin(d, ell(ax, y, z, 0.37, 1.605, 0.9, 0.23, 0.032, 0.06), 0.05); // lower lid, set back so a low camera sees over it
     d = smin(d, taper(x, y, z, 0, 1.86, 0.98, 0, 1.32, 1.22, 0.075, 0.12), 0.1); // nose bridge
     d = smin(d, ell(x, y, z, 0, 1.25, 1.2, 0.15, 0.115, 0.13), 0.06); // nose tip
     d = smin(d, ell(ax, y, z, 0.15, 1.24, 1.09, 0.1, 0.09, 0.1), 0.05); // nostril wings
     d = smax(d, -ell(ax, y, z, 0.075, 1.155, 1.16, 0.045, 0.03, 0.05), 0.02); // nostrils
-    d = smin(d, ell(x, y, z, 0, 0.975, 1.015, 0.3, 0.095, 0.14), 0.06); // upper lip
-    d = smin(d, ell(x, y, z, 0, 0.852, 0.995, 0.26, 0.1, 0.14), 0.06); // lower lip
-    d = smax(d, -ell(x, y, z, 0, 0.912, 1.08, 0.27, 0.014, 0.1), 0.02); // mouth line
-    d = smax(d, -ell(ax, y, z, 0.285, 0.915, 0.97, 0.04, 0.035, 0.05), 0.02); // mouth corners
+    d = smin(d, ell(ax, y, z, 0.1, 0.978, 1.012, 0.19, 0.085, 0.13), 0.06); // upper lip: two lobes make the bow
+    d = smin(d, ell(x, y, z, 0, 0.958, 1.0, 0.27, 0.07, 0.12), 0.05); // upper lip body
+    d = smin(d, ell(x, y + 0.6 * x * x, z, 0, 0.858, 0.99, 0.23, 0.095, 0.14), 0.07); // lower lip, full in the middle
+    d = smax(d, -ell(x, y - 0.55 * x * x, z, 0, 0.912, 1.1, 0.25, 0.01, 0.07), 0.025); // mouth line, shallow, corners lift a little
+    // open the almond between the lids down to the inlaid eyeball (the blends above otherwise skin it over)
+    d = smax(d, -ell(ax, y, z, EYE.x, EYE.y, 1.13, 0.205, 0.085, 0.2), 0.012);
   }
-  // skull cap: an offset shell of the head mass above the cap line
-  let cap = smax(base - 0.06, capEdge(z) - y, 0.015);
-  cap = smax(cap, -(base + 0.5), 0.01);
-  cap = smax(cap, -ell(ax, y, z, 0.96, 1.58, 0.06, 0.32, 0.56, 0.36), 0.03); // the cap leaves the ears free
-  d = min(d, cap);
+  // skull cap: the skull itself, swollen by a few mm that ramp in from zero at the cap line, so the cap
+  // hugs the head with no brim band or step; the edge is drawn by the paint, not by a ridge
+  const capT = sstep(capEdge(z), capEdge(z) + 0.3, y);
+  d = min(d, max(base - 0.02 * capT, capEdge(z) - y)); // only above the cap line, so the face carving stays open
+  if (y > 0.9) d = carve(d, abs(y - capEdge(z)) - 0.008, 0.014, 0.006); // a crisp incised line where the cap meets the brow
+  // a broad trapezius flare at the root of the neck, so the neck grows out of the shoulders, not a tube out of the collar
+  d = smin(d, ell(x, y, z, 0, -0.98, -0.1, 1.45, 0.32, 0.95), 0.45);
   if (ax > 0.6 && y > 1.0 && y < 2.2 && z > -0.45 && z < 0.4) {
     d = smin(d, ell(ax, y, z, 0.96, 1.58, 0.06, 0.13, 0.4, 0.25), 0.06); // ear
     d = smax(d, -ell(ax, y, z, 1.07, 1.56, 0.1, 0.07, 0.27, 0.15), 0.04); // concha
   }
   if (y < 0.75 && ax < 0.5 && z > 0.3) d = smin(d, beardSDF(x, y, z), 0.12);
   // weathering
-  d += 0.009 * fbm(x * 4, y * 4, z * 4, 11) + 0.0035 * vnoise(x * 15, y * 15, z * 15, 12);
+  d += 0.0055 * fbm(x * 4, y * 4, z * 4, 11) + 0.002 * vnoise(x * 15, y * 15, z * 15, 12);
   d = applyChips(d, x, y, z, HEAD_CHIPS, 0.015);
   return d;
 }
@@ -368,23 +374,24 @@ function headPaint(x, y, z, nx, ny, nz, out) {
     // brow: an arc that sits on the crest of the carved brow band (centre y 1.955)
     const bt = (ax - 0.37) / 0.4;
     const browY = 1.975 - 0.07 * bt * bt - 0.015 * bt;
-    const brow = ax > 0.13 && ax < 0.72 ? abs(y - browY) * 0.9 - 0.011 : 1;
-    gold = min(rim, line, brow);
+    void browY; // no painted brows: the carved brow band reads on its own
+    gold = min(rim, line);
   }
   out[1] = Math.max(-0.04, Math.min(0.04, gold));
   out[2] = 1; // no glow lines on the face: the lips stay stone
   // tint: the skull cap painted in faded lapis, the false beard in a dark blue-black, the face bare
   // limestone with a trace of red ochre in the recesses (the shader wears the paint off the high spots)
-  const onCap = y > capEdge(z) - 0.01 && headBase(x, y, z) > 0.015;
+  const onCap = y > capEdge(z) + 0.004; // painted to the incised line, a clean edge
   const onBeard = y < 0.62 && ax < 0.42 && z > 0.45 && beardSDF(x, y, z) < 0.03;
   const w = 0.9 + 0.12 * fbm(x * 1.3, y * 1.3, z * 1.3, 21);
   if (onCap) {
-    const k = (0.8 + 0.25 * fbm(x * 2.2, y * 2.2, z * 2.2, 22)) * w;
-    out[3] = LAPIS[0] * k; out[4] = LAPIS[1] * k; out[5] = LAPIS[2] * k;
-    out[0] = 0.15;
+    // deep saturated lapis, worn lighter in patches but never grey
+    const k = 0.92 + 0.22 * fbm(x * 2.2, y * 2.2, z * 2.2, 22);
+    out[3] = 0.024 * k; out[4] = 0.075 * k; out[5] = 0.36 * k;
+    out[0] = 0.04;
   } else if (onBeard) {
     const k = (0.85 + 0.2 * fbm(x * 3, y * 3, z * 3, 23)) * w;
-    out[3] = 0.13 * k; out[4] = 0.15 * k; out[5] = 0.26 * k;
+    out[3] = 0.025 * k; out[4] = 0.065 * k; out[5] = 0.3 * k; // the beard in the same lapis as the cap, a shade darker
     out[0] = 0.1;
   } else {
     out[3] = w; out[4] = w * 0.975; out[5] = w * 0.95;
@@ -395,11 +402,11 @@ function headPaint(x, y, z, nx, ny, nz, out) {
 // Figure frame: soles at y = 0. Statue space adds Y0.
 // Keyframes: y, half-width a, half-depth b, centre z, superellipse exponent n.
 const BODY_KEYS = [
-  [0.0, 1.15, 1.2, 0.42, 2.6], [0.7, 1.2, 1.22, 0.38, 2.5], [1.4, 1.12, 0.98, 0.04, 2.3],
-  [4.0, 1.3, 1.02, 0.0, 2.3], [6.0, 1.38, 1.02, -0.02, 2.3], [9.0, 1.72, 1.12, 0.0, 2.4],
-  [11.0, 1.98, 1.25, 0.05, 2.5], [12.5, 2.04, 1.28, 0.08, 2.5], [14.0, 2.22, 1.4, 0.14, 2.6],
-  [15.6, 2.62, 1.42, 0.14, 3.4], [16.8, 2.8, 1.26, 0.05, 4.6], [17.45, 2.74, 1.1, 0.05, 4.6],
-  [17.85, 2.3, 1.0, 0.05, 3.2], [18.2, 1.18, 0.92, 0.12, 2.2], [18.7, 0.84, 0.78, 0.2, 2.1],
+  [0.0, 1.6, 1.38, 0.42, 2.9], [0.7, 1.66, 1.4, 0.38, 2.9], [1.4, 1.6, 1.22, 0.04, 2.9],
+  [4.0, 1.74, 1.24, 0.0, 2.9], [6.0, 1.86, 1.26, -0.02, 2.9], [9.0, 2.12, 1.32, 0.0, 2.9],
+  [11.0, 2.36, 1.4, 0.05, 3.0], [12.5, 2.46, 1.44, 0.08, 3.1], [14.0, 2.64, 1.52, 0.14, 3.3],
+  [15.6, 2.98, 1.52, 0.14, 4.0], [16.8, 3.12, 1.36, 0.05, 5.0], [17.45, 3.02, 1.16, 0.05, 5.0],
+  [17.85, 2.45, 1.02, 0.05, 3.2], [18.2, 1.18, 0.92, 0.12, 2.2], [18.7, 0.84, 0.78, 0.2, 2.1],
 ];
 const BODY_LUT_STEP = 0.02;
 const BODY_LUT = (() => {
@@ -421,17 +428,17 @@ const BODY_LUT = (() => {
   return lut;
 })();
 const COLLAR_C = [0, 18.12, 0.15];
-const COLLAR_R0 = 1.02, COLLAR_ROW = 0.17;
+const COLLAR_R0 = 1.02, COLLAR_ROW = 0.2;
 // worn pigment of the bead rows, inner to outer: gold, lapis, carnelian, turquoise, gold, ...
 // worn pigment of the bead rows, inner to outer; gold rows are gilded beads. Then a row of gold drop beads.
-const LAPIS = [0.2, 0.3, 0.62], OCHRE = [0.66, 0.32, 0.18], TURQ = [0.28, 0.54, 0.5];
+const LAPIS = [0.1, 0.2, 0.62], OCHRE = [0.66, 0.32, 0.18], TURQ = [0.28, 0.54, 0.5];
 const COLLAR_ROWS = ['gold', LAPIS, OCHRE, TURQ, 'gold', LAPIS, TURQ, OCHRE];
 const COLLAR_BEAD = [0.09, 0.15, 0.12, 0.15, 0.09, 0.15, 0.12, 0.15]; // bead length along each row
 const COLLAR_EDGE = COLLAR_R0 + COLLAR_ROWS.length * COLLAR_ROW;
 const COLLAR_LINES = [1, 4, 7]; // row boundaries that carry a thin glowing inlay line
 const COLLAR_DROP = 0.16;
 const BODY_CHIPS = [
-  ...chipsAlong('bchip-sh', 6, [-2.6, 17.0, 0.2], [2.6, 17.0, 0.2], 0.08, 0.2, 0.6),
+  ...chipsAlong('bchip-sh', 6, [-2.95, 17.0, 0.2], [2.95, 17.0, 0.2], 0.08, 0.2, 0.6),
   ...chipsAlong('bchip-ft', 5, [-1.0, 0.75, 1.55], [1.0, 0.75, 1.55], 0.07, 0.16, 0.3),
   ...chipsAlong('bchip-bp', 7, [-0.92, 2.0, -1.72], [0.92, 17.4, -1.72], 0.1, 0.28, 0.3),
   ...chipsAlong('bchip-cl', 8, [-2.0, 16.3, 1.25], [2.0, 16.3, 1.25], 0.05, 0.12, 0.5),
@@ -449,13 +456,13 @@ function torsoSDF(x, y, z) {
   const r = pow(pow(qx, n) + pow(qz, n), 1 / n);
   let d = (r - 1) * min(a, b) * 0.92;
   // feet under the shroud
-  d = smin(d, rbox(x, y, z, 0, 0.36, 0.85, 0.92, 0.36, 0.85, 0.32), 0.4);
+  d = smin(d, rbox(x, y, z, 0, 0.36, 0.85, 1.3, 0.36, 0.9, 0.32), 0.4);
   // arms under the shroud: upper arms at the sides, forearms folded to the hands at the chest
   if (y > 10.8 && y < 17.6) {
     const sx = x < 0 ? -1 : 1;
     const wy = sx < 0 ? 12.92 : 11.8; // wrists meet the fists on the sceptre (GRIP, SCEPTRE_SCALE)
-    let arm = taper(ax, y, z, 2.12, 16.4, 0.05, 2.2, 13.3, 0.62, 0.54, 0.48);
-    arm = smin(arm, taper(ax, y, z, 2.2, 13.3, 0.62, 0.8, wy, 1.42, 0.48, 0.37), 0.3);
+    let arm = taper(ax, y, z, 2.4, 16.4, 0.05, 2.5, 13.3, 0.66, 0.62, 0.54);
+    arm = smin(arm, taper(ax, y, z, 2.5, 13.3, 0.66, 0.8, wy, 1.42, 0.54, 0.4), 0.35);
     d = smin(d, arm, 0.45);
   }
   d = max(d, -y);
@@ -496,7 +503,7 @@ function collarSDF(x, y, z) {
   if (y < 15.2 || y > 18.6) return 1;
   const dx = x - COLLAR_C[0], dy = y - COLLAR_C[1], dz = z - COLLAR_C[2];
   const r2 = dx * dx + dy * dy + dz * dz;
-  if (r2 > 2.85 * 2.85 || r2 < 0.75 * 0.75) return 1;
+  if (r2 > 3.2 * 3.2 || r2 < 0.75 * 0.75) return 1;
   const { rho, bump, drop } = collarField(x, y, z);
   const dropBump = 0.016 * sstep(-0.035, 0, drop);
   const torso = torsoSDF(x, y, z);
@@ -538,11 +545,8 @@ function backPillar(x, y, z) {
   return rbox(x, y, z, 0, 8.8, -1.35, 0.95, 8.8, 0.5, 0.06);
 }
 // incised inscription column down the front of the wrapping, and a few weathering cracks
-const CRACKS = [
-  [-1.35, 9.1, -0.75, 10.5, 0.03], [-0.75, 10.5, -0.9, 11.6, 0.025], [-0.9, 11.6, -0.55, 12.3, 0.02],
-  [0.95, 3.6, 1.15, 5.1, 0.03], [1.15, 5.1, 0.95, 5.9, 0.024],
-  [-2.25, 16.9, -1.95, 16.1, 0.022], [-1.95, 16.1, -2.05, 15.3, 0.02],
-];
+// (the long cracks read as black scratches at every distance, so the weathering is left to chips and the texture)
+const CRACKS = [];
 function glyph2(u, v, k, k2, sc) {
   u /= sc; v /= sc;
   let g;
@@ -587,7 +591,7 @@ function bodySDF(x, y, z) {
     for (const [ax, ay, bx, by, w] of CRACKS) {
       if (y < min(ay, by) - 0.2 || y > max(ay, by) + 0.2) continue;
       const j = 0.03 * vnoise(x * 6, y * 6, z * 6, 71);
-      d = carve(d, seg2(x + j, y, ax, ay, bx, by)[0] - w * 0.5, 0.06, 0.006);
+      d = carve(d, seg2(x + j, y, ax, ay, bx, by)[0] - w * 1.1, 0.045, 0.02); // wide enough to survive the 8 cm lower-body mesh
     }
   }
   d = applyChips(d, x, y, z, BODY_CHIPS, 0.03);
@@ -607,10 +611,11 @@ const STAFF_BOTTOM = (PLINTH_TOP - GRIP.y) / SCEPTRE_SCALE; // sceptre-local: re
 function fistsSDF(x, y, z) {
   let d = 1e9;
   for (const [cy, side] of [[0.36, -1], [-0.36, 1]]) {
-    let f = rbox(x, y, z, 0, cy, 0.02, 0.42, 0.33, 0.36, 0.15);
-    // finger grooves seen from the front
+    // a rounded fist: a soft box blended with an ellipsoid so it reads as flesh wrapped round the staff, not a block
+    let f = smin(rbox(x, y, z, 0, cy, 0.0, 0.4, 0.31, 0.33, 0.24), ell(x, y, z, side * -0.04, cy, 0.08, 0.44, 0.33, 0.36), 0.08);
+    // finger grooves seen from the front, each finger a slight roll
     const g = 0.5 + 0.5 * cos((2 * Math.PI * (y - cy - 0.0825)) / 0.165);
-    f += 0.02 * pow(g, 8) * sstep(-0.05, 0.2, z) * sstep(0.3, 0.28, abs(y - cy));
+    f += 0.034 * pow(g, 6) * sstep(-0.05, 0.2, z) * sstep(0.3, 0.26, abs(y - cy));
     // wrist into the wrapping
     f = smin(f, taper(x, y, z, side * 0.22, cy, -0.15, side * 0.85, cy - 0.06, -0.48, 0.27, 0.3), 0.12);
     d = min(d, f);
@@ -887,7 +892,9 @@ vec3 vc = vColor;
 float vMax = max(vc.r, max(vc.g, vc.b)), vMin = min(vc.r, min(vc.g, vc.b));
 float isPaint = smoothstep(0.1, 0.24, (vMax - vMin) / max(vMax, 1e-3));
 float wear = smoothstep(0.42, 0.78, gH + (macro - 0.5) * 0.9 + (tri(tRough).g - 0.5) * 0.3);
-float paintA = isPaint * (1.0 - 0.8 * wear) * (1.0 - sandM);
+// deep lapis (cap, beard) is a thick glaze-like coat: it wears far less than the thin collar pigments
+float keep = smoothstep(0.75, 0.9, (vMax - vMin) / max(vMax, 1e-3));
+float paintA = isPaint * (1.0 - 0.8 * wear * (1.0 - 0.75 * keep)) * (1.0 - sandM);
 float grain = clamp(dot(alb, vec3(0.333)) / 0.47, 0.4, 1.6);
 vec3 stoneC = diffuseColor.rgb * mix(vc, vec3(vMax * 0.95), isPaint);
 vec3 paintC = vc * grain * (0.78 + 0.22 * gAO);
@@ -1104,9 +1111,9 @@ function buildGeometry(quality) {
   const collarF = (x, y, z) => collarSDF(fx(x), fy(y), fz(z)) * sm;
   const collarP = (x, y, z, nx, ny, nz, o) => collarPaint(fx(x), fy(y), fz(z), nx, ny, nz, o);
   const geos = {
-    plinth: polygonize(plinthSDF, [-6.75, -0.3, -6.15, 6.75, 5.55, 6.15], 0.085 * q, plinthPaint, 4, 0.5),
-    bodyLower: polygonize(bodyF, [-3.95, figY(-0.1), -2.45, 3.95, figY(13.3), 2.8], 0.065 * q, bodyP, 4, 0.4),
-    bodyUpper: polygonize(bodyF, [-4.2, figY(13.0), -2.45, 4.2, figY(19.1), 2.7], 0.05 * q, bodyP, 4, 0.45),
+    plinth: polygonize(plinthSDF, [-6.75, -0.3, -6.15, 6.75, 5.55, 6.15], 0.09 * q, plinthPaint, 4, 0.5),
+    bodyLower: polygonize(bodyF, [-3.95, figY(-0.1), -2.45, 3.95, figY(13.3), 2.8], 0.08 * q, bodyP, 4, 0.4),
+    bodyUpper: polygonize(bodyF, [-4.2, figY(13.0), -2.45, 4.2, figY(19.1), 2.7], 0.055 * q, bodyP, 4, 0.45),
     collar: polygonize(collarF, [-3.75, figY(15.2), -0.75, 3.75, figY(18.5), 2.8], 0.028 * q, collarP, 4, 0.1),
     head: polygonize(headSDF, [-1.25, -1.15, -1.4, 1.25, 3.15, 1.5], 0.019 * q, headPaint, 4, 0.12),
     sceptre: polygonize(sceptreSDF, [-1.25, -1.0, -1.15, 1.25, 3.05, 0.65], 0.022 * q, sceptrePaint, 4, 0.1),
@@ -1231,7 +1238,7 @@ export async function createPtahColossus(assets, opts = {}) {
     sceptre.rotation.z = -state.sceptreTilt;
     sceptre.rotation.x = 0.12 * abs(state.sceptreTilt);
     // a faint inner light in the iris, only while the god speaks (voice > 0); eyeGlow only scales it
-    eyeMat.emissiveIntensity = 0.42 * v * (0.6 + 0.4 * eg);
+    eyeMat.emissiveIntensity = 0.22 * v * (0.6 + 0.4 * eg);
     // no glow on the collar or the inlays: gold leaf stays gold leaf
     inlay.uInlayGlow.value = 0;
     inlay.uVoiceGlow.value = 0;

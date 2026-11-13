@@ -196,12 +196,58 @@ Every row reaches 4. Subject in d is a narrow 4: at museum close-up range the fa
 
 The contact sheet is `snapshots/lookdev/colossus-sheet.jpg`: a 2×2 grid of labelled 960×540 cells.
 
+## Round 4 (in-set deliverables, cap, neck, face)
+
+The round-3 stills were rejected: they came from the flat pyramid stage, d was a face close-up (banned), the cap read as a grey-purple beanie, the face was cartoon-like, and the neck rose like a tube. **Every round-4 deliverable now comes from the in-set harness** (`lookdev/colossus4.*`, approved desert v4 set). `lookdev/shoot-colossus.mjs` and `src/look-colossus.js` are no longer used for deliverables.
+
+Changes in `src/ptah-colossus.js`:
+- **Cap.** The cap is a smooth shell that only exists above the cap line. The cap line runs from 1.05 m at the back to 2.10 m at the brow, with a fine incised line and no brim band. Its paint is a deep, saturated lapis (0.024, 0.075, 0.36). The wear shader keeps saturated paint (`keep` factor), so the cap no longer greys toward lavender. An earlier cap blend (`smin` with the uncarved head) had filled every face carving, including the eye sockets. It is now a `min` with `max(base, capEdge − y)`, so the eyes are open again.
+- **Neck and head.** The head pivot is 0.4 m lower (figY 17.6), the neck is shorter and thicker, and a trapezius flare runs into the shoulders. The tube neck is gone.
+- **Face.** The painted felt-tip brows are gone. The upper lip has two lobes, the lower lip curves, and the mouth line is carved with a slight curve. There are new lids, and the almond is open to the eyeball. The eye glow is lower (0.22 · voice).
+- **Beard.** Finer vertical plaits and a central groove.
+- **Hands.** The fists blend a rounded box with an ellipsoid and show finger grooves.
+- **Cracks.** Removed, because they read as black scratches.
+- **Cell sizes.** The plinth is 0.09, the lower body 0.08 and the upper body 0.055.
+
+Changes in `lookdev/colossus4.js`:
+- **Shot a.** A world camera at 84 mm frames the whole god on the plinth beside the lit screen. The robots are about 4% of the frame height.
+- **Shot d.** Golden-hour backlight. The key light swings behind the statue, low and amber (`#FF9440`, intensity 9, elevation 0.16). The environment light drops to 0.14 and the hemisphere fill to 0.2 of its value. The camera is low and frontal three-quarter at 40 mm.
+- **Debug.** There is a `hide=<mesh>` debug query.
+
+**Triangles:** 867,458 at high quality, down from 925,556 at the start of this round. That is still about 40k above the 827k target.
+
+**Textures.** A sourcing lane fetched two Poly Haven CC0 sets: `sandstone_cracks` (Rob Tuytel) and `dark_rock` (Amal Kumar). They are in the manifest and in `CREDITS.media.md`, and the research is in `notes/stone-textures-sourcing.md`. They are **not wired in yet**: the statue still uses `worn_rock_natural_01`.
+
+### Round-4 scorecard
+
+The commands were `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus-c colossus-d`, and the sheet is `snapshots/lookdev/colossus-sheet.jpg`. The bar is "a frame the user would put in a trailer", and I score honestly against it.
+
+| still | Subject | Set | Light | Effect | Text | Continuity | verdict |
+|---|---|---|---|---|---|---|---|
+| `snapshots/lookdev/colossus-a.png`: low wide in set | 4: the god, plinth, screen and robots all read; the cap reads pale through the haze at this distance | 4 | 4 | 4: eyes dark | 5 | 4 | **pass**: the strongest frame |
+| `snapshots/lookdev/colossus-b.png`: waist-up three-quarter, voice 0.5 | 3: the fists read as stacked rings and the face is generic; the cap, collar and beard are good | 4 | 4 | 4 | 5 | 4 | **fail** (hands and face) |
+| `snapshots/lookdev/colossus-c.png`: head and shoulders, voice 1 | 3: the cap is now clean lapis and the eyes are open, but the face is still cartoon-like (wide teal "googly" eyes and a smirking mouth) | 4 | 4 | 4 | 5 | 4 | **fail** (face) |
+| `snapshots/lookdev/colossus-d.png`: golden-hour backlit | 4: a dark monumental shape against a deep sky with the plinth carvings visible; the rim light is weak (only a faint warm edge) | 4 | 3: the backlight doesn't sculpt the edges enough | 4 | 5 | 4 | **marginal** |
+
+## Scan route (lane-e research)
+
+The research is in `notes/lane-e-statue-scans.md` (main checkout). It recommends the **Ptah-Sokar-Osiris figure W2059**, from the Egypt Centre, Swansea University (Sketchfab glTF, 611k triangles, CC BY 4.0, login needed), as "usable with work". I think the procedural face has reached its ceiling, so I recommend this route. I have **not** switched; this is a proposal. How I would fit it:
+1. Fetch it through the manifest as a git-ignored GLB, with a CC-BY credit line in `CREDITS.media.md` and on the end card.
+2. Offline, decimate and retopologise the head and torso to about 150–250k triangles. Trim the back pillar and the scan's own base, and bake AO into a vertex channel.
+3. Load it in `createPtahColossus` in place of the SDF head and torso. Scale it to `NATIVE_HEIGHT` and seat it on the existing SDF plinth.
+4. Replace the wig with the SDF lapis skullcap, intersected against the scan's skull, and keep the SDF beard, collar, eyes, fists and sceptre at the current GRIP.
+5. Apply the existing stone shader, with the sand, inlay and paint masks recomputed from height and normal. Keep the API (`group`, `height`, `handles`, `setState`) unchanged.
+
 ## Verification
 
 Run from `demos/agent-pronounce` unless noted.
 
 | command | exit | notes |
 |---|---|---|
+| `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus-c colossus-d` (round 4) | 0 | 867,458 triangles; only the known 404s |
+| `node node_modules/hyperframes/dist/cli.js check --json --timeout 120000` (round 4) | 1 | one lint error, which this change did not cause: `audio_src_not_found` for the VO and SFX mp3s, which are not generated in this worktree (the audio scripts are off-limits here) |
+| `node tools/guards/no-media.mjs` (repo root, round 4) | 0 | "checked 466 files; no violations" |
+| `node tools/media/fetch-media.mjs demos/agent-pronounce --check` (round 4) | 0 | 219/219 ok |
 | `node --check src/ptah-colossus.js` | 0 | |
 | `node lookdev/shoot-colossus.mjs colossus-a colossus-b colossus-c colossus-d` | 0 | 29–49 s per shot; 881,164 triangles |
 | `node lookdev/shoot-colossus4.mjs colossus-c --suffix=-set` | 0 | in-set check, desert v4; loads in 53 s |
@@ -220,6 +266,16 @@ Run from `demos/agent-pronounce` unless noted.
 - **Collar coverage.** The collar covers only the front and sides (z > −0.45), because the back pillar hides the rest. This halves its triangle count.
 
 ## Open defects
+
+Round 4 (current):
+- **R4-1. Face is cartoon-like** (colossus-c and colossus-b). The fix plan is the W2059 scan route above. Without it: switch the inlay eyes to calcite white with an obsidian pupil (no teal), narrow the almond, and neutralise the mouth curve.
+- **R4-2. Fists read as stacked rings** (colossus-b). Fix: use separate finger lobes over a fist mass and wrap the thumb over the shaft.
+- **R4-3. Weak rim light in d.** Fix: add a warm rim light behind the statue, about 2 m above the head, raise the sun elevation to 0.22, and add bloom on the edge.
+- **R4-4. Cap reads pale through the haze in the wide shot (a).** Fix: lower the haze density on the statue, or darken the lapis albedo by about 15%.
+- **R4-5. Triangles are 867k, above the 827k target.** Fix: set the upper-body cell to 0.06, which should save about 50k.
+- **R4-6. New stone textures are not wired in yet.** Fix: use `sandstone_cracks` on the body and `dark_rock` on the plinth.
+
+Round 3 (historical; items 1, 4 and 6 are superseded by round 4):
 
 1. **Face is stylised, not carved.** The face holds at the colossus-d distance, but the mouth is still two lip ellipsoids with a straight groove and no philtrum. The round-2 fix plan for the mouth (one mouth mass with a carved vermilion border) is not done.
 2. **Inlay lines render dark.** The brow and cosmetic-line inlay read as dark carved grooves, not gold, under the low key light. Fix: raise the gold roughness on the head inlay to about 0.45 and lift its albedo.

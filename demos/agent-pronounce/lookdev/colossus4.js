@@ -12,13 +12,15 @@ import { createPtahColossus } from '../src/ptah-colossus.js';
 
 const SHOTS = {
   // a: low wide from the forecourt, god on its plinth beside the lit screen, crews tiny for scale
-  a: { set: 'b', world: { pos: [-22, 2.2, 50], tgt: [13.5, 9.0, -48] }, mm: 70, state: { voice: 0 }, rim: 0.8, shadow: 'wide' },
-  // b: waist-up, three-quarter, voice 0.5
-  b: { set: 'b', bearing: 34, dist: 31, eye: 7.5, look: [0, 17.6, 0], mm: 40, state: { voice: 0.5, eyeGlow: 1, headYaw: 0.08 }, rim: 2.2 },
+  a: { set: 'b', world: { pos: [-22, 2.2, 50], tgt: [13.5, 9.0, -48] }, mm: 84, state: { voice: 0 }, rim: 0.8, shadow: 'wide' },
+  // b: waist-up, three-quarter, voice 0.5: low heroic camera on a long lens
+  b: { set: 'b', bearing: 32, dist: 46, eye: 8, look: [0, 18.6, 0], mm: 70, state: { voice: 0.5, eyeGlow: 1, headYaw: 0.1 }, rim: 2.6 },
   // c: head-and-shoulders, voice 1
-  c: { set: 'b', bearing: 22, dist: 23, eye: 15.5, look: [0, 21.4, 0.6], mm: 50, state: { voice: 1, eyeGlow: 1, headPitch: 0.03 }, rim: 2.4 },
-  // d: backlit against the low sun: profile silhouette with the sceptre
-  d: { set: 'b', world: { pos: [106, 1.5, -77.4], tgt: [29, 13.5, -66] }, mm: 35, state: { voice: 0 }, rim: 0, backlit: true },
+  c: { set: 'b', bearing: 18, dist: 32, eye: 13, look: [0, 21.7, 0.6], mm: 85, state: { voice: 1, eyeGlow: 1, headPitch: 0.04 }, rim: 2.8 },
+  // d: backlit at golden hour: a low frontal three-quarter looking up at the god against the deep anti-sun sky; the key light
+  //    swings behind the statue, low and amber, so the shoulders, cap and sceptre are edged in gold and the front falls into shape
+  d: { set: 'b', bearing: 24, dist: 58, eye: 1.4, look: [0, 13.2, 0], mm: 40, state: { voice: 0 }, rim: 0,
+       golden: { side: 1.1, elev: 0.16, color: '#FF9440', sun: 9, env: 0.14, hemi: 0.2 } },
 };
 
 const W = 1920, H = 1080;
@@ -47,6 +49,7 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     god.group.rotation.y = A.yaw;
     scene.add(god.group);
     god.setState(S.state);
+    if (q.get('hide')) god.group.traverse((o) => { if (o.name === q.get('hide')) o.visible = false; }); // debug: hide a named mesh
     god.group.updateMatrixWorld(true);
     const local = (x, y, z) => god.group.localToWorld(new THREE.Vector3(x, y, z));
 
@@ -72,6 +75,17 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
 
     // the sun's shadow frustum: recentre it on the statue (or between screen and statue for the wide)
     const sun = handles.sun;
+    if (S.golden) {
+      // golden hour behind the god: the key swings round behind the statue and drops low and amber, the sky
+      // and hemisphere fill fall away so the front reads as a dark shape against the anti-sun sky, edged in gold
+      const back = A.position.clone().sub(pos).setY(0).normalize();
+      const side = new THREE.Vector3(-back.z, 0, back.x).multiplyScalar(S.golden.side);
+      const dir = back.add(side).normalize().setY(S.golden.elev).normalize();
+      sun.position.copy(sun.target.position).addScaledVector(dir, 110);
+      sun.color.set(S.golden.color); sun.intensity = S.golden.sun;
+      scene.environmentIntensity = S.golden.env;
+      scene.traverse((o) => { if (o.isHemisphereLight) o.intensity *= S.golden.hemi; });
+    }
     const toSun = sun.position.clone().sub(sun.target.position);
     const c = S.shadow === 'wide' ? new THREE.Vector3(14, 0, -46) : A.position.clone().add(new THREE.Vector3(0, 8, 0));
     sun.target.position.copy(c); sun.position.copy(c).add(toSun);
@@ -89,7 +103,8 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     }
     await whenTexturesReady();
     const dist = pos.distanceTo(local(0, 16, 0));
-    const film = post === 'base' ? { ...look.film, ao: false, dof: false } : { ...look.film, dof: S.world ? false : { focus: dist, aperture: 0.00025, maxblur: 0.003 } };
+    const film0 = { ...look.film, ...(S.film || {}) };
+    const film = post === 'base' ? { ...film0, ao: false, dof: false } : { ...film0, dof: S.world ? false : { focus: dist, aperture: 0.00025, maxblur: 0.003 } };
     const draw = () => renderFilm(renderer, scene, camera, film, W, H, 0);
     draw(); draw();
     window.__lookdevInfo = { shot, post, triangles: god.triangles, camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), tgt: tgt.toArray().map((v) => +v.toFixed(2)) } };
