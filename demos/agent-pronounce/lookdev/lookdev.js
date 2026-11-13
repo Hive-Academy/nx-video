@@ -10,6 +10,7 @@ import { buildDesertLook } from '../src/look-desert.js';
 import { buildVortexLook } from '../src/look-vortex.js';
 import { buildWorkspaceLook } from '../src/look-workspace.js';
 import { renderFilm } from '../src/look-kit.js';
+import { buildBodyA, buildBodyB, buildBodyC, buildBodyD } from '../src/look-bodies.js';
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
 renderer.setSize(W, H, false);
@@ -26,6 +27,11 @@ const BUILDERS = {
   'workspace-a': (a) => buildWorkspaceLook(a, renderer, { shot: 'a' }),
   'workspace-b': (a) => buildWorkspaceLook(a, renderer, { shot: 'b' }),
   'workspace-c': (a) => buildWorkspaceLook(a, renderer, { shot: 'c' }),
+  'body-a': (a) => buildBodyA(a, renderer, { camera: 'screen' }),
+  'body-a-b': (a) => buildBodyA(a, renderer, { camera: 'b' }),
+  'body-b': (a) => buildBodyB(a, renderer),
+  'body-c': (a) => buildBodyC(a, renderer),
+  'body-d': (a) => buildBodyD(a, renderer),
 };
 // Force the GPU to finish so the timing measures the frame, not the command submission.
 const sync = (() => { const px = new Uint8Array(4); return () => { const gl = renderer.getContext(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }; })();
