@@ -20,7 +20,7 @@ import { KINDS as STREET_KINDS } from './tour-street.js';
 import { KINDS as TEMPLE_KINDS } from './tour-temple.js';
 import { KINDS as OFFICE_KINDS } from './set-office.js';
 import { KINDS as VORTEX_KINDS } from './set-vortex4.js';
-import { KINDS as DESERT_KINDS } from './set-desert.js';
+import { KINDS as DESERT_KINDS } from './set-desert4.js';
 import { KINDS as WORKSPACE_KINDS } from './set-workspace.js';
 
 export const TOUR_KINDS = { ...LOFT_KINDS, ...STREET_KINDS, ...TEMPLE_KINDS, ...OFFICE_KINDS, ...VORTEX_KINDS, ...DESERT_KINDS, ...WORKSPACE_KINDS };
@@ -62,7 +62,7 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
       initCraft(renderer);
       const builders = {
         office: () => import('./look-office.js').then((m) => m.buildOfficeLook(assets, renderer, options)),
-        desert: () => import('./look-desert.js').then((m) => m.buildDesertLook(assets, renderer)),
+        desert: () => import('./look-desert4.js').then((m) => m.buildDesert4Look(assets, renderer, options)),
         workspace: () => import('./look-workspace.js').then((m) => m.buildWorkspaceLook(assets, renderer, options)),
         vortex: () => import('./look-vortex.js').then((m) => m.buildVortexLook(assets, renderer)),
         vortex4: () => import('./look-vortex4.js').then((m) => m.buildVortex4Look(assets, renderer, options)),
