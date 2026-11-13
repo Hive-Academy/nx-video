@@ -1,5 +1,5 @@
 // Desert v4 look-dev page: 1920x1080 stills of src/look-desert4.js.
-//   desert4.html?shot=a|b|c|d[&post=base|preview][&time=N]
+//   desert4.html?shot=a|b|c|d|e[&post=base|preview][&time=N]
 // post=base    : the look kit film chain without AO and DOF (fast iteration).
 // post=preview : the full look kit film chain (AO + DOF + bloom + grade), the final stills.
 import * as THREE from 'three';
@@ -40,8 +40,14 @@ initCraft(renderer);
       for (let i = 0; i < N; i++) { draw(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
       ms = +((performance.now() - t0) / N).toFixed(1);
     }
+    // scene cost: one plain beauty render (shadow maps included), counted on its own
+    renderer.info.reset();
+    renderer.info.autoReset = false;
+    renderer.render(scene, camera);
+    const cost = { calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
+    renderer.info.autoReset = true;
     draw();
-    window.__lookdevInfo = { shot, post, msPerFrame: ms, ...(look.info || {}) };
+    window.__lookdevInfo = { shot, post, msPerFrame: ms, ...cost, ...(look.info || {}) };
     window.__lookdev = 'done';
   } catch (e) {
     console.error(e);

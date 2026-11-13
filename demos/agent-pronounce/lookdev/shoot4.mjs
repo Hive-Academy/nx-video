@@ -13,7 +13,7 @@ const OUT = join(ROOT, 'snapshots', 'lookdev');
 const args = process.argv.slice(2);
 const opt = (k, d) => (args.find((a) => a.startsWith(`--${k}=`)) || `=${d}`).replace(/^[^=]*=/, '');
 const scenes = args.filter((a) => !a.startsWith('--'));
-const list = scenes.length ? scenes : ['desert4-a', 'desert4-b', 'desert4-c', 'desert4-d'];
+const list = scenes.length ? scenes : ['desert4-a', 'desert4-b', 'desert4-c', 'desert4-d', 'desert4-e'];
 const post = opt('post', 'preview');
 const time = opt('time', '0');
 const suffix = opt('suffix', '');
