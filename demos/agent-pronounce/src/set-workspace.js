@@ -2,14 +2,15 @@
 // from the first frame to the cue where the vortex starts (`through`).
 //
 // Shot grammar (scene-local seconds; every time is a cue or a line time from ctx):
-//   a crane   0 .. N1-0.4       high over the shoulders, both at work facing the hero screen
-//   reverse   N1-0.4 .. N2end-0.4  from the screen side: Codex reads the screen (not looking up),
-//                                 Claude swivels half toward him to ask
-//   insert    .. landingOut+     push to a straight-on hold on the hero screen; the 2D landing clip
-//                                 sits exactly over the panel (build-timing.mjs, HOLD below); both
-//                                 swivel to talk off camera; pull back to the approved b two-shot
+//   open      0 .. landingIn  crane from over the shoulders (both at work) down to a low centred
+//                                 two-shot as both swivel to talk (visors read by ~2 s); N1, N2 with
+//                                 a focus rack; then a 1 s push into the straight-on screen hold
+//   insert    .. landingOut+     hold: the 2D landing clip sits exactly over the panel (build-timing.mjs,
+//                                 HOLD below), the 3D screen plays the same clip underneath; both turn
+//                                 back to each other; pull back to the approved b two-shot
+//   (the camera never crosses the seat line: Claude frame-left, Codex frame-right throughout)
 //   c Codex   N5-0.4 ..         MCU (the tightest framing; the visor rim steps at anything tighter)
-//   b' Claude O1-0.4 ..         two-shot leaning to Claude, the screen between them: spark and dip
+//   b' Claude O1-0.4 ..         wide two-shot, both shells whole; Claude's visor flares at spark, dip
 //   c Codex   O3-0.5 ..         MCU
 //   storm     rumble-0.2 .. through  b, the storm grows on the screen, lights dip, push into it
 //
@@ -19,7 +20,6 @@ import * as THREE from 'three';
 import { hash, noise1, clamp, ease } from './util.js';
 import { tourSpec, speak, listen, idle, anticipate, sceneCue } from './cribs.js';
 import { custom } from './cribs-camera.js';
-import { bolt as makeBolt } from './craft.js';
 import { vortexTexture } from './look-vortex.js';
 import { assetUrl } from './assets.js';
 import { LAYOUT, SHOTS } from './look-workspace.js';
@@ -77,24 +77,31 @@ async function build(scene, assets, ctx) {
   stormScreen.renderOrder = 2;
   scene.add(stormScreen);
 
-  // the spark: a bolt that jumps off the screen's lower-left corner toward Claude, plus trails and embers
-  const sparkPos = V(-sc.w / 2 + 0.16, sc.at[1] - sc.h / 2 + 0.12, panelZ + 0.03);
-  const sparkArc = makeBolt(sparkPos, sparkPos.clone().add(V(-0.12, 0.42, 0.55)), 613, { depth: 5, core: 0.012, glow: 0.06 });
-  sparkArc.visible = false; scene.add(sparkArc);
-  const sparkTrails = [];
-  for (let i = 0; i < 6; i++) {
-    const end = sparkPos.clone().add(V((hash('ws-spark-x', i) - 0.6) * 0.6, 0.1 + hash('ws-spark-y', i) * 0.45, 0.15 + hash('ws-spark-z', i) * 0.4));
-    const trail = makeBolt(sparkPos, end, 820 + i, { depth: 3, core: 0.005, glow: 0.024 });
-    trail.visible = false; scene.add(trail); sparkTrails.push(trail);
-  }
-  const n = 28, geo = new THREE.BufferGeometry();
+  // the spark (O1 "...for an app."): the screen flickers and Claude's visor flares. A warm ring pulse
+  // leaves the visor, a small burst of soft embers falls from it, and a warm point light at the visor
+  // lights the shell, the desk and the neighbour. All of it is tone mapped, so nothing clips.
+  const dot = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,0.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  const warm = new THREE.Color('#FFB878');
+  const ringMat = new THREE.MeshBasicMaterial({ color: warm, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending });
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 72), ringMat);
+  ring.visible = false; scene.add(ring);
+  const n = 36, geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  const sparks = new THREE.Points(geo, new THREE.PointsMaterial({ color: '#E1F4FF', size: 0.03, transparent: true, opacity: 0, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending }));
+  const sparks = new THREE.Points(geo, new THREE.PointsMaterial({ color: warm, map: dot, size: 0.022, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
   sparks.visible = false; scene.add(sparks);
+  // embers in the visor frame: x forward (out of the visor), y up, z side
   const sparkVel = Array.from({ length: n }, (_, i) => {
-    const a = hash('ws-ember', i) * Math.PI * 2;
-    return V(Math.cos(a) * 0.8, 0.5 + hash('ws-ember-y', i), 0.6 + 0.6 * hash('ws-ember-z', i)).multiplyScalar(0.4 + 0.7 * hash('ws-ember-v', i));
+    const a = hash('ws-ember', i) * Math.PI * 2, r = 0.25 + 0.75 * hash('ws-ember-r', i);
+    return V(0.55 + 0.5 * hash('ws-ember-f', i), r * Math.sin(a) * 0.6 + 0.15, r * Math.cos(a) * 0.6).multiplyScalar(0.35 + 0.45 * hash('ws-ember-v', i));
   });
+  const flareLight = new THREE.PointLight(warm, 0, 1.6, 2);
+  scene.add(flareLight);
 
   // sand and wind pouring out of the screen (pull)
   const windGeo = new THREE.BufferGeometry();
@@ -107,7 +114,7 @@ async function build(scene, assets, ctx) {
   const stormVeil = new THREE.Mesh(new THREE.PlaneGeometry(40, 24), stormMat);
   stormVeil.renderOrder = 900; stormVeil.visible = false; scene.add(stormVeil);
   // effects stay out of the depth pass, so they never pull the focus plane
-  (scene.userData.noDepth ||= []).push(sparkArc, ...sparkTrails, sparks, wind, stormVeil);
+  (scene.userData.noDepth ||= []).push(ring, sparks, wind, stormVeil);
 
   // light rest values, so the dips scale from the approved look
   const L = h.lights;
@@ -125,7 +132,7 @@ async function build(scene, assets, ctx) {
   for (const r of Object.values(cast)) r.yawPeer = yawToward(r.seatAt, (r === cast.Codex ? cast.Claude : cast.Codex).seatAt);
 
   return {
-    robots: {}, cast, h, sources, seq, seqFps: SEQ.fps, screenColor, stormScreen, stormScreenMat, stormTex, sparkPos, sparkArc, sparkTrails,
+    robots: {}, cast, h, sources, seq, seqFps: SEQ.fps, screenColor, stormScreen, stormScreenMat, stormTex, ring, ringMat, flareLight,
     sparks, sparkVel, wind, stormVeil, stormMat, base, slColor, screenCenter,
     post: { film: look.film, shadows: true, filmFrame: 0 },
   };
@@ -171,29 +178,33 @@ function plan(world, ctx) {
   const shots = [];
   const add = (label, t0, sample) => { const s = custom(label, sample, 0); s.t0 = t0; s.still = true; shots.push(s); return s; };
 
-  // a: a short crane down onto the approved over-the-shoulder still
+  // Screen direction: the camera always stays on the window side (+z) of the line between the
+  // seats, so Claude is frame-left and Codex frame-right in every shot.
+  // open: one move from the approved over-the-shoulder a (both at work) down to a low centred
+  // two-shot as both swivel to talk; the visors turn into view in the first two seconds
   const tA = N1.localStart - 0.4;
-  add('a crane', 0, (t) => {
-    const u = ease.sineInOut(clamp(t / tA));
-    return { pos: P(A.pos).add(V(0.16 * (1 - u), 0.3 * (1 - u), 0.1 * (1 - u))).add(drift(t, 'a')), target: P(A.target), fov: fovOf(A.focal), subject: P(A.subject), aperture: A.aperture };
-  });
-  // reverse: from in front of the hero screen, both faces lit by it; focus racks to Claude on her line
+  // B0 stays in front of the window plant's foliage (z < 1.95 below 1.2 m)
+  const B0 = { pos: V(0.02, 0.92, 1.84), target: V(0, 0.66, 0.2), fov: fovOf(21) };
   const tR = end(N2) - 0.4;
-  add('reverse two-shot', tA, (t) => {
-    const u = clamp((t - tA) / (tR - tA));
-    const rack = ease.sineInOut(clamp((t - (N2.localStart - 0.5)) / 0.6));
-    return { pos: V(0.04, 1.02, -0.52 + 0.08 * u).add(drift(t, 'r')), target: V(0, 0.66, 0.78), fov: fovOf(24),
-      subject: face(codex).lerp(face(claude), rack), aperture: 0.004 };
-  });
-  // insert: push into the straight-on hold, hold still for the 2D clip, pull back to the approved b
   const pushA = tR + 0.1, pushB = landingIn - 0.04, backA = landingOut + 0.32, backB = backA + 1.9;
-  const mid = { pos: V(0, 1.1, 1.35), target: V(0, 0.97, sc.at[2]), fov: fovOf(22) };
+  add('open: crane to two-shot', 0, (t) => {
+    const u = ease.sineInOut(clamp(t / tA));
+    const rack = ease.sineInOut(clamp((t - (N2.localStart - 0.5)) / 0.6));
+    const aPos = P(A.pos).add(V(0.12, 0.12, 0.06));
+    const settle = clamp((t - tA) / 1.5);
+    const uz = ease.sineInOut(clamp(t / (0.55 * tA))), uy = ease.sineInOut(clamp((t - 0.25 * tA) / (0.75 * tA)));
+    const pos = V(mix(aPos.x, B0.pos.x, u), mix(aPos.y, B0.pos.y, uy), mix(aPos.z, B0.pos.z, uz)).add(drift(t, 'o', 0.5 + 0.5 * settle));
+    const target = P(A.target).lerp(B0.target, u);
+    const subject = P(A.subject).lerp(face(codex).lerp(face(claude), rack), u);
+    // then the 1 s push into the straight-on screen hold (the landing clip)
+    const k = ease.sineInOut(clamp((t - pushA) / (pushB - pushA)));
+    return { pos: pos.lerp(hold.pos, k), target: target.lerp(hold.target, k), fov: mix(mix(fovOf(A.focal), B0.fov, u), hold.fov, k),
+      subject: subject.lerp(center, k), aperture: mix(mix(A.aperture, 0.004, u), 0.002, k) };
+  });
+  // insert: hold still under the 2D clip, then pull back to the approved b
   const tC1 = N5.localStart - 0.4;
-  add('insert', tR, (t) => {
-    if (t < backA) {
-      const u = ease.sineInOut(clamp((t - pushA) / (pushB - pushA)));
-      return { pos: mid.pos.clone().lerp(hold.pos, u), target: mid.target.clone().lerp(hold.target, u), fov: mix(mid.fov, hold.fov, u), subject: center.clone(), aperture: 0.002 };
-    }
+  add('insert', landingIn - 0.04, (t) => {
+    if (t < backA) return { pos: hold.pos.clone(), target: hold.target.clone(), fov: hold.fov, subject: center.clone(), aperture: 0.002 };
     const u = ease.sineInOut(clamp((t - backA) / (backB - backA)));
     const settle = clamp((t - backB) / 2);
     return { pos: hold.pos.clone().lerp(P(B.pos), u).add(drift(t, 'b', settle)), target: hold.target.clone().lerp(P(B.target), u), fov: mix(hold.fov, fovOf(B.focal), u),
@@ -205,7 +216,7 @@ function plan(world, ctx) {
   add('c Codex N5', tC1, cShot('c1'));
   // b': the two-shot leaning to Claude, the screen and its spark between them
   const tB2 = O1.localStart - 0.4;
-  add("b' Claude O1", tB2, (t) => ({ pos: V(-0.5, 0.98, 2.1).add(drift(t, 'b2')), target: V(-0.2, 0.72, 0.0), fov: fovOf(26), subject: face(claude), aperture: 0.005 }));
+  add("b' Claude O1", tB2, (t) => ({ pos: V(-0.36, 0.94, 2.2).add(drift(t, 'b2')), target: V(-0.06, 0.7, 0.2), fov: fovOf(22), subject: face(claude), aperture: 0.005 }));
   const tC2 = O3.localStart - 0.5;
   add('c Codex O3', tC2, cShot('c2'));
   // storm: back to b as the screen boils, then the 1.6 s push into the screen
@@ -219,11 +230,11 @@ function plan(world, ctx) {
       subject: P(B.subject).lerp(center, u), aperture: B.aperture * (1 - u) + 0.001 };
   });
 
-  // swivel: 0 = work (facing the screen), 1 = talk; Claude half-turns to ask on N2
-  const swivel = {
-    Codex: (t) => ease.sineInOut(clamp((t - (landingIn + 1.2)) / 1.1)),
-    Claude: (t) => 0.38 * ease.sineInOut(clamp((t - (N2.localStart - 0.55)) / 0.7)) + 0.62 * ease.sineInOut(clamp((t - (landingIn + 1.6)) / 1.1)),
-  };
+  // swivel: 0 = work (facing the screen), 1 = talk. Both turn to each other in the opening crane,
+  // back to the screen as the camera pushes into it, and to each other again on the pull-back.
+  const up = (t, a, d) => ease.sineInOut(clamp((t - a) / d));
+  const swivelOf = (lag) => (t) => up(t, 0.35 + lag, 1.3) * (1 - up(t, pushA - 0.45 + lag, 0.8)) + up(t, landingOut + 0.15 + lag, 1.2);
+  const swivel = { Claude: swivelOf(0), Codex: swivelOf(0.22) };
   // seeded blinks: 2.2-4.2 s apart, 0.14 s each
   const blinks = {};
   for (const name of ['Codex', 'Claude']) {
@@ -237,6 +248,8 @@ function plan(world, ctx) {
     const tahPulse = pulse(t, tah, 0.35);
     const sparkU = (t - spark) / 0.32;
     const sparkGlow = sparkU >= 0 && sparkU < 1 ? (1 - sparkU) * (0.7 + 0.3 * noise1(t * 60, 'ws-arc')) : 0;
+    const fu = (t - spark) / 0.75; // Claude's visor flare: a 0.1 s attack, then a soft fall
+    const flare = fu >= 0 && fu < 1 ? Math.min(1, fu * 7.5) * (1 - fu) ** 2 : 0;
     const firstDip = 0.55 * ease.sineInOut(clamp((t - dip) / 0.1)) * (1 - ease.sineInOut(clamp((t - (dip + 0.6)) / 0.6)));
     const build = ease.sineInOut(clamp((t - rumble) / 0.6));
     const flicker = 0.7 + 0.3 * noise1(t * 21, 'ws-flicker');
@@ -256,12 +269,11 @@ function plan(world, ctx) {
       r.root.position.set(r.seatAt.x - 0.03 * fdir.x, r.seatY + lift, r.seatAt.z - 0.03 * fdir.z + 0.05 * grip);
       r.root.rotation.y = yaw;
       r.chair.rotation.y = yaw - Math.PI / 2;
-      // head: listeners turn a little toward the speaker; Codex reads the screen through N1-N3
+      // head: listeners turn a little toward the speaker
       const speaking = spk === name;
       let gaze = 0;
       if (spk && !speaking) gaze = clamp(wrap(r.yawPeer - yaw), -0.45, 0.45) * 0.55;
       if (speaking) gaze = clamp(wrap(r.yawPeer - yaw), -0.45, 0.45) * 0.25;
-      if (name === 'Codex' && t < landingIn + 1.2) gaze = 0.04 * noise1(t * 0.6, 'ws-read'); // not looking up
       const screenGaze = clamp(wrap(yawToward(r.seatAt, center) - yaw), -0.6, 0.6);
       const toScreen = Math.max(0.55 * tahPulse * (name === 'Claude' ? 1 : 0.4), 0.75 * build);
       const headYaw = mix(gaze, screenGaze, toScreen) + 0.035 * noise1(t * 0.9, `ws-hy-${name}`);
@@ -278,7 +290,7 @@ function plan(world, ctx) {
         bx: (p.fx || 0) - 0.1 * grip, liftModel: lift / r.scale,
         eyeSX: (p.eyeSX || 1) + 0.18 * tahPulse, eyeSY: (p.eyeSY || 1) + 0.18 * tahPulse,
         blink: Math.max(p.blink || 0, blinkAt(name, t)),
-        glow: (p.glow || 0) + 0.5 * tahPulse + 0.6 * sparkGlow + 0.35 * build,
+        glow: (p.glow || 0) + 0.5 * tahPulse + (name === 'Claude' ? 0.5 * flare : 0.15 * sparkGlow) + 0.35 * build,
       });
     }
 
@@ -308,19 +320,40 @@ function plan(world, ctx) {
     for (const l of [L.spill, h.screenLight]) l.color.copy(world.slColor).lerp(sand, 0.6 * build);
 
     // ------------------------------------------------ spark
-    world.sparkArc.visible = sparkGlow > 0.05;
-    world.sparkTrails.forEach((tr, i) => { tr.visible = sparkU >= 0.04 * i && sparkU < 0.55 + 0.04 * i; });
-    const eu = (t - spark) / 0.9;
+    // Claude's visor frame, from the eye groups (after apply, so it follows the head)
+    const eu = (t - spark) / 0.9, ru = (t - spark) / 0.55;
+    const flareOn = eu >= -0.02 && eu < 1;
+    world.ring.visible = ru >= 0 && ru < 1;
     world.sparks.visible = eu >= 0 && eu < 1;
-    if (world.sparks.visible) {
-      const a = world.sparks.geometry.attributes.position.array;
-      world.sparkVel.forEach((v, i) => {
-        a[i * 3] = world.sparkPos.x + v.x * eu * 0.6;
-        a[i * 3 + 1] = world.sparkPos.y + v.y * eu * 0.6 - 0.35 * eu * eu;
-        a[i * 3 + 2] = world.sparkPos.z + v.z * eu * 0.6;
-      });
-      world.sparks.geometry.attributes.position.needsUpdate = true;
-      world.sparks.material.opacity = 1 - eu;
+    world.flareLight.intensity = flareOn ? 1.2 * flare : 0;
+    if (flareOn) {
+      const cl = world.cast.Claude;
+      cl.root.updateMatrixWorld(true);
+      const vc = V(0, 0, 0), tmp = V(0, 0, 0);
+      for (const g of cl.eyeGroups) vc.add(g.getWorldPosition(tmp));
+      vc.multiplyScalar(1 / cl.eyeGroups.length);
+      const ball = cl.ballHead.getWorldPosition(V(0, 0, 0));
+      const fwd = vc.clone().sub(ball).setY(0).normalize();
+      const side = V(0, 1, 0).cross(fwd).normalize();
+      const out = vc.clone().addScaledVector(fwd, 0.03);
+      world.flareLight.position.copy(vc).addScaledVector(fwd, 0.12);
+      if (world.ring.visible) {
+        const k = ease.power2Out(ru);
+        world.ring.position.copy(out).addScaledVector(fwd, 0.08 * k);
+        world.ring.lookAt(out.clone().add(fwd));
+        world.ring.scale.setScalar(0.07 + 0.3 * k);
+        world.ringMat.opacity = 0.38 * (1 - ru) ** 2;
+      }
+      if (world.sparks.visible) {
+        const a = world.sparks.geometry.attributes.position.array;
+        world.sparkVel.forEach((v, i) => {
+          const p = out.clone().addScaledVector(fwd, v.x * eu).addScaledVector(side, v.z * eu);
+          p.y += v.y * eu - 0.45 * eu * eu;
+          a[i * 3] = p.x; a[i * 3 + 1] = p.y; a[i * 3 + 2] = p.z;
+        });
+        world.sparks.geometry.attributes.position.needsUpdate = true;
+        world.sparks.material.opacity = 0.85 * (1 - eu) ** 1.5;
+      }
     }
 
     // ------------------------------------------------ wind and the veil
@@ -349,7 +382,7 @@ function plan(world, ctx) {
     const film = world.post.film;
     film.dof.focus = cam.pos.distanceTo(cam.subject);
     film.dof.aperture = cam.aperture;
-    film.bloom.strength = 0.22 + 0.18 * tahPulse + 0.5 * sparkGlow + 0.35 * build;
+    film.bloom.strength = 0.22 + 0.18 * tahPulse + 0.15 * sparkGlow + 0.05 * flare + 0.35 * build;
     film.exposure = 0.95 * (1 - 0.15 * firstDip - 0.12 * build);
     world.post.filmFrame = Math.round(t * 30);
   }
