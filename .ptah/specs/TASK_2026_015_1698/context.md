@@ -632,3 +632,17 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   Render with `--player-ready-timeout 240000` until a render confirms the faster load.
 - Desert (`demo/ep06-v4-desert-integration`, `4d697b9`): a–e pass; e is restaged as a low hero
   angle. It will be re-shot with bodies and the scan colossus after approval.
+
+## 2026-11-13 — session 6: colossus and bodies approved, four look branches merged
+
+- User approved the scan colossus "as framed": wide and mid shots, waist-up (sheet still B) is
+  the tightest allowed. Never frame it tighter than waist-up.
+- User approved the robot bodies (`createBodiedRobot`, 6 poses, sheet stills a–d).
+- Merged into `demo/ep06-p-is-not-silent` with no conflicts: `demo/ep06-v4-ptah-colossus`
+  (`be51fd5`), `demo/ep06-v4-workspace-look` (`1ecf8d5`), `demo/ep06-v4-robot-bodies`
+  (`fea027b`), `demo/ep06-v4-desert-integration` (`4d697b9`).
+- `fetch-media --check` needed 10 colossus stone textures fetched in the main tree (220/220 ok).
+  The git-ignored landing stills (`assets/live-demo/stills/`) were copied from the workspace
+  worktree; regenerate them with `scripts/live-demo/landing-stills.mjs` on a fresh checkout.
+- Next: one Opus child per scene (workspace re-pose with bodies, desert re-shoot with bodies and
+  the scan colossus, vortex look-dev). Each still needs user approval before animation.
