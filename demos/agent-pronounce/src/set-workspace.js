@@ -190,7 +190,7 @@ function plan(world, ctx) {
   add('open: crane to two-shot', 0, (t) => {
     const u = ease.sineInOut(clamp(t / tA));
     const rack = ease.sineInOut(clamp((t - (N2.localStart - 0.5)) / 0.6));
-    const aPos = P(A.pos).add(V(0.12, 0.12, 0.06));
+    const aPos = P(A.pos).add(V(0.12, 0.04, 0.06)); // 8 cm below the earlier start: the visors read by 1.5 s
     const settle = clamp((t - tA) / 1.5);
     const uz = ease.sineInOut(clamp(t / (0.55 * tA))), uy = ease.sineInOut(clamp((t - 0.25 * tA) / (0.75 * tA)));
     const pos = V(mix(aPos.x, B0.pos.x, u), mix(aPos.y, B0.pos.y, uy), mix(aPos.z, B0.pos.z, uz)).add(drift(t, 'o', 0.5 + 0.5 * settle));

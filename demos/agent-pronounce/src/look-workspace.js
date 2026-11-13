@@ -123,6 +123,12 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const L = LAYOUT;
   const scene = new THREE.Scene();
   scene.userData.noDepth = [];
+  // start every model, the HDRIs and the screen still at once (inside the full film the look loaded
+  // them one by one and missed the render's readiness window); each is still awaited at its original
+  // line, so placement order is unchanged
+  const models = Object.fromEntries(['modern_wooden_cabinet', 'ceramic_vase_01', 'book_encyclopedia_set_01', 'hanging_picture_frame_01', 'desk_lamp_arm_01', 'office_notepads', 'stationery_supplies', 'concrete_cat_statue', 'potted_plant_04', 'steel_frame_shelves_03', 'pachira_aquatica_01', 'potted_plant_02', 'modern_ceiling_lamp_01'].map((id) => [id, M(id)]));
+  const screenTexLoad = new THREE.TextureLoader().loadAsync(assetUrl('assets/live-demo/stills/landing-app.png'));
+  for (const p of [...Object.values(models), screenTexLoad]) p.catch(() => {}); // rejections surface at the awaits
   const [night, city] = await Promise.all([hdri('hdri/unfinished_office_night_1k.hdr'), hdri('hdri/shanghai_bund_2k.hdr')]);
   environment(renderer, scene, night.tex, { intensity: 0.62, rotation: 0.6, background: true, backgroundTex: city.tex, backgroundIntensity: 0.3 });
   scene.backgroundRotation = new THREE.Euler(0, 4.05, 0);
@@ -193,7 +199,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
 
   // ---------------------------------------------------------------- hero screen
   const sc = L.screen;
-  const screenTex = await new THREE.TextureLoader().loadAsync(assetUrl('assets/live-demo/stills/landing-app.png'));
+  const screenTex = await screenTexLoad;
   screenTex.colorSpace = THREE.SRGBColorSpace; screenTex.anisotropy = 16;
   screenTex.generateMipmaps = true; screenTex.minFilter = THREE.LinearMipmapLinearFilter;
   const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
@@ -231,15 +237,15 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   };
 
   // console under the screen
-  const cab = fit(await M('modern_wooden_cabinet'), { w: 1.9, at: [0, 0, R.zFront + 0.27] });
+  const cab = fit(await models.modern_wooden_cabinet, { w: 1.9, at: [0, 0, R.zFront + 0.27] });
   cab.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.roughness = Math.max(o.material.roughness, 0.7); o.material.envMapIntensity = 0.5; } });
   scene.add(shadows(cab));
-  const vase = fit(await M('ceramic_vase_01'), { h: 0.16, at: [0.78, cab.userData.size.y, R.zFront + 0.25] });
-  const books = fit(await M('book_encyclopedia_set_01'), { w: 0.3, at: [-0.72, cab.userData.size.y, R.zFront + 0.25], yaw: 0.1 });
+  const vase = fit(await models.ceramic_vase_01, { h: 0.16, at: [0.78, cab.userData.size.y, R.zFront + 0.25] });
+  const books = fit(await models.book_encyclopedia_set_01, { w: 0.3, at: [-0.72, cab.userData.size.y, R.zFront + 0.25], yaw: 0.1 });
   scene.add(shadows(vase), shadows(books));
 
   // the blueprint on the screen wall, right of the screen; a pendant globe over the desks
-  const frame = fit(await M('hanging_picture_frame_01'), { h: 0.62, at: [-R.x + 0.035, 0.62, 1.05], yaw: Math.PI / 2 });
+  const frame = fit(await models.hanging_picture_frame_01, { h: 0.62, at: [-R.x + 0.035, 0.62, 1.05], yaw: Math.PI / 2 });
   const bp = blueprintTexture();
   frame.traverse((o) => { if (o.isMesh && /artwork/.test(o.material.name)) o.material = new THREE.MeshStandardMaterial({ map: bp, emissiveMap: bp, emissive: '#FFFFFF', emissiveIntensity: 0.22, roughness: 0.8 }); else if (o.isMesh && /glass/.test(o.material.name)) o.visible = false; });
   scene.add(shadows(frame));
@@ -248,11 +254,11 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
 
   // ---------------------------------------------------------------- desks, chairs, robots
   const steel = new THREE.MeshStandardMaterial({ color: '#1A1B1E', metalness: 0.75, roughness: 0.42 });
-  const lampSrc = await M('desk_lamp_arm_01');
-  const pads = await M('office_notepads');
-  const stationery = await M('stationery_supplies');
-  const cat = await M('concrete_cat_statue');
-  const plantSmall = await M('potted_plant_04');
+  const lampSrc = await models.desk_lamp_arm_01;
+  const pads = await models.office_notepads;
+  const stationery = await models.stationery_supplies;
+  const cat = await models.concrete_cat_statue;
+  const plantSmall = await models.potted_plant_04;
   const robots = {};
   const lamps = [];
   for (const [name, side] of [['Codex', 1], ['Claude', -1]]) {
@@ -309,13 +315,13 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   }
 
   // ---------------------------------------------------------------- back of the room
-  const shelves = fit(await M('steel_frame_shelves_03'), { h: 1.45, at: [1.35, 0, R.zBack - 0.24], yaw: Math.PI });
+  const shelves = fit(await models.steel_frame_shelves_03, { h: 1.45, at: [1.35, 0, R.zBack - 0.24], yaw: Math.PI });
   scene.add(shadows(shelves));
-  const plantBig = fit(await M('pachira_aquatica_01'), { h: 1.2, at: [-1.78, 0, R.zBack - 0.35] });
+  const plantBig = fit(await models.pachira_aquatica_01, { h: 1.2, at: [-1.78, 0, R.zBack - 0.35] });
   scene.add(shadows(plantBig));
-  const plantFloor = fit(await M('potted_plant_02'), { h: 0.55, at: [1.85, 0, -0.55] });
+  const plantFloor = fit(await models.potted_plant_02, { h: 0.55, at: [1.85, 0, -0.55] });
   scene.add(shadows(plantFloor));
-  const pendant = fit(await M('modern_ceiling_lamp_01'), { h: 0.26, at: [-1.25, R.ceil - 0.26, 0.95] });
+  const pendant = fit(await models.modern_ceiling_lamp_01, { h: 0.26, at: [-1.25, R.ceil - 0.26, 0.95] });
   pendant.traverse((o) => { if (o.isMesh && /globe/.test(o.material.name)) { o.material = o.material.clone(); o.material.emissive = new THREE.Color('#FFC890'); o.material.emissiveIntensity = 3; } });
   scene.add(pendant);
 

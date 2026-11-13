@@ -125,11 +125,14 @@ the render.
 
 ## Open defects
 
-1. **Opening visors:** at 0.5 s only the shell tops show. At 1.5 s the visors are partly in frame
-   at the bottom edge, and at 2.5 s they read clearly. That is slightly later than the 1–2 s
-   target. Fix if wanted: start the crane about 8 cm lower.
-2. **Render readiness:** inside the full film the workspace look needs about 85 s to load.
-   Render with `--player-ready-timeout 240000` until the look loads its models in parallel.
+1. **Opening visors (fixed in the follow-up):** the crane now starts 8 cm lower. A snapshot at
+   1.0, 1.5 and 2.0 s (`snapshots/workspace-anim/crane/`) shows both visors with their eyes at
+   the lower edge at 1.5 s and clearly at 2.0 s. Not re-rendered, as instructed.
+2. **Render readiness (load fix in the follow-up):** in the render the workspace look needed
+   about 85 s to load. `look-workspace.js` now starts its 13 models, the screen still and the HDRIs
+   at once, and still awaits each at its original line, so placement order is unchanged. The new
+   readiness time is not measured (no render). Keep `--player-ready-timeout 240000` until a
+   render confirms it.
 3. **Render time:** 49 min for a draft of the whole film.
 4. The 10 fps screen sequence steps during the 0.3 s insert fades (barely visible at this size).
 5. The robots keep the ball rig. Bodies come from `demo/ep06-v4-robot-bodies`, and the scene will
