@@ -88,16 +88,14 @@ of the action), Defects.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `body-a.png` | 4 | 4 | 4 | 4 | 5 | 4 | **pass**: fingertips 1.6–1.7 mm above the key tops, knees clear the desk by 0.149 m, no crossings. The lamp sits in the foreground, and the robots are at the frame edges with an empty centre. |
 | `body-b.png` | 5 | 4 | 5 | 4 | 5 | 4 | **pass**: head is about 36% of the height, joints and accent read in every view, no clipped white on the shell. The eye highlights sit near white. |
-| `body-c.png` | 4 | 3 | 4 | 4 | 4 | 4 | **borderline**: the rise from the chair reads (crouch, hands on knees, feet planted at y 0.036). The shell reads grey in the dark room, and the high camera angle flattens the legs. |
+| `body-c.png` | 4 | 4 | 4 | 4 | 4 | 4 | **pass**: the rise from the chair reads (crouch, hands on knees, feet planted at y 0.036). A cool hero key from the screen side makes the shell read white: 10 of 60,000 sampled robot pixels hit 255, all in specular glints, so the shell does not clip. The high camera angle flattens the legs. |
 | `body-d.png` | 4 | 4 | 4 | 4 | 4 | 4 | **pass**: faces at three-quarter, feet grounded by a raycast onto the paving, and the point reads. Old ball crew robots remain in the background, and the legs read thin at this size. |
-
-body-c scores 3 on Light, so it is not delivered as final. See open defects.
 
 ## Open defects
 
-1. **body-c light (3).** The shell goes grey in the low-key room. Fix: add a soft key from
-   the camera-left window side for this shot, or raise `faceBoost` and the shell's
-   `envMapIntensity` on the hero only. Then reshoot `body-c` at the same `t`.
+1. **body-c light: fixed.** The shell had gone grey in the low-key room. A shot-only spot from
+   the screen side (#E6EEFF, intensity 11, high and camera-left, aimed at the head) fixed it.
+   body-c was reshot at the same `t` (0.7).
 2. **body-a composition.** The foreground lamp and the empty centre. Fix: hide or move the
    lamp for the shot, or move the camera 0.1 m toward the lamp side and tighten to 28 mm.
 3. **Hero-asset gate.** The body is procedural (see "Base asset and licence"). If the reviewer

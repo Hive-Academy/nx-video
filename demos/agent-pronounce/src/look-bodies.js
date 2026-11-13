@@ -136,6 +136,11 @@ export async function buildBodyC(assets, renderer) {
   cl.robot.setPose('seated-turn', 1, TIME);
   // three-quarter from the room's open floor, front-left of Codex (clear of the window plants)
   const at = cx.robot.group.position;
+  // hero key from the screen side, high: lights the head top and shoulders the high camera sees
+  const key = practical('spot', { color: '#E6EEFF', intensity: 11, distance: 3.5, angle: 0.42, penumbra: 1, shadow: 0 });
+  key.position.set(at.x - 0.75, 1.45, at.z + 0.1);
+  key.target.position.copy(head);
+  look.scene.add(key, key.target);
   const pos = V(at.x - 0.5, 0.82, at.z + 1.02);
   const tgt = V(at.x + 0.02, 0.38, at.z + 0.25);
   // whatever sits between the lens and Codex's head (plants) would hide the still
