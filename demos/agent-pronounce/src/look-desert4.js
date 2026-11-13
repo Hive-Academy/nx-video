@@ -78,17 +78,18 @@ const SHOTS = {
     pos: null, target: null, mm: 35, dof: { focus: 4.6, aperture: 0.0025, maxblur: 0.007 }, screenOn: true, ptah: { voice: 0.3, eyeGlow: 0.4 },
     seats: [{ name: 'Claude', chair: [-0.6, -13.0], face: 'screen', yaw: 0, head: 0.3 }, { name: 'Codex', chair: [1.6, -13.4], face: 'screen', yaw: 0, head: -0.3 }],
   },
-  // e: the giant rises, the hero shot of the act. Low on the open sand east of the forecourt,
-  // 35 mm, about 74 m from the colossus: the whole figure at frame right, the lit screen at frame
-  // left seen about 49 degrees off its axis, and the two visitors on their feet out of their chairs
-  // in the near foreground (about 11 m), looking up at it. Haze cards lie between them and the
-  // giant, and a warm rim light comes from behind it. The anchor fixes how big it can get: it
-  // stands 36 m behind a 12.5 m facade, so any camera that keeps the screen in frame and the
-  // facade smaller than the figure holds the colossus to about half the frame height (notes).
+  // e: the giant rises, a low hero angle. 24 mm, lens 0.55 m above the sand, about 49 m from the
+  // colossus and tilted up 7 degrees. The two visitors stand 1.9 m and 2.45 m in front of the
+  // lens, seen from the rear three-quarters, looking up. The colossus sits at about 0.72 of the
+  // frame width, plinth on the horizon, crown near the top edge. The facade's side is at the left
+  // edge as context. The head turns a little toward the visitors (headYaw), and eyeGain lifts the
+  // eye emissive from the scene side so the eyes read at 49 m. The rim is a spot with a distance
+  // cutoff, so it lights the giant but not the visitors. Layout maths: lookdev/e-geom.mjs (args: camX camZ camHeight offsetDeg tiltDeg).
   e: {
-    pos: [42.5, 0.3, 7.0], target: [4.2, 5.7, -63.3], mm: 35, dof: { focus: 'seats', aperture: 0.00035, maxblur: 0.004 }, screenOn: true, ptah: { voice: 0.2, eyeGlow: 1 },
+    pos: [42.8, 0.84, -26.3], target: [29.37, 3.65, -41.12], mm: 24, dof: { focus: 'seats', aperture: 0.00012, maxblur: 0.003 }, screenOn: true,
+    ptah: { voice: 0.2, eyeGlow: 1, headYaw: 0.4, headPitch: 0.1 }, eyeGain: 4,
     haze: true, rim: true,
-    seats: [{ name: 'Claude', chair: [34.1, -2.7], at: [35.75, -2.4], face: 'ptah', yaw: -1.6, head: 0, pitch: 0.32, stand: true, chairYaw: 2.1 }, { name: 'Codex', chair: [37.3, -5.5], at: [36.6, -3.7], face: 'ptah', yaw: -1.45, head: 0, pitch: 0.3, stand: true, chairYaw: -1.2 }],
+    seats: [{ name: 'Claude', chair: [37.19, -28.77], at: [40.17, -28.3], face: 'ptah', yaw: -0.4, head: 0, pitch: 0.32, stand: true, chairYaw: 0.6 }, { name: 'Codex', chair: [41.86, -31.66], at: [40.61, -29.17], face: 'ptah', yaw: -0.6, head: 0, pitch: 0.3, stand: true, chairYaw: -0.9 }],
   },
 };
 
@@ -380,6 +381,13 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     colossus.group.position.copy(anchor);
     colossus.group.rotation.y = yaw;
     // only the API: group, setState. Extra opts or state keys a later design ignores are harmless.
+    // eyeGain: a scene-side multiplier on the eye emissive for distant shots, kept across later
+    // setState calls. Skipped when a design has no handles.eyeMaterial.
+    const eyeMat = colossus.handles && colossus.handles.eyeMaterial;
+    if (S.eyeGain && eyeMat && colossus.setState) {
+      const base = colossus.setState;
+      colossus.setState = (s) => { base(s); eyeMat.emissiveIntensity *= S.eyeGain; };
+    }
     if (colossus.setState) colossus.setState({ eyeGlow: 0, headYaw: 0, headPitch: 0, sceptreTilt: 0, voice: 0, ...S.ptah });
     scene.add(colossus.group);
     handles.colossus = colossus;
@@ -526,7 +534,10 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     }
     if (S.rim) {
       const away = giant.clone().sub(cam).setY(0).normalize();
-      const rimSun = new THREE.DirectionalLight('#FFB476', 5.5);
+      // three.js light layers only filter against the camera, not per object, so the visitors
+      // are kept out of the rim with a distance cutoff instead: decay 0, the light ends about
+      // 22 m past the giant, and the visitors stand about 90 m from it.
+      const rimSun = new THREE.SpotLight('#FFB476', 9, 62, 0.32, 0.5, 0);
       rimSun.position.copy(giant).addScaledVector(away, 40).setY(16);
       rimSun.target.position.copy(giant).setY(14);
       scene.add(rimSun, rimSun.target);

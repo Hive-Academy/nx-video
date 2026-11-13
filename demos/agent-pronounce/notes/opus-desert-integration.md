@@ -38,6 +38,8 @@ Per the orchestrator update, the colossus design is being redone on `demo/ep06-v
 
 ## Pass 2 (orchestrator review of 5c44cf5)
 
+Pass 3 below replaces the pass 2 e restage. The crew fit and the c chairs still stand.
+
 All the changes are in `src/look-desert4.js`, `lookdev/desert4.js` and `lookdev/shoot4.mjs`. `src/ptah-colossus.js` and `src/look-colossus.js` are untouched.
 
 - **Crew fit (b, c).** Each crew def takes a `fit`: `shift` [world dx, dz] of its ramp, `ds` haul progress, `k` file width and `ro` across-ramp offset. `buildCrew` applies it.
@@ -56,36 +58,46 @@ All the changes are in `src/look-desert4.js`, `lookdev/desert4.js` and `lookdev/
 - **`ptahQuality`.** This option, set from `?ptahq=draft`, builds a faster colossus for framing passes.
 - **Shoot timeout.** `shoot4.mjs` sets `protocolTimeout: 900000`, which fixes the e timeout.
 
-## Scorecard (pass 2 finals)
+## Pass 3 (orchestrator review of 862cdbd)
 
-I viewed each still downscaled to 1280 px. The rows follow `video-quality-bar/references/scorecard.md`. None of these stills has captions or cards. Their only effect is the eye and visor glow. `cropped` is the harness check for robots cut by a frame edge.
+- **c left edge, checked, no change.** At full resolution, the leftmost big robot (blue collar) starts about 130 px inside the frame. The harness test projects all 8 corners of every robot's 3D box and reports `cropped: []`. The dark shape at the very left edge is a ramp prop, not a robot. So c was not re-shot.
+- **e restaged as a low hero angle.** The colossus anchor (29, -66) and the facade are unchanged. `lookdev/e-geom.mjs` computes the layout and the ground heights.
+  - **Camera.** It is at [42.8, 0.84, -26.3], 0.7 m above the sand, with a 24 mm lens tilted up 8°. The colossus is 42 m away and sits 23° right of centre.
+  - **Visitors.** Claude stands at [40.17, -28.3], 3.25 m from the lens, and Codex at [40.61, -29.17], 3.6 m away. Both face the giant, with an extra yaw of -0.4 and -0.6, so they read in rear three-quarter view, with the ear ring toward the lens. Their pitch is 0.32 and 0.3.
+  - **Chairs.** The empty chairs stand at [37.19, -28.77] (left) and [41.86, -31.66] (right).
+- **Rim light kept off the visitors.** three.js light layers only filter against the camera. They cannot exclude objects from a light, so a layer cannot do this. The rim is now a `SpotLight` (#FFB476, intensity 9, angle 0.32, decay 0) with a **62 m distance cutoff**. It lights the giant from 40 m behind it and ends about 22 m in front of it. The visitors stand about 80 m from the light, so they get none of it.
+- **The eyes now read.** `setState({ eyeGlow: 1, voice: 0.2 })` caps the eye emissive at about 0.64, which is invisible at range. Shot e sets `eyeGain: 4`, a scene-side multiplier on `handles.eyeMaterial.emissiveIntensity`. It wraps `setState`, so later calls keep it. A design with no `handles.eyeMaterial` skips it. The state also turns the head toward the visitors (`headYaw: 0.4`, `headPitch: 0.1`). `src/ptah-colossus.js` and `src/look-colossus.js` are untouched.
+
+## Scorecard (pass 3 finals)
+
+I viewed each still downscaled to 1280 px, and the e eyes and c left edge also at full resolution. The rows follow `video-quality-bar/references/scorecard.md`. None of these stills has captions or cards. Their only effect is the eye and visor glow. `cropped` is the harness check for robots cut by a frame edge.
 
 | Still | Subject | Set dressing | Light | Effect | Text and safe area | Continuity | `cropped` | Verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| a | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass** (unchanged from pass 1) |
-| b | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass**: no crew robot is cut, and the colossus stands at the right, knees up |
-| c | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass**: crews in full at both edges, both chairs read, visitors about 20% of frame |
-| d | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass** |
-| e | 3 | 3 | 4 | 2 | 5 | 4 | [] | **fail**: see below |
+| a | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass** (accepted; unchanged) |
+| b | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass** (accepted; unchanged) |
+| c | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass**: left edge checked, nothing cut |
+| d | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass** (accepted; unchanged) |
+| e | 4 | 4 | 4 | 4 | 5 | 4 | [] | **pass**, with the minor notes below |
 
 What I saw in e:
-- The whole colossus stands at the right, plinth to crown, from 5% to 58% of frame height. That is about 55%, not the 60–70% target.
-- The lit screen sits small at the left, about 19% of the frame width, and its text does not read at 1280 px.
-- The bottom 40% of the frame is plain sand. The sky band above the facade, in the middle of the frame, is empty.
-- The two standing visitors are about 12% of frame height. They read as robots between their chairs, side-on and looking up.
-- `eyeGlow: 1` still does not read at 74 m.
-- Claude's visor shows a warm orange reflection from the rim light.
+- **Colossus.** It towers at frame right, at x about 0.76. The crown is at the top edge (y 0.007) and the plinth sits on the horizon at y about 0.68, so the figure fills about 68% of the frame height.
+- **Eyes.** They read as two teal points at full resolution. At 1280 px they are faint but visible.
+- **Visitors.** They are large in the foreground: 32.7% (Claude) and 29.2% (Codex) of frame height. They are seen from the rear three-quarters, ear rings toward the lens, turned toward the giant.
+- **Chairs.** The two empty chairs frame the visitors left and right. The right chair is cut by the frame edge; it is a prop, not a robot.
+- **Background.** The pyramids sit in the middle distance, between the visitors.
+- **Foreground.** The bottom of the frame is the visitors, their shadows and the chairs, with no plain sand band. Only a strip of about 12% of shadowed sand lies under their feet.
 
 ## Open defects
 
-1. **e does not meet the "giant rises" brief.** The colossus is about 55% of frame height, the bottom 40% is sand and the screen is small.
-   - The cause is geometric. The anchor at (29, -66) sits behind the 12.5 m facade. A camera close enough to give 60–70% puts the facade as tall as the giant, or pushes it out of frame. About 55–57% is the most this anchor gives with both in frame.
-   - Option 1: move `ptahAnchor` nearer the forecourt, about 20 m toward the plaza. This changes the approved set and the b framing.
-   - Option 2: accept a facade as large as the giant, with the camera about 50 m away.
-   - Option 3: raise the camera to about 3 m with a slight down tilt and fill the foreground with the chairs and props. This removes the sand band but not the size limit.
-2. **e: the eye glow does not read.** It belongs to the colossus redesign (museum scan) behind the same API. Re-judge it when that drops in.
-3. **e: Claude's visor shows a warm reflection** of the rim light. Fix: exclude the visitors from the rim light with a layer, or lower the visor env in e.
-4. **b and c: the visitors are seen from behind.** This is the approved composition.
+1. **e: the facade reads as a dark slab at the left edge.** It is the facade's side face, in shade from the low sun. The screen is out of frame, which the brief allows. Fix if wanted: add a bounce card on that face, or set the offset to about 26° so a sliver of the lit screen front enters.
+2. **e: Codex is at 29.2% of frame height,** just under the 30% target. Move Codex 0.15 m nearer the lens to fix it.
+3. **e: "looking up" reads mainly through posture.** At rear three-quarter view the visor is hidden, which is inherent to the angle. The pitch is 0.3 rad.
+4. **e: the colossus is slightly soft** from the DOF focused at 3.3 m (aperture 0.00012).
+5. **The eye gain is a scene-side stopgap.** When the museum-scan colossus lands, re-check that it exposes `handles.eyeMaterial`, or drop `eyeGain`.
+6. **b and c: the visitors are seen from behind.** This is the approved composition.
+
+The earlier rim reflection in Claude's visor is gone. The rim light no longer reaches the visitors, and the visor faces away from the lens.
 
 ## How to re-shoot
 
@@ -111,9 +123,9 @@ Each still takes about 2.5 minutes to load, mostly building the colossus at high
 | b | 866 | 5.23 M | 162 s |
 | c | 818 | 5.05 M | 146 s |
 | d | 716 | 4.28 M | 166 s |
-| e | 810 | 5.37 M | 164 s |
+| e (pass 3) | 530 | 5.15 M | about 160 s |
 
-- The time per frame for e at preview post (`--time=10`) is **218 ms**, on an RTX 3070 Laptop GPU.
+- The time per frame for e at preview post (`--time=10`) is **132 ms** for the pass 3 hero, down from 218 ms for the pass 2 wide. Both were measured on an RTX 3070 Laptop GPU.
 - The colossus is drawn in the beauty pass and in the 4096 sun shadow pass, so it accounts for about 1.7 M of each total.
 - Most of the load time goes to building the colossus at high quality. Use `?ptahq=draft` for framing passes.
 
