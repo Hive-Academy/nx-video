@@ -14,8 +14,11 @@
 //   c Codex   O3-0.5 ..         MCU
 //   storm     rumble-0.2 .. through  b, the storm grows on the screen, lights dip, push into it
 //
-// The robots stay the ball rig. Life is head yaw, nod, bob, squash, visor glow, blinks and the
-// chair swivel. Everything is a pure function of t: hash and noise1 only.
+// The robots are createBodiedRobot bodies seated in the chairs (the approved body-a staging from
+// look-bodies.js). At work the chairs roll in to the desk and the bodies type (seated-typing IK to
+// the keyboard keys); the existing swivel blends them into seated-turn to talk. Life is head yaw,
+// nod, squash, visor glow and blinks on the ball head. Everything is a pure function of t: hash
+// and noise1 only.
 import * as THREE from 'three';
 import { hash, noise1, clamp, ease } from './util.js';
 import { tourSpec, speak, listen, idle, anticipate, sceneCue } from './cribs.js';
@@ -23,6 +26,9 @@ import { custom } from './cribs-camera.js';
 import { vortexTexture } from './look-vortex.js';
 import { assetUrl } from './assets.js';
 import { LAYOUT, SHOTS } from './look-workspace.js';
+import { createBodiedRobot, BODY } from './robot-body.js';
+
+const BODY_SIZE = 0.15; // head radius, as the approved body look-dev (look-bodies.js BODY_SIZE)
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const pulse = (t, at, w) => (t < at ? 0 : Math.exp(-3 * ((t - at) / w) ** 2));
@@ -36,6 +42,30 @@ const yawToward = (from, to) => Math.atan2(-(to.z - from.z), to.x - from.x);
 // The straight-on screen hold. build-timing.mjs places the landing clip at this exact rect:
 // width HOLD.px centred in 1920x1080, so the clip lands on the 3D panel pixel for pixel.
 export const HOLD = { d: 1.2, px: 1650 };
+
+// Pose a seated bodied robot between its two approved poses: 'seated-typing' at work (k 1) and
+// 'seated-turn' toward `look` at talk (k 0). Between them every node's local transform is blended
+// (positions lerp, rotations slerp), so the hands leave and find the keys without a pop.
+const _q = new THREE.Quaternion();
+function poseBody(r, k, time, look, eyeGlow) {
+  const b = r.body;
+  const typing = () => { b.setState({ typing: 1, lookAt: look }); b.setPose('seated-typing', time); };
+  const turn = () => { b.setState({ typing: 0, lookAt: look }); b.setPose('seated-turn', 1, time); };
+  b.setState({ eyeGlow });
+  if (k >= 0.999) return typing();
+  if (k <= 0.001) return turn();
+  turn();
+  const snap = r.snap ||= r.nodes.map(() => ({ p: V(0, 0, 0), q: new THREE.Quaternion() }));
+  r.nodes.forEach((o, i) => { snap[i].p.copy(o.position); snap[i].q.copy(o.quaternion); });
+  typing();
+  const e = ease.sineInOut(k);
+  r.nodes.forEach((o, i) => {
+    if (o === b.group) return;
+    o.position.lerpVectors(snap[i].p, o.position, e);
+    o.quaternion.copy(_q.copy(snap[i].q).slerp(o.quaternion, e));
+  });
+  b.group.updateMatrixWorld(true);
+}
 
 async function build(scene, assets, ctx) {
   const look = await ctx.useLook('workspace', { shot: 'b' });
@@ -123,12 +153,40 @@ async function build(scene, assets, ctx) {
   const slColor = h.screenLight.color.clone();
 
   // seats: work faces the hero screen, talk swivels toward each other and the window (look-workspace.js)
-  const cast = { Codex: h.robots.Codex, Claude: h.robots.Claude };
-  for (const r of Object.values(cast)) {
-    const s = r.side;
-    r.yawWork = yawToward(r.seatAt, V(s * 0.25, 0, sc.at[2]));
-    r.yawTalk = yawToward(r.seatAt, V(-s * 0.5, 0, 1.6));
+  // The approved bodied robots (robot-body.js) replace the ball rigs, seated in the same chairs.
+  // At work the chair sits pulled in to its desk and faces it (the approved body-a staging: keyboard
+  // at the desk's front edge, seat 0.4 in front of it); at talk it is back on its approved seat
+  // spot, swivelled. The ball rigs stay built (the room probe and the specs use them), hidden.
+  const kbs = [];
+  scene.traverse((o) => { if (o.isInstancedMesh && o.count === 61) kbs.push(o.parent); });
+  const cast = {};
+  for (const name of ['Codex', 'Claude']) {
+    const old = h.robots[name], s = old.side;
+    old.root.visible = false;
+    const deskYaw = s * LAYOUT.desk.yaw;
+    const n = V(Math.sin(deskYaw), 0, Math.cos(deskYaw)); // desk front normal (toward the user)
+    const kb = kbs.find((k) => Math.sign(k.position.x) === s);
+    kb.position.addScaledVector(n, 0.07);
+    kb.updateMatrixWorld(true);
+    const body = createBodiedRobot(assets, { agent: name, size: BODY_SIZE, shade: { faceBoost: name === 'Claude' ? 1.25 : 1 } });
+    body.setEnvMap(old.mats.shell.envMap);
+    scene.add(body.group);
+    const front = 0.152; // cushion front lip, chair-local
+    body.setState({ seat: { y: old.seatY, front, z: front - BODY.thigh * BODY_SIZE + 0.07 * BODY_SIZE }, keys: kb, seed: name });
+    // the contact-shadow decal under the chair rides with it
+    let decal = null, dd = 0.05;
+    for (const o of scene.children) if (o.isMesh && Math.abs(o.position.y - 0.014) < 0.002) { const k = Math.hypot(o.position.x - old.seatAt.x, o.position.z - old.seatAt.z); if (k < dd) { decal = o; dd = k; } }
+    const nodes = []; body.group.traverse((o) => nodes.push(o));
+    cast[name] = {
+      body, nodes, keyboard: kb, decal, chair: old.chair, seatAt: old.seatAt, seatY: old.seatY, side: s, scale: old.scale,
+      deskSeat: kb.position.clone().addScaledVector(n, 0.4).setY(0),
+      root: body.group, ballHead: body.handles.ballHead, eyeGroups: body.handles.head.eyeGroups,
+      eyeBase: body.handles.head.eyeGroups.map((g) => g.scale.clone()),
+    };
+    // work faces the desk (the chair's rotation.y = yaw - PI/2 convention below)
+    cast[name].yawWork = deskYaw + Math.PI / 2;
   }
+  for (const r of Object.values(cast)) r.yawTalk = yawToward(r.seatAt, V(-r.side * 0.5, 0, 1.6));
   for (const r of Object.values(cast)) r.yawPeer = yawToward(r.seatAt, (r === cast.Codex ? cast.Claude : cast.Codex).seatAt);
 
   return {
@@ -264,11 +322,13 @@ function plan(world, ctx) {
       const p = ctx.getSim().robotPose(name, t);
       const w = swivel[name](t);
       const yaw = r.yawWork + wrap(r.yawTalk - r.yawWork) * w;
-      const fdir = V(Math.cos(yaw), 0, -Math.sin(yaw));
-      const lift = p.lift || 0;
-      r.root.position.set(r.seatAt.x - 0.03 * fdir.x, r.seatY + lift, r.seatAt.z - 0.03 * fdir.z + 0.05 * grip);
-      r.root.rotation.y = yaw;
+      // the chair rolls in to the desk as it swivels to work, back to its seat spot to talk
+      const chairAt = r.deskSeat.clone().lerp(r.seatAt, w);
+      r.chair.position.copy(chairAt);
       r.chair.rotation.y = yaw - Math.PI / 2;
+      if (r.decal) { r.decal.position.x = chairAt.x; r.decal.position.z = chairAt.z; }
+      r.root.position.copy(chairAt);
+      r.root.rotation.y = yaw + Math.PI / 2; // the body faces local +z, the chair's facing
       // head: listeners turn a little toward the speaker
       const speaking = spk === name;
       let gaze = 0;
@@ -278,20 +338,24 @@ function plan(world, ctx) {
       const toScreen = Math.max(0.55 * tahPulse * (name === 'Claude' ? 1 : 0.4), 0.75 * build);
       const headYaw = mix(gaze, screenGaze, toScreen) + 0.035 * noise1(t * 0.9, `ws-hy-${name}`);
       const work = 1 - w;
-      const breathe = 0.014 * Math.sin(2.0 * t + (name === 'Claude' ? 1.3 : 0));
       const flinch = 0.18 * pulse(t, dip, 0.4) * (name === 'Claude' ? 1 : 0.6);
       const tahLean = name === 'Claude' ? 0.08 * win(t, tah - 0.2, tah + 1.6, 0.5) : 0;
-      r.apply({
-        hop: (p.hop || 0) * 0.5, ballDy: p.ballDy || 0, squash: p.squash || 0,
-        roll: (p.roll || 0) + 0.04 * noise1(t * 0.5, `ws-roll-${name}`),
-        pitch: mix(-0.04, -0.12, work) + (p.pitch || 0) + breathe + flinch + 0.2 * danger - 0.18 * grip + tahLean,
-        nod: mix(0.03, -0.06, work) + (p.nod || 0) + 0.06 * tahPulse,
-        headYaw: headYaw + 0.12 * danger * (name === 'Codex' ? 1 : -1),
-        bx: (p.fx || 0) - 0.1 * grip, liftModel: lift / r.scale,
-        eyeSX: (p.eyeSX || 1) + 0.18 * tahPulse, eyeSY: (p.eyeSY || 1) + 0.18 * tahPulse,
-        blink: Math.max(p.blink || 0, blinkAt(name, t)),
-        glow: (p.glow || 0) + 0.5 * tahPulse + (name === 'Claude' ? 0.5 * flare : 0.15 * sparkGlow) + 0.35 * build,
-      });
+      const glow = (p.glow || 0) + 0.5 * tahPulse + (name === 'Claude' ? 0.5 * flare : 0.15 * sparkGlow) + 0.35 * build;
+      // gaze: the same head yaw as the ball rig, as a world look point from the seated head
+      // (a fixed height above the chair, so the pose never depends on the previous frame)
+      const Y = yaw + headYaw + 0.12 * danger * (name === 'Codex' ? 1 : -1);
+      const tilt = mix(-0.02, 0.16, work) + 0.25 * danger - 0.4 * ((p.pitch || 0) + flinch + tahLean);
+      const look = chairAt.clone().add(V(Math.cos(Y), 0.72 + tilt, -Math.sin(Y)));
+      const time = t + (name === 'Codex' ? 0.37 : 0);
+      poseBody(r, work, time, look, 1 + 0.3 * glow);
+      // talk life on the ball head (it keeps its model frame: nod about z, yaw about y)
+      const sq = clamp(p.squash ?? 1, 0.85, 1.15), side = 1 / Math.sqrt(sq);
+      r.ballHead.scale.set(side, sq, side);
+      r.ballHead.rotation.set(0.03 * noise1(t * 0.5, `ws-roll-${name}`), 0, (p.nod || 0) + 0.06 * tahPulse - 0.5 * flinch);
+      r.eyeGroups.forEach((g, i) => g.scale.set(r.eyeBase[i].x * ((p.eyeSX || 1) + 0.18 * tahPulse), r.eyeBase[i].y * ((p.eyeSY || 1) + 0.18 * tahPulse), r.eyeBase[i].z * ((p.eyeSX || 1) + 0.18 * tahPulse)));
+      const bl = Math.max(p.blink || 0, blinkAt(name, t));
+      for (const e of r.body.handles.head.eyes) if (e.morphTargetInfluences) e.morphTargetInfluences[0] = clamp(bl);
+      r.root.updateMatrixWorld(true);
     }
 
     // ------------------------------------------------ hero screen
