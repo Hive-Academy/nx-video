@@ -7,7 +7,7 @@ const repoRoot = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const SIZE_LIMIT = 1_048_576;
 
 // Source: Hive-Academy/ptah-extension@e0ca51e6e:export-kit.mjs:66; .glb/.gltf added for this public repository.
-const MEDIA_EXT = new Set(['.mp4', '.webm', '.mov', '.mkv', '.m4v', '.wav', '.mp3', '.m4a', '.glb', '.gltf']);
+const MEDIA_EXT = new Set(['.mp4', '.webm', '.mov', '.mkv', '.m4v', '.wav', '.mp3', '.m4a', '.ogg', '.flac', '.glb', '.gltf', '.hdr', '.exr', '.ktx2', '.ttf', '.otf', '.zip']);
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp']);
 
 export function parseAllowList(text) {

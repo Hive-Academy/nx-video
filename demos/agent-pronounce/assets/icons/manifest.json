@@ -1,0 +1,65 @@
+{
+  "claude": {
+    "source": "https://thesvg.org/icons/claude/default.svg",
+    "page": "https://thesvg.org/icon/claude",
+    "variant": "default"
+  },
+  "claude-ondark": {
+    "source": "https://thesvg.org/icons/claude/default.svg",
+    "page": "https://thesvg.org/icon/claude",
+    "variant": "default"
+  },
+  "codex": {
+    "source": "https://thesvg.org/icons/codex/default.svg",
+    "page": "https://thesvg.org/icon/codex",
+    "variant": "default"
+  },
+  "codex-ondark": {
+    "source": "https://thesvg.org/icons/codex/dark.svg",
+    "page": "https://thesvg.org/icon/codex",
+    "variant": "dark"
+  },
+  "openai": {
+    "source": "https://thesvg.org/icons/openai/light.svg",
+    "page": "https://thesvg.org/icon/openai",
+    "variant": "light"
+  },
+  "openai-ondark": {
+    "source": "https://thesvg.org/icons/openai/dark.svg",
+    "page": "https://thesvg.org/icon/openai",
+    "variant": "dark"
+  },
+  "cursor": {
+    "source": "https://thesvg.org/icons/cursor/light.svg",
+    "page": "https://thesvg.org/icon/cursor",
+    "variant": "light"
+  },
+  "cursor-ondark": {
+    "source": "https://thesvg.org/icons/cursor/default.svg",
+    "page": "https://thesvg.org/icon/cursor",
+    "variant": "default"
+  },
+  "antigravity": {
+    "source": "https://thesvg.org/icons/google-antigravity/default.svg",
+    "page": "https://thesvg.org/icon/google-antigravity",
+    "variant": "default"
+  },
+  "antigravity-ondark": {
+    "source": "https://thesvg.org/icons/google-antigravity/default.svg",
+    "page": "https://thesvg.org/icon/google-antigravity",
+    "variant": "default"
+  },
+  "opencode": {
+    "source": "https://thesvg.org/icons/opencode/default.svg",
+    "page": "https://thesvg.org/icon/opencode",
+    "variant": "default"
+  },
+  "opencode-ondark": {
+    "source": "https://thesvg.org/icons/opencode/default.svg",
+    "page": "https://thesvg.org/icon/opencode",
+    "variant": "default"
+  },
+  "ptah": {
+    "source": "ptah-extension/apps/ptah-landing-page/public/assets/icons/ptah-icon.webp (emblem); ptah-ondark.png from assets/brand/ptah-emblem-gold.png"
+  }
+}
