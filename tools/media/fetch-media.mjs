@@ -14,9 +14,10 @@
 // `extract` (optional): the url is a zip; keep only that member, saved as `path`.
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const LICENCES = {
   'CC0-1.0': { name: 'CC0 1.0', url: 'https://creativecommons.org/publicdomain/zero/1.0/', credit: false },
@@ -39,7 +40,25 @@ const checkOnly = flags.includes('--check');
 const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
 const sha = (buf) => createHash('sha256').update(buf).digest('hex');
 let failures = 0;
+let skipped = 0;
 let changed = false;
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
+function sketchfabToken() {
+  if (process.env.SKETCHFAB_API_TOKEN) return process.env.SKETCHFAB_API_TOKEN;
+  const envFile = join(ROOT, '.env');
+  if (!existsSync(envFile)) return null;
+  for (const line of readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*(?:export\s+)?SKETCHFAB_API_TOKEN\s*=\s*(.*?)\s*$/);
+    if (match) return match[1].replace(/^(['"])(.*)\1$/, '$2') || null;
+  }
+  return null;
+}
+
+function hasFiles(dir) {
+  return existsSync(dir) && statSync(dir).isDirectory() &&
+    readdirSync(dir, { recursive: true, withFileTypes: true }).some((entry) => entry.isFile());
+}
 
 function fail(item, msg) {
   failures++;
@@ -47,7 +66,11 @@ function fail(item, msg) {
 }
 
 function validate(item) {
-  for (const k of ['path', 'url', 'title', 'author', 'source', 'licence']) if (!item[k]) return `missing "${k}"`;
+  for (const k of ['path', 'title', 'author', 'source', 'licence']) if (!item[k]) return `missing "${k}"`;
+  if (item.sketchfab) {
+    if (item.url || !/^[0-9a-f]{32}$/i.test(item.sketchfab.uid || '') || !['gltf', 'glb'].includes(item.sketchfab.format))
+      return 'sketchfab requires a uid and format (gltf or glb), instead of url';
+  } else if (!item.url) return 'missing "url"';
   if (!LICENCES[item.licence]) return `licence "${item.licence}" is not allowed (allowed: ${Object.keys(LICENCES).join(', ')})`;
   if (item.path.includes('..') || /^[a-z]:|^\//i.test(item.path)) return 'path must be relative to the episode folder';
   const ignored = spawnSync('git', ['check-ignore', '-q', join(EP, item.path)], { cwd: EP, shell: false });
@@ -55,10 +78,39 @@ function validate(item) {
   return null;
 }
 
-async function download(url) {
+async function download(url, label = url) {
   const res = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'nx-video-fetch-media' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${label}`);
   return Buffer.from(await res.arrayBuffer());
+}
+
+async function downloadSketchfab(item, token) {
+  const res = await fetch(`https://api.sketchfab.com/v3/models/${item.sketchfab.uid}/download`, {
+    headers: { Authorization: `Token ${token}`, 'user-agent': 'nx-video-fetch-media' },
+  });
+  if (!res.ok) throw new Error(`Sketchfab Download API HTTP ${res.status}`);
+  const data = await res.json();
+  const url = data[item.sketchfab.format]?.url;
+  if (!url) throw new Error(`Sketchfab did not provide ${item.sketchfab.format} download`);
+  return download(url, 'Sketchfab archive');
+}
+
+function unzipFolder(zipBuf, dest) {
+  mkdirSync(dirname(dest), { recursive: true });
+  const stage = mkdtempSync(join(dirname(dest), '.sketchfab-'));
+  const zipDir = mkdtempSync(join(tmpdir(), 'fetch-media-'));
+  try {
+    writeFileSync(join(zipDir, 'a.zip'), zipBuf);
+    const sys = join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe');
+    const tar = process.platform === 'win32' && existsSync(sys) ? sys : 'tar';
+    const r = spawnSync(tar, ['-xf', join(zipDir, 'a.zip'), '-C', stage], { shell: false });
+    if (r.status !== 0) throw new Error('tar could not extract Sketchfab archive');
+    if (!hasFiles(stage)) throw new Error('Sketchfab archive contains no files');
+    renameSync(stage, dest);
+  } finally {
+    rmSync(zipDir, { recursive: true, force: true });
+    rmSync(stage, { recursive: true, force: true });
+  }
 }
 
 function unzipMember(zipBuf, member) {
@@ -84,25 +136,44 @@ for (const item of manifest.items) {
   if (bad) { fail(item, bad); continue; }
   const dest = join(EP, item.path);
   if (existsSync(dest)) {
+    if (item.sketchfab?.format === 'gltf') {
+      if (hasFiles(dest)) console.log(`ok   ${item.path}`);
+      else fail(item, 'extracted folder has no files');
+      continue;
+    }
     const have = sha(readFileSync(dest));
     if (item.sha256 && have !== item.sha256) fail(item, `sha256 mismatch (have ${have})`);
     else console.log(`ok   ${item.path}`);
-    if (!item.sha256 && pin) { item.sha256 = have; changed = true; }
+    if (!item.sha256 && pin && !item.sketchfab) { item.sha256 = have; changed = true; }
+    continue;
+  }
+  const token = item.sketchfab ? sketchfabToken() : null;
+  if (checkOnly && item.sketchfab && !token) {
+    skipped++;
+    console.log(`skip ${item.path}: needs SKETCHFAB_API_TOKEN in the repository root .env`);
     continue;
   }
   if (checkOnly) { fail(item, 'missing (run without --check to fetch)'); continue; }
+  if (item.sketchfab && !token) {
+    skipped++;
+    console.log(`skip ${item.path}: set SKETCHFAB_API_TOKEN in the repository root .env to download`);
+    continue;
+  }
   try {
-    let buf = await download(item.url);
+    let buf = item.sketchfab ? await downloadSketchfab(item, token) : await download(item.url);
     if (item.extract) buf = unzipMember(buf, item.extract);
     const got = sha(buf);
     if (item.sha256 && got !== item.sha256) { fail(item, `sha256 mismatch (got ${got})`); continue; }
-    mkdirSync(dirname(dest), { recursive: true });
-    writeFileSync(dest, buf);
+    if (item.sketchfab?.format === 'gltf') unzipFolder(buf, dest);
+    else {
+      mkdirSync(dirname(dest), { recursive: true });
+      writeFileSync(dest, buf);
+    }
     console.log(`got  ${item.path} (${(buf.length / 1024).toFixed(0)} KB)`);
     if (!item.sha256 && pin) { item.sha256 = got; changed = true; }
     if (!item.sha256 && !pin) console.log(`     sha256 ${got} (run with --pin to record it)`);
   } catch (e) {
-    fail(item, e.message);
+    fail(item, item.sketchfab ? 'Sketchfab download failed; check token, model access, and network' : e.message);
   }
 }
 
@@ -128,5 +199,5 @@ const credits = [
   '',
 ].join('\n');
 if (!checkOnly) writeFileSync(join(EP, 'assets', 'CREDITS.media.md'), credits);
-console.log(`${manifest.items.length - failures}/${manifest.items.length} ok${checkOnly ? '' : `; credits -> ${relative(process.cwd(), join(EP, 'assets', 'CREDITS.media.md'))}`}`);
+console.log(`${manifest.items.length - failures - skipped}/${manifest.items.length} ok${skipped ? `; ${skipped} skipped` : ''}${checkOnly ? '' : `; credits -> ${relative(process.cwd(), join(EP, 'assets', 'CREDITS.media.md'))}`}`);
 process.exit(failures ? 1 : 0);

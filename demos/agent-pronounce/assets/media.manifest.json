@@ -1,6 +1,19 @@
 {
   "items": [
     {
+      "path": "assets/third-party/models/sketchfab/ptah-sokar-osiris-w2059/",
+      "sketchfab": {
+        "uid": "1fe96a1e10514357bcf2e05225f44ea4",
+        "format": "gltf"
+      },
+      "title": "Ptah-Sokar-Osiris Figure (W2059)",
+      "author": "The Egypt Centre, Swansea University",
+      "source": "https://sketchfab.com/3d-models/ptah-sokar-osiris-figure-w2059-1fe96a1e10514357bcf2e05225f44ea4",
+      "licence": "CC-BY-4.0",
+      "changes": "Scaled to a 24 m colossus; wig replaced by a skullcap; hands, sceptre and collar added; retopologised and rebaked for real time",
+      "sha256": ""
+    },
+    {
       "path": "assets/third-party/hdri/kloofendal_48d_partly_cloudy_puresky_1k.hdr",
       "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_puresky_1k.hdr",
       "title": "Kloofendal 48d Partly Cloudy (Pure Sky)",
