@@ -1,5 +1,8 @@
 // Ptah colossus look-dev inside the approved desert v4 set (src/look-desert4.js), 1920x1080.
-//   colossus4.html?shot=a|b|c|d[&post=base|preview][&quality=high|draft][&cam=x,y,z&tgt=x,y,z&mm=N]
+//   colossus4.html?shot=a|b|c|d[&post=base|preview][&quality=high|draft][&scan=0|<asset path>][&cam=x,y,z&tgt=x,y,z&mm=N]
+// The figure is the museum scan when its file is present (scan=0 forces the procedural one). Shot distances
+// and heights are authored for the 24.08 m procedural statue and scale with the built height (k below), so
+// the framing carries over to any mesh.
 // The colossus replaces the set's Ptah proxy at handles.ptahAnchor, exactly as the integration does.
 // Shot cameras are relative to the anchor: bearing is degrees from the statue's facing (+ = toward the
 // statue's left, frame right in a frontal view), dist in metres, eye/look heights in metres.
@@ -20,7 +23,7 @@ const SHOTS = {
   // d: backlit at golden hour: a low frontal three-quarter looking up at the god against the deep anti-sun sky; the key light
   //    swings behind the statue, low and amber, so the shoulders, cap and sceptre are edged in gold and the front falls into shape
   d: { set: 'b', bearing: 24, dist: 58, eye: 1.4, look: [0, 13.2, 0], mm: 40, state: { voice: 0 }, rim: 0,
-       golden: { side: 1.1, elev: 0.16, color: '#FF9440', sun: 9, env: 0.14, hemi: 0.2 } },
+       golden: { side: 1.9, elev: 0.2, color: '#FF9440', sun: 12, env: 0.14, hemi: 0.2 } },
 };
 
 const W = 1920, H = 1080;
@@ -44,7 +47,9 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     const { scene, camera, handles } = look;
     const A = handles.ptahAnchor;
     if (handles.ptahProxy) handles.ptahProxy.visible = false;
-    const god = await createPtahColossus(assets, { quality: q.get('quality') || 'high' });
+    const scanQ = q.get('scan');
+    const god = await createPtahColossus(assets, { quality: q.get('quality') || 'high', ...(scanQ ? { scan: scanQ === '0' ? false : scanQ } : {}) });
+    const k = god.height / 24.08; // framing scale against the procedural statue the shots were authored for
     god.group.position.copy(A.position);
     god.group.rotation.y = A.yaw;
     scene.add(god.group);
@@ -58,16 +63,17 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     if (S.world) { // world preset: pos y is the eye height above the ground
       pos = new THREE.Vector3(...S.world.pos); pos.y += groundAt(pos.x, pos.z);
       tgt = new THREE.Vector3(...S.world.tgt);
+      tgt.y = A.position.y + (tgt.y - A.position.y) * k; // aim at the same fraction of a taller god
     }
     else {
       const b = (S.bearing * Math.PI) / 180;
-      pos = local(Math.sin(b) * S.dist, 0, Math.cos(b) * S.dist);
-      pos.y = A.position.y + S.eye;
-      tgt = local(...S.look);
+      pos = local(Math.sin(b) * S.dist * k, 0, Math.cos(b) * S.dist * k);
+      pos.y = A.position.y + S.eye * k;
+      tgt = local(...S.look.map((v) => v * k));
     }
     if (q.get('cam')) pos = vec(q.get('cam'));
     if (q.get('tgt')) tgt = vec(q.get('tgt'));
-    camera.setFocalLength(+(q.get('mm') || S.mm));
+    camera.setFocalLength(+(q.get('mm') || (S.world ? S.mm / k : S.mm))); // the wide holds its spot and widens instead
     camera.position.copy(pos);
     camera.lookAt(tgt);
     camera.updateProjectionMatrix();
@@ -87,27 +93,27 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
       scene.traverse((o) => { if (o.isHemisphereLight) o.intensity *= S.golden.hemi; });
     }
     const toSun = sun.position.clone().sub(sun.target.position);
-    const c = S.shadow === 'wide' ? new THREE.Vector3(14, 0, -46) : A.position.clone().add(new THREE.Vector3(0, 8, 0));
+    const c = S.shadow === 'wide' ? new THREE.Vector3(14, 0, -46) : A.position.clone().add(new THREE.Vector3(0, 8 * k, 0));
     sun.target.position.copy(c); sun.position.copy(c).add(toSun);
     sun.target.updateMatrixWorld();
-    if (S.shadow !== 'wide') Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26 });
+    if (S.shadow !== 'wide') Object.assign(sun.shadow.camera, { left: -26 * k, right: 26 * k, top: 26 * k, bottom: -26 * k });
     sun.shadow.camera.updateProjectionMatrix();
 
     // rim: a cool light from behind the statue, opposite the camera, to part the head from the sky
     if (S.rim > 0) {
       const back = A.position.clone().sub(pos).setY(0).normalize();
       const rim = new THREE.DirectionalLight('#BFD6FF', S.rim);
-      rim.position.copy(A.position).addScaledVector(back, 60).add(new THREE.Vector3(0, 40, 0));
-      rim.target.position.copy(local(0, 20, 0));
+      rim.position.copy(A.position).addScaledVector(back, 60 * k).add(new THREE.Vector3(0, 40 * k, 0));
+      rim.target.position.copy(local(0, 20 * k, 0));
       scene.add(rim, rim.target);
     }
     await whenTexturesReady();
-    const dist = pos.distanceTo(local(0, 16, 0));
+    const dist = pos.distanceTo(local(0, 16 * k, 0));
     const film0 = { ...look.film, ...(S.film || {}) };
     const film = post === 'base' ? { ...film0, ao: false, dof: false } : { ...film0, dof: S.world ? false : { focus: dist, aperture: 0.00025, maxblur: 0.003 } };
     const draw = () => renderFilm(renderer, scene, camera, film, W, H, 0);
     draw(); draw();
-    window.__lookdevInfo = { shot, post, triangles: god.triangles, camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), tgt: tgt.toArray().map((v) => +v.toFixed(2)) } };
+    window.__lookdevInfo = { shot, post, triangles: god.triangles, source: god.source, height: +god.height.toFixed(2), camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), tgt: tgt.toArray().map((v) => +v.toFixed(2)) } };
     window.__lookdev = 'done';
   } catch (e) {
     console.error(e);

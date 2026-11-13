@@ -2,6 +2,7 @@
 // Render the desert v4 look-dev stills at 1920x1080 with headless Chrome.
 //   node lookdev/shoot-colossus4.mjs [colossus-a colossus-b ...] [--post=base|preview] [--time=N] [--suffix=x]
 // Writes snapshots/lookdev/<scene><suffix>.png and prints page errors, console errors and 4xx/5xx.
+// A 404 on the Sketchfab scan is expected until the archive is fetched: the statue falls back to procedural.
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -41,8 +42,9 @@ try {
     await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
     const errors = [];
     page.on('pageerror', (e) => errors.push(`pageerror ${e}`));
-    page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`${m.type()} ${m.text()}`); });
-    page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('favicon.ico') && !r.url().endsWith('audio/cues.json')) errors.push(`${r.status()} ${r.url()}`); });
+    page.on('console', (m) => { if (/Failed to load resource: .* 404/.test(m.text())) return; // 404s are judged by the response handler
+      if (m.type() === 'error' || m.type() === 'warning') errors.push(`${m.type()} ${m.text()}`); });
+    page.on('response', (r) => { if (r.status() >= 400 && !r.url().endsWith('favicon.ico') && !r.url().endsWith('audio/cues.json') && !(r.status() === 404 && r.url().includes('/models/sketchfab/'))) errors.push(`${r.status()} ${r.url()}`); });
     const t0 = Date.now();
     await page.goto(`http://localhost:${port}/lookdev/colossus4.html?shot=${shot}&post=${post}&time=${time}${opt("q","") ? "&" + opt("q","") : ""}`);
     await page.waitForFunction('window.__lookdev === "done" || window.__lookdev?.error', { timeout: 300000 });

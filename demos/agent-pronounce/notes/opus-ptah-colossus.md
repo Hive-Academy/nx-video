@@ -238,9 +238,52 @@ The research is in `notes/lane-e-statue-scans.md` (main checkout). It recommends
 4. Replace the wig with the SDF lapis skullcap, intersected against the scan's skull, and keep the SDF beard, collar, eyes, fists and sceptre at the current GRIP.
 5. Apply the existing stone shader, with the sand, inlay and paint masks recomputed from height and normal. Keep the API (`group`, `height`, `handles`, `setState`) unchanged.
 
+## Round 5 (museum scan fitting path)
+
+User decision: the figure moves to the museum scan **"Ptah-Sokar-Osiris Figure (W2059)"** by The Egypt Centre, Swansea University (CC BY 4.0, commercial use allowed, credit on the end card). The fitting path is built. **The scan file is not on disk yet**, because the Sketchfab token does not exist yet, so every still below is still the procedural figure. No more procedural sculpting was done.
+
+**`src/ptah-colossus.js`.** The API is unchanged. It adds an `opts.scan` option, which takes the asset path (default `SCAN_URL`) or `false`, and an extra `source: 'scan' | 'procedural'` field on the result.
+- **Fallback.** When `scene.gltf` is missing (404), the procedural statue is built exactly as before.
+- **Loading.** `fitScan()` loads the glTF as data only. It samples each material's base-colour map into a per-vertex colour (sRGB to linear).
+- **Orientation and scale.** It orients the figure (`SCAN_FIT.up`: `'auto'` uses the longest axis; then `yaw`), trims to `soles`..`crown`, scales to **24 m soles to crown**, and centres it on the trunk.
+- **Decimation.** Deterministic vertex clustering, with the grid cell sized from the surface area for `targetTris` (260k at high quality, a third at draft).
+- **Cutting.** It cuts the scan's own base, the back pillar (`SCAN_FIT.pillar`) and configured boxes (`SCAN_FIT.cuts`, for the wig lappets).
+- **Skullcap.** Above the cap line (lower at the brow), the wig is squeezed in toward the head axis on the sides and back, and painted lapis.
+- **Ambient occlusion.** Cavity AO comes from the one-ring curvature (smoothed twice), plus ground occlusion at the soles. Up-facing creases get sand.
+- **Stone material.** The figure uses the same `stone` material as the procedural body. That means the triplanar CC0 rock detail at colossal scale (5 m tiles), weathering streaks, a sand mask and AO. The scan's own paint is mixed in at `SCAN_FIT.paint` and wears like mineral paint, so 24 m reads as stone rather than an enlarged figurine.
+- **Fitted procedural parts.** The figure stands on the procedural plinth (soles at 5.4 m, total native height 29.4 m). The procedural collar is scaled to the scan's measured shoulder width and seated at the measured shoulder height. The procedural fists and sceptre sit at the measured chest front. Eye glow is a soft additive disc on each painted eye, visible only while `voice > 0`. The head pivot is an empty marker, because the scan is one rigid mesh.
+- **Tuning.** All fit values are in `SCAN_FIT`: `up`, `yaw`, `soles`, `crown`, `cap`, `pillar`, `cuts`, `eyes`, and the `collar` and `sceptre` nudges. They are measured once the archive is on disk.
+
+**`lookdev/colossus4.js`.**
+- **Framing scale.** All shot distances, heights and targets scale with the built height (`k = god.height / 24.08`), so the four framings carry over to the 29.4 m scan statue. The wide holds its camera position and widens its lens by k instead, which keeps the robots at about 3–4% of frame height.
+- **Queries.** `scan=0` forces the procedural figure; `scan=<path>` points at another file.
+- **Shot d.** The golden key light swings further to the side (side 1.9, elevation 0.2, intensity 12), so the right flank and plinth carry a warm golden-hour edge. This is the R4-3 fix.
+
+**`lookdev/shoot-colossus4.mjs`.** A 404 on `models/sketchfab/` is expected until the fetch, so it is not counted as an error.
+
+**Checks done:**
+- `colossus-a` with no scan rendered procedural, 867,458 triangles, no errors.
+- `colossus-b` with `scan=assets/third-party/models/ph/dead_quiver_trunk/dead_quiver_trunk_1k.gltf` ran the whole scan path with no errors: load, colour bake, orient, 24 m scale, decimate, cap, AO, and the fitted collar, sceptre and eye glow. That file is a Poly Haven CC0 tree trunk used only as test data, and the render was deleted afterwards. The statue totalled 473,682 triangles, with `source: 'scan'` and height 29.4.
+
+**When the archive lands** (the folder `assets/third-party/models/sketchfab/ptah-sokar-osiris-w2059/`):
+1. Render the four shots once with the defaults. Read `up`, `yaw` and `soles` from the result, then set `pillar` and the wig-lappet `cuts`.
+2. Fix `cap.line` and `cap.front` on the brow, and set the `eyes` fractions on the painted eyes.
+3. Nudge the collar and sceptre.
+4. Re-shoot a, b, c and d and score them.
+
+The credit line is `SCAN_CREDIT` in the module. It goes in `CREDITS.media.md` and on the end card when the fetcher's manifest entry lands.
+
 ## Verification
 
 Run from `demos/agent-pronounce` unless noted.
+
+| command | exit | notes |
+|---|---|---|
+| `node lookdev/shoot-colossus4.mjs colossus-a --suffix=-fallback` (round 5) | 0 | scan absent, so procedural; 867,458 triangles; no errors |
+| `node lookdev/shoot-colossus4.mjs colossus-b --suffix=-standin --q=scan=<CC0 trunk gltf>` (round 5) | 0 | scan path ran end to end; 473,682 triangles; the render was deleted afterwards |
+| `node lookdev/shoot-colossus4.mjs colossus-d` (round 5) | 0 | R4-3 rim fix; becomes the new `colossus-d.png` and the sheet is rebuilt |
+| `node tools/guards/no-media.mjs` (repo root, round 5) | 0 | "checked 467 files; no violations" |
+| `hyperframes check --json` (round 5) | 1 | not caused by this branch: `audio_src_not_found` (VO not generated here), plus three `nested_media_start_basis_ambiguous` findings in `compositions/`, which this branch does not touch |
 
 | command | exit | notes |
 |---|---|---|

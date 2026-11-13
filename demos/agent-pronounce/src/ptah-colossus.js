@@ -21,6 +21,7 @@
 // Determinism: the build is a pure function of the code (hash-seeded noise, no clocks, no
 // Math.random). setState() only sets transforms, uniforms and dust alpha.
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { assetUrl } from './assets.js';
 import { hash } from './util.js';
 
@@ -1100,8 +1101,9 @@ function projectTo(f, x, y, z) {
 
 // ---------------------------------------------------------------- geometry build (cached per page)
 const geoCache = new Map();
-function buildGeometry(quality) {
-  if (geoCache.has(quality)) return geoCache.get(quality);
+function buildGeometry(quality, scanMode = false) {
+  const ck = `${quality}|${scanMode}`;
+  if (geoCache.has(ck)) return geoCache.get(ck);
   const q = quality === 'draft' ? 1.7 : 1;
   // figure frame -> statue space; the field is scaled by the smallest axis scale so it stays a lower bound
   const { sx, sy, sz } = FIG, sm = min(sx, sy, sz);
@@ -1110,45 +1112,283 @@ function buildGeometry(quality) {
   const bodyP = (x, y, z, nx, ny, nz, o) => bodyPaint(fx(x), fy(y), fz(z), nx, ny, nz, o);
   const collarF = (x, y, z) => collarSDF(fx(x), fy(y), fz(z)) * sm;
   const collarP = (x, y, z, nx, ny, nz, o) => collarPaint(fx(x), fy(y), fz(z), nx, ny, nz, o);
+  // with a scan the figure (body, head, eyes) comes from the scan; plinth, collar, sceptre and drift stay
   const geos = {
     plinth: polygonize(plinthSDF, [-6.75, -0.3, -6.15, 6.75, 5.55, 6.15], 0.09 * q, plinthPaint, 4, 0.5),
-    bodyLower: polygonize(bodyF, [-3.95, figY(-0.1), -2.45, 3.95, figY(13.3), 2.8], 0.08 * q, bodyP, 4, 0.4),
-    bodyUpper: polygonize(bodyF, [-4.2, figY(13.0), -2.45, 4.2, figY(19.1), 2.7], 0.055 * q, bodyP, 4, 0.45),
     collar: polygonize(collarF, [-3.75, figY(15.2), -0.75, 3.75, figY(18.5), 2.8], 0.028 * q, collarP, 4, 0.1),
-    head: polygonize(headSDF, [-1.25, -1.15, -1.4, 1.25, 3.15, 1.5], 0.019 * q, headPaint, 4, 0.12),
     sceptre: polygonize(sceptreSDF, [-1.25, -1.0, -1.15, 1.25, 3.05, 0.65], 0.022 * q, sceptrePaint, 4, 0.1),
     staff: staffGeometry(),
     drift: sandDriftGeometry(),
-    eyeR: eyeGeometry(-1), eyeL: eyeGeometry(1),
   };
+  if (!scanMode) Object.assign(geos, {
+    bodyLower: polygonize(bodyF, [-3.95, figY(-0.1), -2.45, 3.95, figY(13.3), 2.8], 0.08 * q, bodyP, 4, 0.4),
+    bodyUpper: polygonize(bodyF, [-4.2, figY(13.0), -2.45, 4.2, figY(19.1), 2.7], 0.055 * q, bodyP, 4, 0.45),
+    head: polygonize(headSDF, [-1.25, -1.15, -1.4, 1.25, 3.15, 1.5], 0.019 * q, headPaint, 4, 0.12),
+    eyeR: eyeGeometry(-1), eyeL: eyeGeometry(1),
+  });
+  const plinthDust = [-4.4, -2.2, 0, 2.2, 4.4].map((x) => projectTo(plinthSDF, x, 5.12, 4.65));
   const dust = {
-    body: [
+    body: scanMode ? plinthDust : [
       ...[-1.15, -0.85, 0.85, 1.15].map((a) => projectTo(bodyF, sin(a) * 3.0, figY(16.6 + 0.5 * abs(sin(a))), 2.0 * cos(a))),
       projectTo(bodyF, -3.3, figY(17.2), 0.1), projectTo(bodyF, 3.3, figY(17.2), 0.1),
-      ...[-4.4, -2.2, 0, 2.2, 4.4].map((x) => projectTo(plinthSDF, x, 5.12, 4.65)),
+      ...plinthDust,
     ],
   };
   const out = { geos, dust };
-  geoCache.set(quality, out);
+  geoCache.set(ck, out);
   return out;
+}
+
+// ---------------------------------------------------------------- museum scan path
+// The figure can come from a museum scan: "Ptah-Sokar-Osiris Figure (W2059)" by The Egypt Centre, Swansea
+// University, CC BY 4.0 (credit on the end card). tools/media/fetch-media.mjs fetches it into a git-ignored
+// folder; it is untrusted data and is only parsed as a glTF asset. The scan supplies the figure; the plinth,
+// collar, fists, sceptre, sand drift and eye glow stay procedural and are fitted onto it. Without the file
+// (404) the procedural statue is built instead, so nothing downstream breaks.
+export const SCAN_URL = 'assets/third-party/models/sketchfab/ptah-sokar-osiris-w2059/scene.gltf';
+export const SCAN_CREDIT = 'Ptah-Sokar-Osiris Figure (W2059) by The Egypt Centre, Swansea University, CC BY 4.0, adapted (decimated, recoloured as stone, wig cut to a skullcap, collar and sceptre added)';
+// Fit parameters. Lengths are metres in the fitted figure frame: soles at y 0, crown at y = height, centred
+// on the trunk, facing +z. The defaults are the proportions of a standing mummiform figure; refine them
+// against the archive once it is on disk (see notes/opus-ptah-colossus.md, "Scan route").
+export const SCAN_FIT = {
+  height: 24,               // soles to crown
+  up: 'auto',               // 'auto' (longest axis, positive) or 'x' | '-x' | 'y' | '-y' | 'z' | '-z'
+  yaw: 0,                   // radians about y after the up fix, so the face looks down +z
+  soles: 0, crown: 1,       // fractions of the raw extent along up: soles > 0 trims the scan's own base off
+  targetTris: 260000,       // decimation target at 'high' (a third at 'draft')
+  paint: 0.5,               // how much of the scan's own paint survives on the stone (0 = bare stone)
+  cap: { line: 0.905, front: 0.014, squash: 0.84, color: [0.024, 0.075, 0.36] }, // line, front: fractions of height
+  pillar: null,             // { z, halfW }: cut triangles behind z within |x| < halfW (the back pillar)
+  cuts: [],                 // [{ min: [x, y, z], max: [x, y, z] }]: cut triangles inside (wig lappets, base)
+  eyes: { y: 0.932, x: 0.021 }, // fractions of height; z is found on the face surface
+  collar: { dy: 0, dz: 0, scale: 1 }, // nudges after the automatic shoulder fit
+  sceptre: { dy: 0, dz: 0, scale: 1 },
+};
+// Where the procedural collar and sceptre were designed to sit (statue space), for fitting onto the scan.
+const PROC = { shoulderY: figY(17.2), halfW: 3.6, chestY: figY(15.8), chestZ: 1.92 };
+const UP_ROT = { x: [0, 0, Math.PI / 2], '-x': [0, 0, -Math.PI / 2], y: [0, 0, 0], '-y': [Math.PI, 0, 0], z: [-Math.PI / 2, 0, 0], '-z': [Math.PI / 2, 0, 0] };
+const LIN = Float32Array.from({ length: 256 }, (_, i) => { const c = i / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
+
+// albedo lookup for one glTF material: the base-colour map (sRGB -> linear) times the factor
+function albedoSampler(mat) {
+  const m = Array.isArray(mat) ? mat[0] : mat;
+  const tint = m && m.color ? [m.color.r, m.color.g, m.color.b] : [0.8, 0.8, 0.8];
+  const img = m && m.map && m.map.image;
+  if (!img || !img.width) return (u, v, out) => { out[0] = tint[0]; out[1] = tint[1]; out[2] = tint[2]; };
+  const sc = min(1, 2048 / max(img.width, img.height));
+  const w = max(1, Math.round(img.width * sc)), h = max(1, Math.round(img.height * sc));
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const px = ctx.getImageData(0, 0, w, h).data;
+  const flip = m.map.flipY; // glTF textures are not flipped: v = 0 is the top row
+  return (u, v, out) => {
+    u -= floor(u); v -= floor(v);
+    const x = min(w - 1, (u * w) | 0), y = min(h - 1, ((flip ? 1 - v : v) * h) | 0), k = (y * w + x) * 4;
+    out[0] = LIN[px[k]] * tint[0]; out[1] = LIN[px[k + 1]] * tint[1]; out[2] = LIN[px[k + 2]] * tint[2];
+  };
+}
+
+// Load, orient, scale, decimate, cut and recolour the scan; measure where the procedural parts go.
+async function fitScan(url, quality) {
+  const F = SCAN_FIT;
+  const gltf = await new GLTFLoader().loadAsync(assetUrl(url));
+  gltf.scene.updateMatrixWorld(true);
+  const meshes = [];
+  gltf.scene.traverse((o) => { if (o.isMesh && o.geometry && o.geometry.attributes.position) meshes.push(o); });
+  if (!meshes.length) throw new Error('scan has no meshes');
+  // 1. every mesh in world space, its albedo sampled into a per-vertex colour
+  const P = [], C = [], I = [], v = new THREE.Vector3(), col = [0, 0, 0];
+  for (const o of meshes) {
+    const g = o.geometry, pos = g.attributes.position, uv = g.attributes.uv, base = P.length / 3;
+    const sample = albedoSampler(o.material);
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+      P.push(v.x, v.y, v.z);
+      sample(uv ? uv.getX(i) : 0, uv ? uv.getY(i) : 0, col);
+      C.push(col[0], col[1], col[2]);
+    }
+    if (g.index) for (let i = 0; i < g.index.count; i++) I.push(base + g.index.getX(i));
+    else for (let i = 0; i < pos.count; i++) I.push(base + i);
+  }
+  let n = P.length / 3;
+  // 2. orient (up axis, then yaw), trim to soles..crown, scale to F.height, centre on the trunk
+  const box = new THREE.Box3();
+  for (let i = 0; i < n; i++) box.expandByPoint(v.set(P[3 * i], P[3 * i + 1], P[3 * i + 2]));
+  let up = F.up;
+  if (up === 'auto') { const e = box.getSize(new THREE.Vector3()); up = e.y >= e.x && e.y >= e.z ? 'y' : e.x >= e.z ? 'x' : 'z'; }
+  const R = new THREE.Matrix4().makeRotationY(F.yaw).multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...UP_ROT[up])));
+  box.makeEmpty();
+  for (let i = 0; i < n; i++) {
+    v.set(P[3 * i], P[3 * i + 1], P[3 * i + 2]).applyMatrix4(R);
+    P[3 * i] = v.x; P[3 * i + 1] = v.y; P[3 * i + 2] = v.z;
+    box.expandByPoint(v);
+  }
+  const span = box.max.y - box.min.y, y0 = box.min.y + F.soles * span, y1 = box.min.y + F.crown * span;
+  const s = F.height / (y1 - y0), H = F.height;
+  const trunk = new THREE.Box3();
+  for (let i = 0; i < n; i++) {
+    const t = (P[3 * i + 1] - y0) / (y1 - y0);
+    if (t > 0.3 && t < 0.85) trunk.expandByPoint(v.set(P[3 * i], P[3 * i + 1], P[3 * i + 2]));
+  }
+  const cx = (trunk.min.x + trunk.max.x) / 2, cz = (trunk.min.z + trunk.max.z) / 2;
+  let area = 0;
+  for (let i = 0; i < n; i++) { P[3 * i] = (P[3 * i] - cx) * s; P[3 * i + 1] = (P[3 * i + 1] - y0) * s; P[3 * i + 2] = (P[3 * i + 2] - cz) * s; }
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+  for (let t = 0; t < I.length; t += 3) {
+    a.fromArray(P, 3 * I[t]); b.fromArray(P, 3 * I[t + 1]); c.fromArray(P, 3 * I[t + 2]);
+    area += b.sub(a).cross(c.sub(a)).length() / 2;
+  }
+  // 3. decimate by vertex clustering on a grid sized for the target count (about 2 triangles per surface cell);
+  //    the paint is already in the vertex colour, so no UV seams constrain the merge. Deterministic, O(n).
+  const target = quality === 'draft' ? F.targetTris / 3 : F.targetTris;
+  const cell = sqrt((2 * area) / target);
+  const cellOf = new Int32Array(n), cmap = new Map(), acc = [];
+  for (let i = 0; i < n; i++) {
+    const kx = floor(P[3 * i] / cell) + 2048, ky = floor(P[3 * i + 1] / cell) + 2048, kz = floor(P[3 * i + 2] / cell) + 2048;
+    const key = (kx * 4096 + ky) * 4096 + kz;
+    let id = cmap.get(key);
+    if (id === undefined) { id = acc.length / 7; cmap.set(key, id); acc.push(0, 0, 0, 0, 0, 0, 0); }
+    cellOf[i] = id;
+    const q = id * 7;
+    acc[q] += P[3 * i]; acc[q + 1] += P[3 * i + 1]; acc[q + 2] += P[3 * i + 2];
+    acc[q + 3] += C[3 * i]; acc[q + 4] += C[3 * i + 1]; acc[q + 5] += C[3 * i + 2]; acc[q + 6]++;
+  }
+  // 4. triangles: collapse, drop degenerate, cut the base, the back pillar and the configured boxes
+  const inCut = (x, y, z) => {
+    if (y < 0 || y > H * 1.002) return true;
+    if (F.pillar && z < F.pillar.z && abs(x) < F.pillar.halfW) return true;
+    for (const k of F.cuts) if (x > k.min[0] && x < k.max[0] && y > k.min[1] && y < k.max[1] && z > k.min[2] && z < k.max[2]) return true;
+    return false;
+  };
+  const pos = (id, j) => acc[id * 7 + j] / acc[id * 7 + 6];
+  const used = new Int32Array(acc.length / 7).fill(-1), T = [];
+  let nv = 0;
+  for (let t = 0; t < I.length; t += 3) {
+    const i0 = cellOf[I[t]], i1 = cellOf[I[t + 1]], i2 = cellOf[I[t + 2]];
+    if (i0 === i1 || i1 === i2 || i0 === i2) continue;
+    const mx = (pos(i0, 0) + pos(i1, 0) + pos(i2, 0)) / 3, my = (pos(i0, 1) + pos(i1, 1) + pos(i2, 1)) / 3, mz = (pos(i0, 2) + pos(i1, 2) + pos(i2, 2)) / 3;
+    if (inCut(mx, my, mz)) continue;
+    for (const id of [i0, i1, i2]) { if (used[id] < 0) used[id] = nv++; T.push(used[id]); }
+  }
+  n = nv;
+  const pa = new Float32Array(3 * n), ca = new Float32Array(3 * n);
+  for (let id = 0; id < used.length; id++) {
+    const j = used[id];
+    if (j < 0) continue;
+    for (let k = 0; k < 3; k++) { pa[3 * j + k] = pos(id, k); ca[3 * j + k] = pos(id, 3 + k); }
+  }
+  // 5. head: centre and radius above the cap line; squeeze the wig into a tight skullcap (sides and back
+  //    only, the forehead stays) and paint it lapis
+  let hx = 0, hz = 0, hn = 0, hr = 0;
+  for (let i = 0; i < n; i++) if (pa[3 * i + 1] > F.cap.line * H) { hx += pa[3 * i]; hz += pa[3 * i + 2]; hn++; }
+  hx /= max(hn, 1); hz /= max(hn, 1);
+  for (let i = 0; i < n; i++) if (pa[3 * i + 1] > F.cap.line * H) hr = max(hr, Math.hypot(pa[3 * i] - hx, pa[3 * i + 2] - hz));
+  hr = max(hr, 0.02 * H);
+  const capY = (z) => H * (F.cap.line - F.cap.front * clamp01((z - hz) / hr));
+  const onCap = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    const x = pa[3 * i], y = pa[3 * i + 1], z = pa[3 * i + 2], cy = capY(z);
+    const w = sstep(cy - 0.012 * H, cy + 0.02 * H, y) * (1 - F.cap.squash);
+    pa[3 * i] = hx + (x - hx) * (1 - w);
+    if (z < hz) pa[3 * i + 2] = hz + (z - hz) * (1 - w);
+    onCap[i] = y > cy ? 1 : 0;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pa, 3));
+  geo.setIndex(T);
+  geo.computeVertexNormals();
+  // 6. cavity AO from the one-ring (concave vertices darken, crests lighten for edge wear), smoothed twice
+  const nrm = geo.attributes.normal.array, sum = new Float32Array(3 * n), cnt = new Float32Array(n), el = new Float32Array(n);
+  for (let t = 0; t < T.length; t += 3) for (let e = 0; e < 3; e++) {
+    const p = T[t + e], q1 = T[t + (e + 1) % 3], q2 = T[t + (e + 2) % 3];
+    for (const q of [q1, q2]) {
+      sum[3 * p] += pa[3 * q]; sum[3 * p + 1] += pa[3 * q + 1]; sum[3 * p + 2] += pa[3 * q + 2]; cnt[p]++;
+      el[p] += Math.hypot(pa[3 * q] - pa[3 * p], pa[3 * q + 1] - pa[3 * p + 1], pa[3 * q + 2] - pa[3 * p + 2]);
+    }
+  }
+  let cav = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    if (!cnt[i]) continue;
+    const dx = sum[3 * i] / cnt[i] - pa[3 * i], dy = sum[3 * i + 1] / cnt[i] - pa[3 * i + 1], dz = sum[3 * i + 2] / cnt[i] - pa[3 * i + 2];
+    cav[i] = (dx * nrm[3 * i] + dy * nrm[3 * i + 1] + dz * nrm[3 * i + 2]) / (el[i] / cnt[i]);
+  }
+  for (let pass = 0; pass < 2; pass++) {
+    const nx = new Float32Array(n), nc = new Float32Array(n);
+    for (let t = 0; t < T.length; t += 3) for (let e = 0; e < 3; e++) { const p = T[t + e]; for (let f = 0; f < 3; f++) { nx[p] += cav[T[t + f]]; nc[p]++; } }
+    for (let i = 0; i < n; i++) nx[i] = nc[i] ? nx[i] / nc[i] : cav[i];
+    cav = nx;
+  }
+  // 7. vertex colour = (bare stone, or the scan's paint worn into it) x AO; aPaint = (sand, no gold, no glow line)
+  const vc = new Float32Array(3 * n), ap = new Float32Array(3 * n);
+  for (let i = 0; i < n; i++) {
+    const ao = Math.min(1.08, Math.max(0.32, 1 - 1.8 * max(cav[i], 0) + 0.25 * max(-cav[i], 0)));
+    const y = pa[3 * i + 1] / H;
+    const foot = 0.75 + 0.25 * sstep(0, 0.06, y); // ground occlusion at the soles
+    if (onCap[i]) {
+      const k = 0.92 + 0.16 * vnoise(pa[3 * i] * 2, pa[3 * i + 1] * 2, pa[3 * i + 2] * 2, 21);
+      for (let j = 0; j < 3; j++) vc[3 * i + j] = F.cap.color[j] * k * ao;
+      ap[3 * i] = 0.04;
+    } else {
+      for (let j = 0; j < 3; j++) vc[3 * i + j] = (1 + F.paint * (min(1, 1.6 * ca[3 * i + j]) - 1)) * ao * foot;
+      ap[3 * i] = clamp01(0.25 + 2.2 * max(cav[i], 0) + 0.4 * (1 - sstep(0.02, 0.2, y)));
+    }
+    ap[3 * i + 1] = 1; ap[3 * i + 2] = 1;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(vc, 3));
+  geo.setAttribute('aPaint', new THREE.BufferAttribute(ap, 3));
+  geo.computeBoundingBox(); geo.computeBoundingSphere();
+  // 8. measure: shoulders (widest slice in the upper body), chest front, eyes on the face surface
+  let shoulderY = 0.78 * H, halfW = 0;
+  for (let k = 0; k < 48; k++) {
+    const lo = H * (0.62 + 0.25 * k / 48), hi = lo + H * 0.25 / 48;
+    let wmax = 0;
+    for (let i = 0; i < n; i++) { const y = pa[3 * i + 1]; if (y >= lo && y < hi) wmax = max(wmax, abs(pa[3 * i])); }
+    if (wmax > halfW) { halfW = wmax; shoulderY = (lo + hi) / 2; }
+  }
+  const frontZ = (x0, yc, dx, dy, fb) => {
+    let z = -Infinity;
+    for (let i = 0; i < n; i++) if (abs(pa[3 * i + 1] - yc) < dy && abs(pa[3 * i] - x0) < dx) z = max(z, pa[3 * i + 2]);
+    return Number.isFinite(z) ? z : fb;
+  };
+  const chestY = shoulderY - 0.09 * H;
+  const chestZ = frontZ(0, chestY, 0.06 * H, 0.01 * H, 0.08 * H);
+  const ey = F.eyes.y * H, ex = F.eyes.x * H;
+  const eyes = [-1, 1].map((sd) => new THREE.Vector3(sd * ex, ey, frontZ(sd * ex, ey, 0.005 * H, 0.005 * H, hz + hr)));
+  return { geo, H, triangles: T.length / 3, head: { x: hx, z: hz, r: hr, capY: capY(hz) }, shoulderY, halfW, chestY, chestZ, eyes };
+}
+const scanCache = new Map();
+function loadScan(url, quality) {
+  const key = `${url}|${quality}`;
+  if (!scanCache.has(key)) scanCache.set(key, fitScan(url, quality).catch((e) => {
+    if (!/404|Not Found|Failed to fetch/i.test(String(e && e.message))) console.warn('ptah-colossus: scan unusable, procedural fallback:', e);
+    return null;
+  }));
+  return scanCache.get(key);
 }
 
 // ---------------------------------------------------------------- public API
 /**
- * createPtahColossus(assets, opts) -> { group, height, handles, setState, materials, triangles }
- * opts.height   target height in scene units (default 24.05 = native, about 30 robots)
+ * createPtahColossus(assets, opts) -> { group, height, handles, setState, materials, triangles, source }
+ * opts.height   target height in scene units (default: native, 24.08 procedural or 29.4 with the scan)
  * opts.quality  'high' (default) or 'draft' (coarser mesh, for fast look-dev)
  * opts.eyeColor glow colour of the eyes and the mouth seam (default teal #5FF2E0)
  * opts.drift    false to leave out the sand drift around the plinth (when the set has its own)
+ * opts.scan     asset path of the museum scan (default SCAN_URL), or false for the procedural figure;
+ *               when the file is absent the procedural figure is used
  */
 export async function createPtahColossus(assets, opts = {}) {
-  const { height = NATIVE_HEIGHT, quality = 'high', eyeColor = '#5FF2E0', drift = true } = opts;
+  const { quality = 'high', eyeColor = '#5FF2E0', drift = true, scan = SCAN_URL } = opts;
+  const fit = scan ? await loadScan(scan, quality) : null;
+  const NATIVE = fit ? Y0 + fit.H : NATIVE_HEIGHT;
+  const height = opts.height || NATIVE;
   const [diff, nor, rough, ao, disp, sNor, sRough] = await Promise.all([
     loadTex(`${ROCK}diff_2k.jpg`, true), loadTex(`${ROCK}nor_gl_2k.jpg`, false), loadTex(`${ROCK}rough_2k.jpg`, false),
     loadTex(`${ROCK}ao_2k.jpg`, false), loadTex(`${ROCK}disp_2k.jpg`, false),
     loadTex(`${SAND}nor_gl_1k.jpg`, false), loadTex(`${SAND}rough_1k.jpg`, false),
   ]);
-  const { geos, dust } = buildGeometry(quality);
+  const { geos, dust } = buildGeometry(quality, !!fit);
   const maps = { diff, nor, rough, ao, disp };
   const shared = glowUniforms();
   const stone = makeStoneMaterial(maps, shared, { tint: '#E6CFAE', scale: 0.2, normalScale: 0.6 });
@@ -1169,7 +1409,17 @@ export async function createPtahColossus(assets, opts = {}) {
   };
   const plinth = mk(geos.plinth, granite, 'plinth');
   root.add(plinth);
-  root.add(mk(geos.bodyLower, stone, 'body-lower'), mk(geos.bodyUpper, stone, 'body-upper'), mk(geos.collar, fine, 'collar'));
+  const collar = mk(geos.collar, fine, 'collar');
+  root.add(collar);
+  // fit: the scan figure on the maat pedestal, the procedural collar scaled onto its shoulders
+  let sc = 1;
+  if (fit) {
+    root.add(mk(fit.geo, stone, 'scan-figure')).children.at(-1).position.y = Y0;
+    const C = SCAN_FIT.collar;
+    sc = fit.halfW / PROC.halfW;
+    collar.scale.setScalar(sc * C.scale);
+    collar.position.set(0, Y0 + fit.shoulderY - PROC.shoulderY * sc * C.scale + C.dy, C.dz);
+  } else root.add(mk(geos.bodyLower, stone, 'body-lower'), mk(geos.bodyUpper, stone, 'body-upper'));
   if (drift) {
     const sandMat = new THREE.MeshStandardMaterial({ color: '#E4C08C', roughness: 1, normalMap: sNor, roughnessMap: sRough, normalScale: new THREE.Vector2(0.4, 0.4) });
     const d = mk(geos.drift, sandMat, 'sand-drift');
@@ -1180,18 +1430,30 @@ export async function createPtahColossus(assets, opts = {}) {
   // head on its pivot
   const head = new THREE.Group();
   head.name = 'head-pivot';
-  head.position.copy(HEAD_PIVOT);
-  head.scale.setScalar(HEAD_SCALE);
   head.rotation.order = 'YXZ';
   root.add(head);
-  head.add(mk(geos.head, face, 'head'));
-  // iris: dark polished stone; the glow is an inner light confined to the iris ring, pupil stays dark
-  const eyeMat = new THREE.MeshStandardMaterial({
+  // the scan is one rigid mesh: its head pivot is an empty marker (headYaw / headPitch move nothing)
+  if (fit) head.position.set(fit.head.x, Y0 + fit.head.capY, fit.head.z);
+  else { head.position.copy(HEAD_PIVOT); head.scale.setScalar(HEAD_SCALE); head.add(mk(geos.head, face, 'head')); }
+  // iris: dark polished stone; the glow is an inner light confined to the iris ring, pupil stays dark.
+  // On the scan the painted eyes stay as carved; a soft additive glow sits on them only while he speaks.
+  const eyeMat = fit ? new THREE.MeshBasicMaterial({
+    color: eyeCol, map: radialTexture([[0, '#FFFFFF'], [0.35, '#9FF5EC'], [1, '#000000']], 64),
+    transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+  }) : new THREE.MeshStandardMaterial({
     color: '#1A1512', roughness: 0.35, metalness: 0.0, envMapIntensity: 0.2, emissive: eyeCol, emissiveIntensity: 0,
     emissiveMap: radialTexture([[0, '#0A1414'], [0.3, '#123232'], [0.48, '#9FF5EC'], [0.72, '#FFFFFF'], [0.9, '#6FBFB8'], [1, '#1E3A38']], 128),
   });
   const eyes = [], flares = [];
-  for (const side of [-1, 1]) {
+  if (fit) for (const [i, p] of fit.eyes.entries()) {
+    const e = new THREE.Mesh(new THREE.CircleGeometry(0.0075 * fit.H, 24), eyeMat);
+    e.name = i === 0 ? 'eye-right' : 'eye-left';
+    e.position.set(p.x, Y0 + p.y, p.z + 0.01);
+    e.renderOrder = 2; e.visible = false;
+    root.add(e);
+    eyes.push(e);
+  }
+  for (const side of fit ? [] : [-1, 1]) {
     const e = new THREE.Mesh(side < 0 ? geos.eyeR : geos.eyeL, [fine, eyeMat]);
     e.name = side < 0 ? 'eye-right' : 'eye-left';
     e.position.set(side * EYE.x, EYE.y, EYE.z);
@@ -1206,6 +1468,11 @@ export async function createPtahColossus(assets, opts = {}) {
   sceptre.name = 'sceptre-pivot';
   sceptre.position.copy(GRIP);
   sceptre.scale.setScalar(SCEPTRE_SCALE);
+  if (fit) { // the fists and sceptre in front of the scan's chest, scaled with the shoulders
+    const S = SCAN_FIT.sceptre;
+    sceptre.position.set(0, Y0 + fit.chestY + (GRIP.y - PROC.chestY) * sc + S.dy, fit.chestZ + (GRIP.z - PROC.chestZ) * sc + S.dz);
+    sceptre.scale.setScalar(SCEPTRE_SCALE * sc * S.scale);
+  }
   root.add(sceptre);
   sceptre.add(mk(geos.sceptre, fine, 'hands-sceptre'), mk(geos.staff, fine, 'staff'));
 
@@ -1214,14 +1481,14 @@ export async function createPtahColossus(assets, opts = {}) {
   bodyDust.visible = false;
   root.add(bodyDust);
 
-  const k = height / NATIVE_HEIGHT;
+  const k = height / NATIVE;
   group.scale.setScalar(k);
   group.updateMatrixWorld(true);
-  const bounds = new THREE.Box3(new THREE.Vector3(-PB.x * k, 0, -PB.z * k), new THREE.Vector3(PB.x * k, NATIVE_HEIGHT * k, PB.z * k));
+  const bounds = new THREE.Box3(new THREE.Vector3(-PB.x * k, 0, -PB.z * k), new THREE.Vector3(PB.x * k, NATIVE * k, PB.z * k));
   const anchors = {
-    eyes: new THREE.Vector3(0, HEAD_PIVOT.y + EYE.y * HEAD_SCALE, HEAD_PIVOT.z + EYE.z * HEAD_SCALE).multiplyScalar(k),
-    chest: new THREE.Vector3(0, figY(15.8), 1.92).multiplyScalar(k),
-    sceptreTop: new THREE.Vector3(0, GRIP.y + 2.91 * SCEPTRE_SCALE, GRIP.z).multiplyScalar(k),
+    eyes: (fit ? new THREE.Vector3(0, Y0 + fit.eyes[0].y, fit.eyes[0].z) : new THREE.Vector3(0, HEAD_PIVOT.y + EYE.y * HEAD_SCALE, HEAD_PIVOT.z + EYE.z * HEAD_SCALE)).multiplyScalar(k),
+    chest: (fit ? new THREE.Vector3(0, Y0 + fit.chestY, fit.chestZ) : new THREE.Vector3(0, figY(15.8), 1.92)).multiplyScalar(k),
+    sceptreTop: new THREE.Vector3(0, sceptre.position.y + 2.91 * sceptre.scale.y, sceptre.position.z).multiplyScalar(k),
     plinthTop: new THREE.Vector3(0, 5.2, 0).multiplyScalar(k),
     plinthFront: new THREE.Vector3(0, 0, PB.z).multiplyScalar(k),
   };
@@ -1238,7 +1505,8 @@ export async function createPtahColossus(assets, opts = {}) {
     sceptre.rotation.z = -state.sceptreTilt;
     sceptre.rotation.x = 0.12 * abs(state.sceptreTilt);
     // a faint inner light in the iris, only while the god speaks (voice > 0); eyeGlow only scales it
-    eyeMat.emissiveIntensity = 0.22 * v * (0.6 + 0.4 * eg);
+    if (fit) { eyeMat.opacity = 0.55 * v * (0.6 + 0.4 * eg); for (const e of eyes) e.visible = v > 0.01; }
+    else eyeMat.emissiveIntensity = 0.22 * v * (0.6 + 0.4 * eg);
     // no glow on the collar or the inlays: gold leaf stays gold leaf
     inlay.uInlayGlow.value = 0;
     inlay.uVoiceGlow.value = 0;
@@ -1249,12 +1517,13 @@ export async function createPtahColossus(assets, opts = {}) {
 
   return {
     group,
-    height: NATIVE_HEIGHT * k,
+    height: NATIVE * k,
     handles: { head, eyes, eyeMaterial: eyeMat, eyeFlares: flares, sceptre, sceptreArm: sceptre, chestGlow: inlay.uInlayGlow, plinth, bounds, anchors },
     setState,
     getState: () => ({ ...state }),
     materials: { stone, fine, face, granite, eye: eyeMat },
     triangles: Math.round(triangles),
+    source: fit ? 'scan' : 'procedural',
   };
 }
 
