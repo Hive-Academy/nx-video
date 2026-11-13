@@ -1,15 +1,17 @@
 // Episode 6, desert act, direction v4 look: an open temple-building site in the dunes at golden
-// hour. A monumental wide screen is set into a sandstone facade, a 24 m Ptah proxy stands in the
-// sand beyond it, three hauling crews drag blocks up ramps and the two visitors sit in their
+// hour. A monumental wide screen is set into a sandstone facade, the 24 m Ptah colossus
+// (src/ptah-colossus.js) stands in the sand beyond it, three hauling crews drag blocks up ramps and the two visitors sit in their
 // office chairs on the paved forecourt.
-//   buildDesert4Look(assets, renderer, { shot: 'a'|'b'|'c'|'d', aspect })
+//   buildDesert4Look(assets, renderer, { shot: 'a'|'b'|'c'|'d'|'e', aspect })
 //     -> { scene, camera, exposure, film, handles, info }
 // Metres throughout (robot 0.79 m). +Z points from the facade toward the audience; the
 // screen faces +Z. Static and deterministic: every variation is seeded through util.hash.
 import * as THREE from 'three';
 import { assetUrl } from './assets.js';
 import { glb, hdri, fit, shadows, robot } from './craft.js';
-import { environment, reshadeRobot, contactShadow, screenLight as kitScreenLight } from './look-kit.js';
+import { environment, reshadeRobot, contactShadow, roomProbe, loungeChair, screenLight as kitScreenLight } from './look-kit.js';
+import { ROBOT_SCALE } from './look-workspace.js';
+import { createPtahColossus } from './ptah-colossus.js';
 import { brazier } from './temple.js';
 import { hash, hashRange } from './util.js';
 import { ROBOT } from './robot.js';
@@ -21,6 +23,22 @@ import {
 
 const RS = 0.38; // robot scale
 const BALL = ROBOT.ballRadius * RS; // 0.325 m
+// The visitors' swivel chair keeps the workspace's robot-to-chair ratio: there the chair is
+// 1.17 x 0.63 = 0.737 tall for a robot at ROBOT_SCALE (0.25). Here the robot is at RS (0.38, the
+// crews' size), so the chair scales up by RS / ROBOT_SCALE to 1.12 m, with the same cushion.
+const CHAIR_K = RS / ROBOT_SCALE;
+const CHAIR = { h: 1.17 * 0.63 * CHAIR_K, cushion: 0.06 * CHAIR_K, sink: 0.03 * CHAIR_K };
+// The workspace robot treatment (approved two-shot): warm ceramic shell, dark glass visor with
+// an agent-colour tint, creased normals. faceLight and envMap are set per use.
+const ROBOT_LOOK = { shell: '#CCC3B5', env: 0.9, eyeBoost: 2.6, glass: 0.55, smooth: Math.PI / 4 };
+// Outdoors the sky is far brighter than the workspace room, so the mirror visor and the shell
+// take less of it: the visor stays dark glass with the agent tint, the shell keeps its shading.
+const OUTDOOR_ENV = { shell: 0.6, screen: 0.45 };
+function lookRobot(r, opts) {
+  reshadeRobot(r, { ...ROBOT_LOOK, ...opts });
+  r.mats.shell.envMapIntensity = OUTDOOR_ENV.shell;
+  r.mats.screen.envMapIntensity = OUTDOOR_ENV.screen;
+}
 export const SCREEN = { w: 14.4, h: 6.0, x: 0, y: 4.8, z: -29.86, border: 0.9, face: -30 };
 // app.png is 16:9; the screen is 2.4:1, so cover-crop to the top 800 rows (the UI that matters).
 export const SCREEN_CROP = { repeatY: 800 / 1080, offsetY: 1 - 800 / 1080 };
@@ -32,29 +50,46 @@ const SUN_DIR = V(-0.95, 0.27, 0.14).normalize(); // toward the sun: low, hard c
 const CREW = { lead: 5.25, pairs: [2.4, 3.65], stagger: 0.5, lateral: [0.72, 0.84] };
 // Crew hues, pushed apart for the read at phone size: Antigravity cyan-azure, Cursor violet.
 const CREW_HUE = { Antigravity: '#1FB2F2', Cursor: '#B67BFF' };
-// The Ptah proxy: the colossus on demo/ep06-v4-ptah-colossus is 24.05 m tall (soles at 3 m on
-// its plinth), about 5 m across the shoulders, faces +Z and has its origin at the plinth base.
+// The Ptah colossus comes only through the createPtahColossus(assets, opts) API
+// ({ group, height, handles, setState }), so a redesigned colossus drops in without edits here.
+// It is 24.05 m tall, faces +Z and has its origin at the plinth base. Never frame it tighter than
+// head and shoulders (its face close-up is not approved).
 export const PTAH = { at: [29.0, -66.0], height: 24.05, faceAt: [0, -14] };
 const SKY = 'hdri/mpumalanga_veld_puresky_2k.hdr';
 
 // Per-shot cameras (focal length on a 36 mm gate), visitor seats and post hints.
 // Seats: chair centre [x, z], what the chair faces, extra yaw, the robot's head turn.
+// focus: 'seats' puts the focal plane on the visitors' faces (measured after they are placed).
+// ptah: the colossus state (setState). stand: the visitors stand beside their empty chairs.
 const SHOTS = {
   a: {
-    pos: [3.4, 0.82, -10.2], target: [-4.6, 1.75, -17.6], mm: 28, dof: { focus: 4.0, aperture: 0.003, maxblur: 0.006 }, screenOn: false,
+    pos: [3.4, 0.82, -10.2], target: [-4.6, 1.75, -17.6], mm: 28, dof: { focus: 'seats', aperture: 0.0016, maxblur: 0.005 }, screenOn: false, ptah: { voice: 0, eyeGlow: 0 },
     seats: [{ name: 'Claude', chair: [0.15, -13.9], face: 'camera', yaw: -0.55, head: 0.1 }, { name: 'Codex', chair: [-1.55, -13.15], face: 'camera', yaw: -0.3, head: 0.18 }],
   },
   b: {
-    pos: [1.0, 1.1, -9.8], target: [1.4, 4.75, -30], mm: 28, dof: { focus: 22.0, aperture: 0.0002, maxblur: 0.002 }, screenOn: true,
+    pos: [1.0, 1.1, -9.8], target: [1.4, 4.75, -30], mm: 28, dof: { focus: 22.0, aperture: 0.0002, maxblur: 0.002 }, screenOn: true, ptah: { voice: 0.5, eyeGlow: 0.5 },
     seats: [{ name: 'Claude', chair: [-0.2, -16.8], face: 'screen', yaw: 0, head: 0.5 }, { name: 'Codex', chair: [2.1, -17.2], face: 'screen', yaw: 0, head: -0.5 }],
   },
   c: {
-    pos: [0.45, 0.8, -12.9], target: [0.1, 4.0, -30], mm: 35, dof: { focus: 17.0, aperture: 0.0004, maxblur: 0.004 }, screenOn: true,
-    seats: [{ name: 'Claude', chair: [-0.75, -21.3], face: 'screen', yaw: 0, head: 0.35 }, { name: 'Codex', chair: [1.65, -21.6], face: 'screen', yaw: 0, head: -0.35 }],
+    pos: [0.45, 0.8, -12.9], target: [0.1, 4.0, -30], mm: 35, dof: { focus: 17.0, aperture: 0.0004, maxblur: 0.004 }, screenOn: true, ptah: { voice: 0.3, eyeGlow: 0.4 },
+    seats: [{ name: 'Claude', chair: [0.6, -20.0], face: 'screen', yaw: 0, head: 0.35 }, { name: 'Codex', chair: [2.2, -20.3], face: 'screen', yaw: 0, head: -0.35 }],
   },
   d: {
-    pos: null, target: null, mm: 35, dof: { focus: 4.6, aperture: 0.0025, maxblur: 0.007 }, screenOn: true,
+    pos: null, target: null, mm: 35, dof: { focus: 4.6, aperture: 0.0025, maxblur: 0.007 }, screenOn: true, ptah: { voice: 0.3, eyeGlow: 0.4 },
     seats: [{ name: 'Claude', chair: [-0.6, -13.0], face: 'screen', yaw: 0, head: 0.3 }, { name: 'Codex', chair: [1.6, -13.4], face: 'screen', yaw: 0, head: -0.3 }],
+  },
+  // e: the giant rises, a low hero angle. 24 mm, lens 0.55 m above the sand, about 49 m from the
+  // colossus and tilted up 7 degrees. The two visitors stand 1.9 m and 2.45 m in front of the
+  // lens, seen from the rear three-quarters, looking up. The colossus sits at about 0.72 of the
+  // frame width, plinth on the horizon, crown near the top edge. The facade's side is at the left
+  // edge as context. The head turns a little toward the visitors (headYaw), and eyeGain lifts the
+  // eye emissive from the scene side so the eyes read at 49 m. The rim is a spot with a distance
+  // cutoff, so it lights the giant but not the visitors. Layout maths: lookdev/e-geom.mjs (args: camX camZ camHeight offsetDeg tiltDeg).
+  e: {
+    pos: [42.8, 0.84, -26.3], target: [29.37, 3.65, -41.12], mm: 24, dof: { focus: 'seats', aperture: 0.00012, maxblur: 0.003 }, screenOn: true,
+    ptah: { voice: 0.2, eyeGlow: 1, headYaw: 0.4, headPitch: 0.1 }, eyeGain: 4,
+    haze: true, rim: true,
+    seats: [{ name: 'Claude', chair: [37.19, -28.77], at: [40.17, -28.3], face: 'ptah', yaw: -0.4, head: 0, pitch: 0.32, stand: true, chairYaw: 0.6 }, { name: 'Codex', chair: [41.86, -31.66], at: [40.61, -29.17], face: 'ptah', yaw: -0.6, head: 0, pitch: 0.3, stand: true, chairYaw: -0.9 }],
   },
 };
 
@@ -87,7 +122,7 @@ export function groundAt(x, z) {
   return site * (1 - flat) + dunes * flat;
 }
 
-export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 16 / 9 } = {}) {
+export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 16 / 9, ptahQuality = 'high' } = {}) {
   const S = SHOTS[shot] || SHOTS.b;
   const scene = new THREE.Scene();
   const handles = { crews: [], visitors: [], chairs: [], braziers: [] };
@@ -103,11 +138,13 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   scene.backgroundRotation.set(0, rotY, 0);
 
   const sun = new THREE.DirectionalLight('#FFC48A', 3.7);
-  sun.position.copy(SUN_DIR).multiplyScalar(110).add(V(0, 0, -24));
-  sun.target.position.set(0, 0, -24);
+  // the shadow box reaches the colossus at (29, -66): its self-shadowing and its long shadow on
+  // the dunes read in b and e
+  sun.position.copy(SUN_DIR).multiplyScalar(130).add(V(8, 0, -38));
+  sun.target.position.set(8, 0, -38);
   sun.castShadow = true;
   sun.shadow.mapSize.set(4096, 4096);
-  Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 40, bottom: -40, near: 10, far: 260 });
+  Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 52, bottom: -52, near: 10, far: 300 });
   sun.shadow.bias = -0.00025;
   sun.shadow.normalBias = 0.03;
   sun.shadow.radius = 2;
@@ -333,29 +370,41 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     site.add(shadows(l));
   }
 
-  // ---------------------------------------------------------------- Ptah proxy (true size)
+  // ---------------------------------------------------------------- the Ptah colossus (true size, at the anchor)
   {
-    const p = ptahProxy();
     const [px, pz] = PTAH.at;
-    p.position.set(px, groundAt(px, pz) - 0.35, pz);
-    p.rotation.y = Math.atan2(PTAH.faceAt[0] - px, PTAH.faceAt[1] - pz);
-    scene.add(p);
-    const facing = V(Math.sin(p.rotation.y), 0, Math.cos(p.rotation.y));
-    handles.ptahProxy = p;
-    handles.ptahAnchor = { position: p.position.clone(), yaw: p.rotation.y, facing, height: PTAH.height, scale: 1, note: 'origin at plinth base, faces +Z rotated by yaw; place createPtahColossus().group here' };
+    const anchor = V(px, groundAt(px, pz) - 0.35, pz);
+    const yaw = Math.atan2(PTAH.faceAt[0] - px, PTAH.faceAt[1] - pz);
+    const facing = V(Math.sin(yaw), 0, Math.cos(yaw));
+    handles.ptahAnchor = { position: anchor.clone(), yaw, facing, height: PTAH.height, scale: 1, note: 'origin at plinth base, faces +Z rotated by yaw; the colossus group stands here' };
+    const colossus = await createPtahColossus(assets, { height: PTAH.height, quality: ptahQuality });
+    colossus.group.position.copy(anchor);
+    colossus.group.rotation.y = yaw;
+    // only the API: group, setState. Extra opts or state keys a later design ignores are harmless.
+    // eyeGain: a scene-side multiplier on the eye emissive for distant shots, kept across later
+    // setState calls. Skipped when a design has no handles.eyeMaterial.
+    const eyeMat = colossus.handles && colossus.handles.eyeMaterial;
+    if (S.eyeGain && eyeMat && colossus.setState) {
+      const base = colossus.setState;
+      colossus.setState = (s) => { base(s); eyeMat.emissiveIntensity *= S.eyeGain; };
+    }
+    if (colossus.setState) colossus.setState({ eyeGlow: 0, headYaw: 0, headPitch: 0, sceptreTilt: 0, voice: 0, ...S.ptah });
+    scene.add(colossus.group);
+    handles.colossus = colossus;
+    handles.ptah = colossus.group;
   }
 
   // ---------------------------------------------------------------- crews
   const crewDefs = [
-    { name: 'Antigravity', key: 'near', start: V(-1.55, 0, -24.25), dir: V(-0.17, 0, 0.985), len: 10, rise: 1.0, s: 3.4, seed: 101 },
-    { name: 'Cursor', key: 'mid', start: V(4.2, 0, -27.35), dir: V(0.17, 0, 0.985), len: 12.5, rise: 1.6, s: 3.1, seed: 202 },
-    { name: 'OpenCode', key: 'far', start: V(1.8, 0, -25.95), dir: V(-1, 0, 0), len: 15, rise: 2.2, s: 2.9, seed: 303 },
+    { name: 'Antigravity', key: 'near', start: V(-1.55, 0, -24.25), dir: V(-0.17, 0, 0.985), len: 10, rise: 1.0, s: 3.4, seed: 101, fit: { shift: [1.0, 0], ds: -2.5 } },
+    { name: 'Cursor', key: 'mid', start: V(4.2, 0, -27.35), dir: V(0.17, 0, 0.985), len: 12.5, rise: 1.6, s: 3.1, seed: 202, fit: { shift: [-1.38, 0.24], ds: -2.5, k: 0.9, ro: -0.15 } },
+    { name: 'OpenCode', key: 'far', start: V(1.8, 0, -25.95), dir: V(-1, 0, 0), len: 15, rise: 2.2, s: 2.9, seed: 303, fit: { shift: [-0.4, -0.6], ds: -1.5 } },
   ];
   for (const def of crewDefs) handles.crews.push(buildCrew(assets, scene, def, { blockMat, rubbleMat, woodMat, leather, ropeMat }));
   for (const c of handles.crews) {
     for (const r of c.robots) {
-      reshadeRobot(r, { faceLight: shot === 'd' && c.key === 'mid' ? 0.25 : 0 });
-      if (CREW_HUE[c.name]) tintRobot(r, CREW_HUE[c.name]);
+      lookRobot(r, { faceLight: shot === 'd' && c.key === 'mid' ? 0.25 : 0 });
+      tintRobot(r, CREW_HUE[c.name] || r.color);
       if (r.blob) { r.blob.visible = true; r.blob.material.opacity = Math.max(r.blob.material.opacity ?? 0.5, 0.55); }
     }
   }
@@ -393,26 +442,35 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   }
 
   // ---------------------------------------------------------------- visitors in their chairs (seated in every shot)
+  // The kit's swivel chair (look-kit loungeChair, the workspace chair) at the workspace
+  // robot-to-chair ratio; each robot sits on the chair's userData.seatY, back against the shell.
   const camPos = S.pos ? V(...S.pos) : V(0, 1, 0);
-  const chairSrc = await glb('workspace/mid_century_lounge_chair/mid_century_lounge_chair_1k.gltf');
   for (const v of S.seats) {
     const [cx, cz] = v.chair;
-    const gy = PAVE.top;
-    const lookAt = v.face === 'camera' ? camPos.clone().setY(0) : V(SCREEN.x + (cx < 0.5 ? -1.2 : 1.2), 0, SCREEN.face);
-    const yaw = Math.atan2(lookAt.x - cx, lookAt.z - cz) + v.yaw;
-    // the chair seat faces +Z at yaw 0, like the robot
-    const c = fit(chairSrc.clone(true), { h: 1.17 * 0.63, at: [cx, gy, cz], yaw, sink: 0.015 });
-    shadows(c);
+    const gy = v.stand ? groundAt(cx, cz) : PAVE.top;
+    const ptahAt = handles.ptahAnchor.position;
+    const lookAt = v.face === 'camera' ? camPos.clone().setY(0) : v.face === 'ptah' ? V(ptahAt.x, 0, ptahAt.z) : V(SCREEN.x + (cx < 0.5 ? -1.2 : 1.2), 0, SCREEN.face);
+    const [ox, oz] = v.at || v.chair; // where the robot is (standing robots are off their chairs)
+    const yaw = Math.atan2(lookAt.x - ox, lookAt.z - oz) + v.yaw;
+    const fwd = V(Math.sin(yaw), 0, Math.cos(yaw));
+    const c = await loungeChair({ height: CHAIR.h, cushion: CHAIR.cushion });
+    // the kit chair faces -Z at rotation 0; turn it so its front faces `fwd`. A standing robot
+    // has left its chair: the empty chair stays where it landed, swung a little off its line.
+    c.position.set(cx, gy - 0.01, cz);
+    c.rotation.y = yaw + Math.PI + (v.chairYaw || 0);
     scene.add(c);
     handles.chairs.push(c);
-    scene.add(puffs(V(cx, gy, cz), { n: 5, r: 0.6, seed: hash(v.name), opacity: shot === 'a' ? 0.16 : 0.1, size: 0.8 }));
-    c.updateMatrixWorld(true);
-    const seatY = seatHeight(c);
-    const fwd = V(Math.sin(yaw), 0, Math.cos(yaw));
-    const at = V(cx, seatY - 0.01, cz).addScaledVector(fwd, 0.02);
-    const r = robot(assets, v.name, at, at.clone().add(fwd), { scale: RS, pose: { pitch: v.name === 'Claude' ? 0.04 : 0, headYaw: v.head, nod: 0, eyeSX: 1.05, eyeSY: 1.05 } });
-    reshadeRobot(r, { faceLight: shot === 'a' ? 0.35 : 0.12 });
-    r.blob.visible = false;
+    scene.add(puffs(V(cx, gy, cz), { n: 5, r: 0.6, seed: hash(v.name), opacity: shot === 'a' ? 0.12 : 0.08, size: 0.8 }));
+    let at;
+    if (v.stand) {
+      // on its feet on the sand, its empty chair behind it
+      at = V(v.at[0], groundAt(v.at[0], v.at[1]), v.at[1]);
+    } else {
+      at = V(cx, c.userData.seatY + gy - 0.01, cz).addScaledVector(fwd, -CHAIR.sink);
+    }
+    const r = robot(assets, v.name, at, at.clone().add(fwd), { scale: RS, pose: { pitch: v.pitch ?? (v.stand ? -0.06 : (v.name === 'Claude' ? 0.04 : 0)), headYaw: v.head, nod: v.stand && v.pitch == null ? 0.12 : 0, eyeSX: 1.05, eyeSY: 1.05 } });
+    lookRobot(r, { faceLight: shot === 'a' ? 0.35 : 0.12, faceBoost: v.name === 'Claude' ? 1.25 : 1 });
+    if (r.blob) r.blob.visible = !!v.stand;
     scene.add(r.root);
     handles.visitors.push(r);
   }
@@ -462,6 +520,31 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   scene.add(motes(900, V(0, 0, -20), V(40, 7, 28), 77, { size: 0.045, opacity: 0.5 }));
   scene.add(motes(300, V(0, 0.08, -18), V(30, 0.6, 20), 78, { size: 0.12, opacity: 0.2, color: '#F3D2A8' }));
 
+  // e: haze between the visitors and the giant (scale through air), and a warm rim from behind it
+  if (S.haze || S.rim) {
+    const cam = V(...S.pos), giant = V(PTAH.at[0], 0, PTAH.at[1]);
+    if (S.haze) {
+      for (const [t, w, h, o] of [[0.45, 24, 6, 0.2], [0.6, 30, 10, 0.22], [0.75, 34, 14, 0.2], [0.88, 40, 9, 0.16]]) {
+        const p = cam.clone().setY(0).lerp(giant, t);
+        const hc = hazeCard(w, h, { color: '#E6C29C', opacity: o, seed: Math.round(t * 100) });
+        hc.position.set(p.x, groundAt(p.x, p.z) - 0.3, p.z);
+        hc.lookAt(cam.x, hc.position.y, cam.z);
+        scene.add(hc);
+      }
+    }
+    if (S.rim) {
+      const away = giant.clone().sub(cam).setY(0).normalize();
+      // three.js light layers only filter against the camera, not per object, so the visitors
+      // are kept out of the rim with a distance cutoff instead: decay 0, the light ends about
+      // 22 m past the giant, and the visitors stand about 90 m from it.
+      const rimSun = new THREE.SpotLight('#FFB476', 9, 62, 0.32, 0.5, 0);
+      rimSun.position.copy(giant).addScaledVector(away, 40).setY(16);
+      rimSun.target.position.copy(giant).setY(14);
+      scene.add(rimSun, rimSun.target);
+      handles.ptahRim = rimSun;
+    }
+  }
+
   fog.apply(scene);
   // look kit: transparent atmosphere (dust, haze cards, shafts, motes, flames, decals) stays out of the AO and DOF depth renders
   scene.userData.noDepth = scene.userData.noDepth || [];
@@ -485,6 +568,21 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   camera.position.copy(pos);
   camera.lookAt(target);
   camera.updateMatrixWorld();
+  // focus on the visitors' faces: the mean camera distance to their visor centres
+  const dof = { ...S.dof };
+  if (dof.focus === 'seats') {
+    const d = handles.visitors.map((r) => r.root.localToWorld(V(ROBOT.screenX, ROBOT.eyeY, 0)).distanceTo(pos));
+    dof.focus = +(d.reduce((a, b) => a + b, 0) / d.length).toFixed(2);
+  }
+
+  // reflection probe of the finished site from the forecourt: the robot shells and visors
+  // mirror the real sand, facade and lit screen, as the workspace robots mirror their room
+  {
+    const all = [...handles.visitors, ...handles.crews.flatMap((c) => c.robots)];
+    const probe = roomProbe(renderer, scene, { position: V(1.0, 1.4, -15), size: 256, near: 0.1, far: 900, hide: all.map((r) => r.root) });
+    for (const r of all) for (const k of ['shell', 'feet', 'screen']) { r.mats[k].envMap = probe; r.mats[k].needsUpdate = true; }
+    handles.robotProbe = probe;
+  }
 
   // screen fill: projected glass corners
   const proj = (p) => { const q = p.clone().project(camera); return [(q.x + 1) / 2, (1 - q.y) / 2, q.z]; };
@@ -499,12 +597,32 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
     camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), target: target.toArray().map((v) => +v.toFixed(2)), mm: S.mm },
   };
   {
-    const p = handles.ptahProxy;
+    const p = handles.ptah;
     p.updateMatrixWorld(true);
     const top = proj(p.localToWorld(V(0, PTAH.height, 0)));
     const sl = proj(p.localToWorld(V(-2.5, 19, 0))), sr = proj(p.localToWorld(V(2.5, 19, 0)));
     info.ptah = { top: top.slice(0, 2).map((v) => +v.toFixed(3)), shoulders: [sl, sr].map((s) => s.slice(0, 2).map((v) => +v.toFixed(3))), dist: +p.position.distanceTo(pos).toFixed(1) };
   }
+  // robots cut by a frame edge (partly in frame): [name, crew key or 'visitor', robot index]
+  info.cropped = [];
+  {
+    const box = new THREE.Box3();
+    const groups = [['visitor', handles.visitors], ...handles.crews.map((c) => [c.key, c.robots])];
+    for (const [key, list] of groups) list.forEach((r, i) => {
+      box.setFromObject(r.root);
+      const pts = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => proj(V(k & 1 ? box.max.x : box.min.x, k & 2 ? box.max.y : box.min.y, k & 4 ? box.max.z : box.min.z)));
+      if (pts.some((p) => p[2] >= 1)) return; // behind the camera
+      const x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0]));
+      const y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
+      const inFrame = x1 > 0 && x0 < 1 && y1 > 0 && y0 < 1;
+      if (inFrame && (x0 < 0 || x1 > 1 || y0 < 0 || y1 > 1)) info.cropped.push([r.name.slice(0, 2), key, i, +x0.toFixed(2), +x1.toFixed(2)]);
+    });
+  }
+  // visitor height as a fraction of the frame height
+  info.visitorH = handles.visitors.map((r) => {
+    const b = new THREE.Box3().setFromObject(r.root), c = b.getCenter(V());
+    return +(proj(V(c.x, b.min.y, c.z))[1] - proj(V(c.x, b.max.y, c.z))[1]).toFixed(3);
+  });
   info.faces = [...handles.visitors, ...handles.crews.flatMap((c) => c.robots)].map((r) => {
     const p = proj(r.root.localToWorld(V(ROBOT.screenX, ROBOT.eyeY, 0)));
     return [r.name.slice(0, 2), +p[0].toFixed(2), +p[1].toFixed(2)];
@@ -514,70 +632,32 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
   const film = {
     size: [1920, 1080], tone: 'aces', exposure: 0.9, msaa: 4,
     ao: { radius: 0.45, thickness: 1.2, distanceExponent: 1.6, scale: 1, samples: 16, intensity: 0.85 },
-    dof: S.dof,
+    dof,
     bloom: { strength: 0.28, radius: 0.55, threshold: 1.05 },
     grade: { vignette: 0.28, grain: 0.02, ca: 0.0012, lift: [0.004, 0.006, 0.014], seed: 4 },
   };
   return { scene, camera, bloom: null, exposure: film.exposure, film, handles, info };
 }
 
-// Recolour a crew robot to its crew hue: ear ring, soles and the face screen.
+// Recolour a crew robot (after reshadeRobot with glass) to its crew hue: ear ring, soles and the
+// tint of the dark glass visor. The visor base stays near-black glass, as in the workspace.
 function tintRobot(r, hex) {
   const c = new THREE.Color(hex);
   const m = r.mats;
-  m.glow.color.copy(c); m.glow.emissive.copy(c).multiplyScalar(1.3);
+  m.glow.color.copy(c); m.glow.emissive.copy(c).multiplyScalar(1.3 * 1.3);
   if (m.sole) { m.sole.color.copy(c).multiplyScalar(0.7); m.sole.emissive.copy(c); }
-  m.screen.color.copy(c).multiplyScalar(0.24);
-  m.screen.emissive.copy(c).multiplyScalar(0.5);
-}
-
-// Neutral grey stand-in for the colossus at its true size, so framing can be judged: a plinth
-// with a cavetto top (soles at 3 m), a mummiform body, 5 m shoulders, a head and a crown.
-// Origin at the plinth base centre, facing +Z, top at PTAH.height.
-function ptahProxy() {
-  const g = new THREE.Group();
-  g.name = 'ptahProxy';
-  const grey = new THREE.MeshStandardMaterial({ color: '#8C8C8C', roughness: 0.9, envMapIntensity: 0.8 });
-  g.add(mesh(battered(8, 2.6, 8, { batter: 0.06, tile: 3, back: true }), grey, [0, 0, 0]));
-  g.add(mesh(new THREE.BoxGeometry(8.4, 0.4, 8.4), grey, [0, 2.8, 0]));
-  // body: a lathe profile (radius by height), flattened front to back
-  const prof = [[0, 3.0], [1.45, 3.0], [1.6, 4.5], [1.85, 8.0], [2.05, 11.5], [2.15, 14.5], [2.3, 17.2], [2.5, 18.4], [2.3, 19.2], [1.2, 19.6], [0.75, 19.8], [0, 19.8]];
-  const body = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 40);
-  const bm = mesh(body, grey, [0, 0, 0]);
-  bm.scale.z = 0.62;
-  g.add(bm);
-  // hands on the chest holding the staff, the staff to the plinth
-  g.add(mesh(new THREE.BoxGeometry(1.6, 0.9, 0.7), grey, [0, 15.6, 1.35]));
-  g.add(mesh(new THREE.CylinderGeometry(0.22, 0.22, 12.6, 16), grey, [0, 9.4, 1.65]));
-  // neck, head, skullcap and beard
-  g.add(mesh(new THREE.CylinderGeometry(0.75, 0.85, 1.1, 24), grey, [0, 20.2, 0]));
-  const head = mesh(new THREE.SphereGeometry(1.45, 32, 24), grey, [0, 21.9, 0.1]);
-  head.scale.set(0.95, 1.12, 1.0);
-  g.add(head);
-  const cap = mesh(new THREE.SphereGeometry(1.52, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), grey, [0, 22.35, 0.0]);
-  cap.scale.set(1.0, 1.1, 1.0);
-  g.add(cap);
-  g.add(mesh(new THREE.CylinderGeometry(0.28, 0.2, 1.3, 12), grey, [0, 20.3, 1.1]));
-  // check the top lands at the colossus height
-  const box = new THREE.Box3().setFromObject(g);
-  g.userData.top = box.max.y;
-  shadows(g);
-  return g;
-}
-
-// Highest point of a chair's seat under its centre (ray cast down through the model).
-function seatHeight(chair) {
-  const box = new THREE.Box3().setFromObject(chair);
-  const c = box.getCenter(V(0, 0, 0));
-  const ray = new THREE.Raycaster(V(c.x, box.max.y + 1, c.z), V(0, -1, 0));
-  const hits = ray.intersectObject(chair, true).filter((h) => h.point.y < box.min.y + (box.max.y - box.min.y) * 0.75);
-  return hits.length ? hits[0].point.y : box.min.y + (box.max.y - box.min.y) * 0.5;
+  m.screen.emissive.copy(c).multiplyScalar(ROBOT_LOOK.glass);
 }
 
 // One crew: a ramp along `dir`, a sledge with a lashed block at ramp distance s, four followers
 // in two staggered files on two taut ropes, and a leader on the bridle. All in the ramp's local
 // frame; every robot and the sledge are dropped onto the ramp surface by a ray cast.
-function buildCrew(assets, scene, def, M) {
+function buildCrew(assets, scene, def0, M) {
+  // fit: frame-edge fit for stills b and c (notes): shift moves the ramp in world metres, ds moves the
+  // crew along its ramp (haul progress), k narrows the two files, ro moves crew and sledge across the ramp.
+  const fit = def0.fit || {};
+  const def = { ...def0, s: def0.s + (fit.ds || 0), start: def0.start.clone().add(V((fit.shift || [0, 0])[0], 0, (fit.shift || [0, 0])[1])) };
+  const ro = fit.ro || 0, k = fit.k ?? 1;
   const g = new THREE.Group();
   g.position.copy(def.start);
   g.rotation.y = Math.atan2(def.dir.x, def.dir.z);
@@ -596,7 +676,7 @@ function buildCrew(assets, scene, def, M) {
   g.add(plat);
 
   const sl = sledge(M.woodMat, M.blockMat, { seed: def.seed });
-  sl.position.set(0, Math.min(surface(-0.5, def.s - 0.8), surface(0.5, def.s - 0.8), surface(0, def.s + 0.8)) - 0.01, def.s);
+  sl.position.set(ro, Math.min(surface(ro - 0.5, def.s - 0.8), surface(ro + 0.5, def.s - 0.8), surface(ro, def.s + 0.8)) - 0.01, def.s);
   sl.rotation.x = -rp.userData.slope;
   g.add(sl);
 
@@ -619,19 +699,19 @@ function buildCrew(assets, scene, def, M) {
   const files = { '-1': [], '1': [] };
   CREW.pairs.forEach((dz, i) => {
     for (const side of [-1, 1]) {
-      const lat = CREW.lateral[(i + (side > 0 ? 1 : 0)) % 2] + hashRange(-0.03, 0.03, def.seed, i, side);
+      const lat = CREW.lateral[(i + (side > 0 ? 1 : 0)) % 2] * k + hashRange(-0.03, 0.03, def.seed, i, side);
       const z = def.s + dz + (side > 0 ? CREW.stagger : 0) + hashRange(-0.08, 0.08, def.seed, i, side, 'z');
-      files[side].push(place(side * lat, z, follower(i, side)));
+      files[side].push(place(ro + side * lat, z, follower(i, side)));
     }
   });
-  const leader = place(0.05, def.s + CREW.lead, { pitch: -0.28, bx: 0.14, squash: 0.93, eyeSY: 0.58, eyeSX: 1.1, nod: -0.05 });
+  const leader = place(ro + 0.05, def.s + CREW.lead, { pitch: -0.28, bx: 0.14, squash: 0.93, eyeSY: 0.58, eyeSX: 1.1, nod: -0.05 });
 
   g.updateMatrixWorld(true);
   const toLocal = (obj, p) => g.worldToLocal(obj.localToWorld(p.clone()));
   const ballCentre = (r) => toLocal(r.ballBase, V(0, ROBOT.ballCenterY - ROBOT.ballBottom - 0.05, 0));
   const R = BALL * 1.06;
-  const bridle = V(0, 0, def.s + CREW.lead - 0.85);
-  bridle.y = surface(0, bridle.z) + 0.44;
+  const bridle = V(ro, 0, def.s + CREW.lead - 0.85);
+  bridle.y = surface(ro, bridle.z) + 0.44;
   for (const side of [-1, 1]) {
     const a = toLocal(sl, sl.userData.attach[side < 0 ? 0 : 1]);
     const pts = [a];
