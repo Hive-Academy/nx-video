@@ -608,3 +608,27 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   id are accepted for the public film.
 - N5 take: not explicitly chosen; the film keeps `n5-codex.mp3` ("Puh-TAH"), which matches the
   v4.1 script (Codex says the name correctly).
+
+## 2026-11-13 — scan colossus, robot bodies, workspace fixes (awaiting user approval)
+
+- The user added the Sketchfab token. W2059 was fetched; its archive sha256 is pinned in the
+  manifest, and its CC BY 4.0 end-card credit line is now in `CREDITS.media.md`.
+- Colossus (`demo/ep06-v4-ptah-colossus`, `be51fd5`): the scan is fitted behind
+  `createPtahColossus`:
+  - an inlaid collar on the chest only, and a worn lapis cap;
+  - CC0 sandstone detail;
+  - a pre-baked fitted geometry cache, git-ignored (`fitted-high-<hash>.bin`);
+  - `handles.eyeMaterial`.
+
+  Orchestrator decision, pending the user: the scan face is soft up close, so the colossus is
+  framed wide or mid only, never tighter than waist-up. Stills a, m, b, d.
+- Robot bodies (`demo/ep06-v4-robot-bodies`, `fea027b`): `createBodiedRobot`, a procedural body
+  under the series head, 6 poses; stills body-a..d pass by orchestrator review. Awaiting the user.
+- Workspace (`demo/ep06-v4-workspace-look`, `1ecf8d5`):
+  - the four review fixes, verified on frames from a full draft render (49 min);
+  - parallel asset loading;
+  - the crane lowered.
+
+  Render with `--player-ready-timeout 240000` until a render confirms the faster load.
+- Desert (`demo/ep06-v4-desert-integration`, `4d697b9`): a–e pass; e is restaged as a low hero
+  angle. It will be re-shot with bodies and the scan colossus after approval.
