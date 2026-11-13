@@ -168,19 +168,33 @@ This is a look-dev asset, not an animated scene yet, so there is no animated fra
 
 The contact sheet is `snapshots/lookdev/colossus-sheet.jpg`: a 2×2 grid of labelled 960×540 cells. I reviewed it downscaled, and every still at full size.
 
+## Round 3 (body and face fixes)
+
+Changes in `src/ptah-colossus.js`:
+- **Shoulders and wrap (round-2 defect 2).** The shoulder keys have a higher superellipse exponent and a flatter top, so the shoulders read square. The horizontal bands are replaced by a tight shroud with diagonal carved strap lines, and the forearms show under the wrap toward the fists.
+- **Lids and brow (round-2 defect 1, in part).** The brow band, upper lid and lower lid are thicker and blend into the face with wider smooth-min radii (0.2, 0.08, 0.08 m). The lids sit slightly further from the eye centre, so the eye stays open. The stepped shelf edges are gone at the colossus-d distance.
+- **Sand on the face.** The round-2 face had pale sand patches on every up-facing lid and cheek crease. Up close they read as stickers. The face box (z > 0.25, 0.7 < y < 2.15, |x| < 0.85) now starts at a sand value of −0.45, which cancels the ambient-occlusion sand fill there. Sand stays on the cap, ears, beard, shoulders and plinth, because wind scours a face clean.
+- **In-set harness.** `lookdev/colossus4.html`, `lookdev/colossus4.js` and `lookdev/shoot-colossus4.mjs` are new. They place the colossus at `handles.ptahAnchor` of the approved desert v4 set (`src/look-desert4.js`) and hide the set's proxy, the same way the integration will. They are a check only; the deliverable stills still come from `lookdev/shoot-colossus.mjs`.
+
+Triangles: 881,164 at high quality (about 53k more than round 2, all on the body).
+
 ## Scorecard
+
+These are the round-3 stills from `node lookdev/shoot-colossus.mjs colossus-a colossus-b colossus-c colossus-d`.
 
 | row | colossus-a (wide) | colossus-b (head and collar, voice 1) | colossus-c (¾ waist-up) | colossus-d (face, voice 0.5) |
 |---|---|---|---|---|
-| Subject | 4: silhouette, inscription column, collar, sceptre and plinth read | 4: carved eyes with iris, crisp beaded collar with drops, sceptre top clear of the beard; the face is still a little mask-like | **3**: collar, was–djed–ankh and cracks read, but the mummiform body still reads as a banded column and the shoulders are rounded rather than squared | **3**: eyes, iris and brow lines hold; the lids and brow still show stepped shelf edges, and the lips read as a flat bar |
+| Subject | 4: the silhouette, square shoulders, sceptre and inscribed plinth all read | 4: the eyes are open and glowing, the collar is crisp, and the face is clean stone; the mouth is still a plain bar | 4: the shoulders now read square, the diagonal wrap reads as cloth, and the forearms read under the wrap; the was head of the sceptre still crosses the beard | 4: the lids and brow blend with no shelves, the iris reads and no sand patches remain; the carved brow and liner grooves render dark rather than gold |
 | Set dressing | 4 | 4 | 4 | 4 |
-| Light | 4 | 4 | 4 | 4: a hot specular streak on the camera-left gold brow |
-| Effect | 4: eyes dark, faint inlay | 4: restrained iris light with no bloom past the lid, glowing collar inlay lines, dust only at the shoulder | 4 | 4: iris only |
+| Light | 4 | 4 | 4 | 4 |
+| Effect | 4: eyes dark | 4 | 4 | 4 |
 | Text and safe area | 5 | 5 | 5 | 5 |
 | Continuity | 4 | 4 | 4 | 4 |
-| **result** | pass | pass | **fail** (Subject 3) | **fail** (Subject 3) |
+| **result** | pass | pass | pass | pass |
 
-Two stills fail one row each. See Open defects. I am not passing them.
+Every row reaches 4. Subject in d is a narrow 4: at museum close-up range the face is still stylised, not carved. See Open defects.
+
+The contact sheet is `snapshots/lookdev/colossus-sheet.jpg`: a 2×2 grid of labelled 960×540 cells.
 
 ## Verification
 
@@ -189,11 +203,11 @@ Run from `demos/agent-pronounce` unless noted.
 | command | exit | notes |
 |---|---|---|
 | `node --check src/ptah-colossus.js` | 0 | |
-| node probe of `buildGeometry('high')` | 0 | 0 NaN positions or normals in every part (a first build had NaNs from a `seg2` misuse; fixed) |
-| `node lookdev/shoot-colossus.mjs colossus-a colossus-b colossus-c colossus-d` | 0 | 24–27 s per shot; 827,696 triangles |
+| `node lookdev/shoot-colossus.mjs colossus-a colossus-b colossus-c colossus-d` | 0 | 29–49 s per shot; 881,164 triangles |
+| `node lookdev/shoot-colossus4.mjs colossus-c --suffix=-set` | 0 | in-set check, desert v4; loads in 53 s |
 | `ffmpeg ... xstack` → `snapshots/lookdev/colossus-sheet.jpg` | 0 | 1920×1080, 2×2 |
-| `node tools/guards/no-media.mjs` (repo root) | 0 | "checked 449 files; no violations" |
-| `node tools/media/fetch-media.mjs demos/agent-pronounce --check` (repo root) | 0 | 31/31 ok |
+| `node tools/guards/no-media.mjs` (repo root) | 0 | "checked 463 files; no violations" |
+| `node tools/media/fetch-media.mjs demos/agent-pronounce --check` (repo root) | 0 | 209/209 ok |
 
 **Page and console errors.** There were no page errors. The only 4xx responses were `404 assets/audio/cues.json` and `404 favicon.ico`; the shooter ignores both.
 
@@ -207,12 +221,9 @@ Run from `demos/agent-pronounce` unless noted.
 
 ## Open defects
 
-1. **colossus-d and b, face sculpt (Subject 3 in d).**
-   - Problem: the upper lid, lower lid and brow band are unioned thin ellipsoids. At 1.9 cm meshing and grazing light they still show stepped shelf edges. The lips are a flat bar.
-   - Fix plan: replace the lid ellipsoids with one swept lid profile (an extruded almond curve with a rounded margin) cut into a single eye mound. Sculpt the lips as one mouth mass with a philtrum and a carved vermilion border rather than two ellipsoids. Then reduce the head cell to 1.6 cm only inside the face box.
-2. **colossus-c, body (Subject 3).**
-   - Problem: the shoulders are rounded and the wrapping reads as horizontal rings.
-   - Fix plan: give the shoulder keys a higher superellipse exponent (4–5) with a flatter top (a lofted rbox cap). Replace the horizontal bands with a smooth tight shroud plus two diagonal carved strap lines, and let the forearms read under the wrap toward the fists.
-3. **Gold brow specular.** It can flare white under the low key light. Fix: raise the gold roughness on the head inlay from about 0.3 to 0.45.
-4. **Collar inner row.** At the neck front the inner gold row stretches into long vertical strips, because the shell turns horizontal there. Fix: start the bead rows at rho 1.1 and leave a plain gold band inside that.
-5. **Inside faces.** The collar is a shell, so its cut faces sit inside the torso. They are hidden but cost triangles.
+1. **Face is stylised, not carved.** The face holds at the colossus-d distance, but the mouth is still two lip ellipsoids with a straight groove and no philtrum. The round-2 fix plan for the mouth (one mouth mass with a carved vermilion border) is not done.
+2. **Inlay lines render dark.** The brow and cosmetic-line inlay read as dark carved grooves, not gold, under the low key light. Fix: raise the gold roughness on the head inlay to about 0.45 and lift its albedo.
+3. **Sceptre head over the beard.** In the three-quarter in-set view (colossus-c-set) the was head of the sceptre sits in front of the beard. Fix: move the grip 0.4 m forward, or tilt the sceptre in the presenting shots.
+4. **Backlit in-set shot.** Shot d of `colossus4.js` (backlit against the sun) washes out to haze (`colossus-d-wip.png`). The camera needs to sit lower and further off-axis from the sun. It is not a deliverable.
+5. **Collar inner row, and inside faces.** These are unchanged from round 2: the inner gold row stretches at the neck front, and the collar's cut faces sit hidden inside the torso.
+6. **Scale robot.** In colossus-a the robot at the plinth is only a few pixels tall at 24 m statue height. The scale reads from the plinth and the dunes more than from the robot.
