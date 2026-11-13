@@ -575,3 +575,17 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   `fetch-media --check` 209/209 ok; `no-media` clean (461 files); `check --json` exit 0,
   `ok: true`.
 - Still not approved by the user: every look-dev still. No v4 animation has started.
+
+## 2026-11-13 — user verdicts on the look-dev stills
+
+- User: the colossus stills (`0ffbbd4`, colossus-a..d) are rejected ("didn't like these shots
+  much"); the others are good. So the workspace look (`e8f814a`, hero `workspace-b`) and the
+  desert set look (pass 3, `a0d60ce`) are approved.
+- Orchestrator diagnosis of the colossus, sent to child `3b2b1544…` as a redesign brief:
+  flat low-poly lookdev pyramids and an empty sky; a thin mummy column with no monumental mass;
+  wrong iconography (brown beanie, not a lapis skullcap); plastic collar and waxy face; flat
+  light. The redesign keeps the `createPtahColossus` API, shoots inside the approved desert set,
+  and never frames tighter than head-and-shoulders.
+- Workspace animation started (child `0e86981c…`), scope limited to the opening workspace
+  scene. The desert integration child `b66fe09e…` keeps the colossus behind its API only.
+- Vortex: no look-dev still exists yet, so it is not cleared for animation.
