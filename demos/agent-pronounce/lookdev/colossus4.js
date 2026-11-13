@@ -40,7 +40,9 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
 (async () => {
   try {
     const shot = q.get('shot') || 'b';
-    const S = SHOTS[shot];
+    const S = { ...SHOTS[shot] };
+    // debug overrides for fit work: bear (deg), dist, eye, look=x,y,z (all in the 24.08 m authoring frame)
+    if (q.get('bear')) { delete S.world; S.bearing = +q.get('bear'); S.dist = +(q.get('dist') || 40); S.eye = +(q.get('eye') || 12); S.look = (q.get('look') || '0,14,0').split(',').map(Number); }
     const post = q.get('post') || 'preview';
     const assets = await loadAssets();
     const look = await buildDesert4Look(assets, renderer, { shot: S.set, aspect: W / H });
@@ -48,7 +50,7 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     const A = handles.ptahAnchor;
     if (handles.ptahProxy) handles.ptahProxy.visible = false;
     const scanQ = q.get('scan');
-    const god = await createPtahColossus(assets, { quality: q.get('quality') || 'high', ...(scanQ ? { scan: scanQ === '0' ? false : scanQ } : {}) });
+    const god = await createPtahColossus(assets, { quality: q.get('quality') || 'high', ...(scanQ ? { scan: scanQ === '0' ? false : scanQ } : {}), ...(q.get('fit') ? { scanFit: JSON.parse(q.get('fit')) } : {}) });
     const k = god.height / 24.08; // framing scale against the procedural statue the shots were authored for
     god.group.position.copy(A.position);
     god.group.rotation.y = A.yaw;

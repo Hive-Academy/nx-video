@@ -273,6 +273,30 @@ User decision: the figure moves to the museum scan **"Ptah-Sokar-Osiris Figure (
 
 The credit line is `SCAN_CREDIT` in the module. It goes in `CREDITS.media.md` and on the end card when the fetcher's manifest entry lands.
 
+## Round 6 (scan on disk: fitted and shot)
+
+The W2059 scan is now on disk (`assets/third-party/models/sketchfab/ptah-sokar-osiris-w2059/`, git-ignored, fetched through the manifest). Every still below is the **scan** figure (`source: 'scan'`).
+
+Changes in `src/ptah-colossus.js`:
+- **Spec-gloss albedo.** Sketchfab exports the scan with `KHR_materials_pbrSpecularGlossiness`, which three no longer parses. The diffuse image is read from the glTF JSON (image data only, resolved next to the `.gltf`) and sampled into vertex colour.
+- **Inlaid collar.** The procedural collar mesh could not follow the scan's chest: scaled to fit, it either sank into the body or stood off it. With the scan it is no longer added. The wesekh is instead inlaid into the scan's own surface (fitScan step 8). It is a crescent that hangs from the widest slice (just below the wig lappets) and runs on over the shoulders, fading out there. It has five rows of worn lapis, turquoise and carnelian pigment, separated by thin gold-leaf lines with a gold outer rim. The gold uses the stone shader's existing inlay channel (`aPaint.y < 0`), so it is metallic and catches the sun, and noise wears it through in flecks. The pigment flakes off in seeded patches. Fit knobs: `SCAN_FIT.collar = { top, inner, outer, drop, rows, paint, over }`.
+- **Cap.** The lapis is darker (`[0.02, 0.045, 0.17]`), and seeded wear lets the stone show through, so it no longer reads as plastic.
+- **Eyes.** `SCAN_FIT.eyes.y` was lowered from 0.932 to 0.875, so the glow discs sit on the carved eyes. The earlier value put them on the brow.
+- **Sceptre.** `SCAN_FIT.sceptre = { dy: 0, dz: -0.2 }`. The fists sit just under the collar, and the staff hangs free in front of the tapering legs to the pedestal. A dz of −0.8 buried the fists in the chest bulge.
+
+Numbers: the total is **568,884 triangles** at `quality: 'high'` (scan decimated to the 260k target, plus plinth, sceptre and drift). The native height with the scan is 29.4 m. Load time in the harness is 21–60 s, most of it decimation and AO. For use in the film, cache or pre-bake the fitted geometry.
+
+### Round-6 scorecard
+
+The command was `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus-c` (exit 0, no page errors), and the sheet is `snapshots/lookdev/colossus-sheet.jpg`.
+
+| still | Subject | Set | Light | Effect | Text | Continuity | verdict |
+|---|---|---|---|---|---|---|---|
+| a: low wide in set, eyes dark | 4: a real museum figure at colossal scale, with the collar and sceptre legible from 60 m | 4 | 4 | 4 | 5 | 4 | **pass**. Weakest: the thin maat-pedestal slab reads as a pale gap under the feet from this low angle |
+| b: waist-up ¾, voice 0.5 | 4: the scan face, lappets and beard hold; the collar reads as painted inlay; the was–djed–ankh and fists read | 4 | 4 | 4 | 5 | 4 | **pass**. Weakest: the fists are stylised SDF forms on a scan body (two levels of detail meet) |
+| c: head and shoulders, voice 1 | 4: a genuinely carved, weathered face; the glow sits on the eyes | 4 | 4 | 4: the glow is small at this framing | 5 | 4 | **narrow pass**. Weakest: the collar bands turn vertical where the crescent rounds the right shoulder, and the cap is a flat colour field |
+
+
 ## Verification
 
 Run from `demos/agent-pronounce` unless noted.
@@ -309,6 +333,14 @@ Run from `demos/agent-pronounce` unless noted.
 - **Collar coverage.** The collar covers only the front and sides (z > −0.45), because the back pillar hides the rest. This halves its triangle count.
 
 ## Open defects
+
+Round 6 (current, scan):
+1. Iconography: W2059 is a Ptah-Sokar-Osiris figure with a tripartite wig, so it is not a pure Ptah. The lapis cap is painted over the wig's crown, but the lappets remain. Hands are not part of the scan; the fists are procedural.
+2. The collar bands turn vertical at the right shoulder in the c framing.
+3. `headYaw` / `headPitch` move only an empty marker on the scan (one rigid mesh); the head does not turn.
+4. The load cost is 20–60 s for each fresh page (decimation in JS). A pre-baked fitted GLB should replace this before the film render.
+5. A pale band (the maat-pedestal slab) shows between the feet and the plinth in the low wide shot.
+
 
 Round 4 (current):
 - **R4-1. Face is cartoon-like** (colossus-c and colossus-b). The fix plan is the W2059 scan route above. Without it: switch the inlay eyes to calcite white with an obsidian pupil (no teal), narrow the almond, and neutralise the mouth curve.
