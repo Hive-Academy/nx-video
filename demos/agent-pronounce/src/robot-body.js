@@ -350,6 +350,13 @@ export function createBodiedRobot(assets, { agent = 'Claude', color = null, qual
       P.spine.set(0.42 + 0.01 * breath, 0, 0); P.chestRot.set(0.08, 0, 0);
       P.legs[-s0] = { ankle: V(-s0 * 0.38 * u, B.ankleY * u, state.standZ + 0.5 * u + sway), pole: V(0, 0, 1), pitch: 0 };
       P.legs[s0] = { ankle: V(s0 * 0.4 * u, B.ankleY * u + 0.1 * u, state.standZ - 0.6 * u - sway), pole: V(0, 0, 1), pitch: 0.3 };
+      if (state.haulCycle) {
+        const phase=time*2.4+hash(state.seed,'step')*6;
+        for (const s of [1,-1]) {
+          const a=phase+(s>0?0:Math.PI), step=Math.sin(a);
+          P.legs[s]={ankle:V(s*.4*u,B.ankleY*u+Math.max(0,Math.cos(a))*.12*u,state.standZ+step*.52*u),pole:V(0,0,1),pitch:Math.max(0,Math.cos(a))*.22};
+        }
+      }
       for (const s of [1, -1]) P.arms[s] = { chest: true, wrist: V(s * 0.3 * u, 0.62 * u, 0.95 * u), fingerDir: V(-s, -0.25, -0.2), back: V(0.25 * s, 0, 1), pole: V(s, -0.6, -0.4), curl: [1.0, 1.05, 1.05, 0.7] };
     } else { // standing-idle, point
       P.hip = V(0, hipStand + 0.006 * u * breath, state.standZ);

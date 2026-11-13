@@ -27,7 +27,7 @@ const RS = 0.38; // the series ball-robot scale this set was laid out for (it si
 // The visitors' swivel chair keeps the workspace's robot-to-chair ratio: there the chair is
 // 1.17 x 0.63 = 0.737 tall for a robot at ROBOT_SCALE (0.25). Here the robot is at RS (0.38, the
 // crews' size), so the chair scales up by RS / ROBOT_SCALE to 1.12 m, with the same cushion.
-const CHAIR_K = RS / ROBOT_SCALE;
+export const CHAIR_K = RS / ROBOT_SCALE;
 const CHAIR = { h: 1.17 * 0.63 * CHAIR_K, cushion: 0.06 * CHAIR_K, sink: 0.03 * CHAIR_K };
 // The workspace robot treatment (approved two-shot): warm ceramic shell, dark glass visor with
 // an agent-colour tint, creased normals. faceLight and envMap are set per use.
@@ -38,7 +38,7 @@ const OUTDOOR_ENV = { shell: 0.6, screen: 0.45 };
 // Bodied robot sizes (head radius u, src/robot-body.js). Visitors keep the workspace robot-to-chair
 // ratio (0.15 in the 0.737 m chair, here x CHAIR_K: 1.27 m standing). Crews are the approved body-d
 // crew size (0.27: 1.5 m standing).
-const VIS_U = 0.15 * CHAIR_K;
+export const VIS_U = 0.15 * CHAIR_K;
 const CREW_U = 0.27;
 // A bodied robot with the workspace treatment and the outdoor env levels. Adds root / name / face()
 // so the framing and crop checks below treat every robot alike.
@@ -76,7 +76,7 @@ const SKY = 'hdri/mpumalanga_veld_puresky_2k.hdr';
 // 'camera', 'ptah' or the other visitor's name; seated-turn when it is a name).
 // focus: 'seats' puts the focal plane on the visitors' faces (measured after they are placed).
 // ptah: the colossus state (setState). stand: the visitors stand beside their empty chairs.
-const SHOTS = {
+export const SHOTS = {
   a: {
     pos: [3.4, 0.82, -10.2], target: [-4.6, 1.75, -17.6], mm: 28, dof: { focus: 'seats', aperture: 0.0016, maxblur: 0.005 }, screenOn: false, ptah: { voice: 0, eyeGlow: 0 },
     seats: [{ name: 'Claude', chair: [0.15, -13.9], face: 'camera', yaw: -0.55, look: 'Codex' }, { name: 'Codex', chair: [0.05, -12.48], face: 'camera', yaw: -0.3, look: 'camera' }],
@@ -103,7 +103,7 @@ const SHOTS = {
   // cutoff, so it lights the giant but not the visitors. Layout maths: lookdev/e-geom.mjs (args: camX camZ camHeight offsetDeg tiltDeg).
   e: {
     pos: [42.8, 0.84, -26.3], target: [29.37, 3.9, -41.12], mm: 18, dof: { focus: 'seats', aperture: 0.00012, maxblur: 0.003 }, screenOn: true,
-    ptah: { voice: 0.2, eyeGlow: 1, headYaw: 0.4, headPitch: 0.1 }, eyeGain: 4,
+    ptah: { voice: 0.2, eyeGlow: 1, headYaw: 0.4, headPitch: 0.1 }, eyeGain: 12,
     haze: true, rim: true, bounce: true,
     // Codex is 0.15 m nearer the lens than in the integration pass (it was 29.2 % of the frame height)
     seats: [{ name: 'Claude', chair: [37.19, -28.77], at: [40.17, -28.3], face: 'ptah', yaw: -0.4, look: 'ptah', stand: true, chairYaw: 0.6 }, { name: 'Codex', chair: [41.86, -31.66], at: [40.70, -29.05], face: 'ptah', yaw: -0.6, look: 'ptah', stand: true, chairYaw: -0.9 }],
@@ -488,6 +488,7 @@ export async function buildDesert4Look(assets, renderer, { shot = 'b', aspect = 
       const cs = contactShadow(scene, 0.55, 0.5, 0.5);
       cs.position.copy(r.group.position).add(V(0, 0.01, 0));
       scene.add(cs);
+      r.contactShadow = cs;
     } else {
       // seated in the kit chair: the body sits on its seatY, at the workspace robot-to-chair ratio
       const front = 0.152 * CHAIR_K; // cushion front lip, chair-local
@@ -765,6 +766,9 @@ function buildCrew(assets, scene, def0, M) {
   coil.position.copy(toLocal(sl, V(0.42, sl.userData.blockTop + 0.03, 0.55)));
   coil.rotation.x = Math.PI / 2 - rp.userData.slope;
   g.add(coil);
+  const haulGroup = new THREE.Group();
+  for (const child of [...g.children]) if (child !== rp && child !== plat) haulGroup.add(child);
+  g.add(haulGroup);
   shadows(g);
-  return { key: def.key, name: def.name, group: g, ramp: rp, sledge: sl, robots, leader, dir: def.dir.clone().normalize(), start: def.start.clone() };
+  return { haulGroup, slope: rp.userData.slope, key: def.key, name: def.name, group: g, ramp: rp, sledge: sl, robots, leader, dir: def.dir.clone().normalize(), start: def.start.clone() };
 }
