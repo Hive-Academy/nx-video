@@ -1,11 +1,11 @@
-﻿// Episode 6, direction v4: the vortex between the workspace and the desert (look-dev).
+// Episode 6, direction v4: the vortex between the workspace and the desert (look-dev).
 // The floor falls out from under the two office chairs and both bodied robots tumble, seated,
 // down a swirling funnel of sand and hieroglyph-carved stone toward the desert below.
 //
 //   buildVortex4Look(assets, renderer, { shot: 'a'|'b'|'c'|'d', t })
 //     -> { scene, camera, film, handles, update(t), info }
 //
-// Scene-local time t (s): 0 = the floor falls (the end of the white-out), LAND = 2.6 = the seats
+// Scene-local time t (s): 0 = the camera enters the screen storm, LAND = 2.6 = the seats
 // touch the sand (SPEC: vortex runs 3.5 s, `land` at 2.6 s). update(t) is a pure function of t.
 //
 // Frame: the chairs stay near the origin and the world streams past them. The funnel axis is
@@ -434,7 +434,7 @@ function dustMaterial() {
   });
 }
 
-const ARM_RAISE = -1.6, ARM_SPLAY = 0.55;
+
 const SUN_BELOW = new THREE.Vector3(1.5, -6, 2.5), SUN_ABOVE = new THREE.Vector3(4.5, 3.2, -1.5);
 
 // ------------------------------------------------------------------ build
@@ -648,22 +648,25 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
       yaw += 0.4 * (1 - smooth(tt, LAND - 0.9, LAND - 0.2)) * Math.sin(tt * 0.9 + c.ph);
       const rock = after > 0 ? 0.06 * Math.exp(-after / 0.18) * Math.sin(after * 26 + c.ph) : 0;
       c.pivot.rotation.set(live * (0.55 * Math.sin(tt * 2.1 + c.ph) + 0.25) + rock, yaw, live * 0.65 * Math.sin(tt * 1.6 + c.ph + 1.0), 'YXZ');
+      // The body IK reads world-space shoulders/hips. Refresh the new chair transform before
+      // solving it; otherwise an arbitrary seek uses the previous frame's parent matrix.
+      c.pivot.updateWorldMatrix(true, true);
       c.robot.setPose('seated-idle', 2.35 + tt + c.ph);
       // reaction: Codex throws both arms high, Claude braces on the seat; the arms drop after the landing
       const A = c.robot.handles.arms;
       const up = (0.6 + 0.4 * smooth(tt, 0.0, 0.35)) * (1 - 0.8 * smooth(tt, LAND + 0.05, LAND + 0.6));
       if (c.arms === 'up') {
-        // the arms are IK-solved onto the lap: swing each upper arm up about the body's lateral axis,
-        // then splay it out about the body's forward axis (both in the shoulder's parent space)
-        c.pivot.updateMatrixWorld(true);
+        // Aim the upper arms and forearms above the head in body space. Rotating the
+        // lap IK solution alone folds the wrists across the visor instead of raising them.
         const gq = c.robot.group.getWorldQuaternion(new THREE.Quaternion());
         for (const [s, arm] of [[1, A.L], [-1, A.R]]) {
-          const pq = arm.upper.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
-          const lat = V(1, 0, 0).applyQuaternion(gq).applyQuaternion(pq);
-          const fwd = V(0, 0, 1).applyQuaternion(gq).applyQuaternion(pq);
-          arm.upper.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(lat, ARM_RAISE * up));
-          arm.upper.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(fwd, s * ARM_SPLAY * up));
-          arm.fore.rotateX(-0.35 * up);
+          for (const [joint, direction] of [[arm.upper, V(s * 0.55, 0.9, 0)], [arm.fore, V(s * 0.12, 1, 0.12)]]) {
+            const targetWorld = new THREE.Quaternion().setFromUnitVectors(V(0, -1, 0), direction.normalize().applyQuaternion(gq));
+            const parentWorld = joint.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
+            joint.quaternion.slerp(parentWorld.multiply(targetWorld), up);
+            joint.updateWorldMatrix(false, true);
+          }
+          arm.hand.rotation.set(0, 0, 0);
         }
       } else {
         for (const [s, arm] of [[1, A.L], [-1, A.R]]) { arm.upper.rotateZ(s * 0.45); arm.upper.rotateX(0.35); }
@@ -684,7 +687,7 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
         arr[i * 3] = b.x + Math.cos(p.a) * rr; arr[i * 3 + 1] = yy; arr[i * 3 + 2] = b.z + Math.sin(p.a) * rr;
       });
       layer.geometry.attributes.position.needsUpdate = true;
-      layer.material.opacity = kind === 'burst' ? 0.95 * smooth(after, 0, 0.03) * (1 - 0.6 * smooth(after, 0.25, 0.9)) : 0.5 * smooth(after, 0.05, 0.85);
+      layer.material.opacity = kind === 'burst' ? 0.95 * smooth(after, 0, 0.03) * (1 - 0.6 * smooth(after, 0.25, 0.9)) : 0.23 * smooth(after, 0.05, 0.85);
     }
     // the practical front light rides with the camera onto the faces
     if (camPos) { front.position.copy(camPos).add(V(0.2, 0.4, 0)); front.target.position.copy(centreAt(tt)).add(V(0, 0.35, 0)); }
@@ -718,4 +721,3 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
   const info = { shot, t: T, land: LAND, funnelTop: +funnel.position.y.toFixed(2), groundY: +(funnel.position.y - LEN).toFixed(2), focus: +film.dof.focus.toFixed(2) };
   return { scene, camera, film, handles, update, cameraAt, centreAt, info };
 }
-

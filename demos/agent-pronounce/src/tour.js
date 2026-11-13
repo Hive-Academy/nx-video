@@ -74,6 +74,9 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
       scene.environment = look.scene.environment;
       scene.fog = look.scene.fog;
       scene.userData.noDepth = look.scene.userData.noDepth || []; // the film chain's depth pass skips these
+      // mount() rebuilds this list by traversing object flags after adopting the look.
+      // Preserve its exclusions so transparent storm veils do not become solid DOF occluders.
+      for (const object of scene.userData.noDepth) object.userData.noDepth = true;
       scene.backgroundIntensity = look.scene.backgroundIntensity;
       scene.environmentIntensity = look.scene.environmentIntensity;
       scene.backgroundRotation.copy(look.scene.backgroundRotation);

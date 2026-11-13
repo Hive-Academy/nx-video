@@ -22,6 +22,7 @@ async function build(scene, assets, ctx) {
   // the storm the office ended in: a camera-locked veil that thins as the funnel opens
   const veilMat = new THREE.MeshBasicMaterial({ map: vortexTexture(), transparent: true, opacity: 1, depthTest: false, depthWrite: false });
   const veil = new THREE.Mesh(new THREE.PlaneGeometry(40, 24), veilMat);
+  veil.userData.noDepth = true;
   veil.renderOrder = 900; scene.add(veil);
   (scene.userData.noDepth ||= []).push(veil);
   return { robots: {}, look, veil, veilMat, post: { film: look.film, shadows: true, filmFrame: 0 } };
