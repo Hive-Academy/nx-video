@@ -21,8 +21,9 @@ import { KINDS as TEMPLE_KINDS } from './tour-temple.js';
 import { KINDS as OFFICE_KINDS } from './set-office.js';
 import { KINDS as VORTEX_KINDS } from './set-vortex.js';
 import { KINDS as DESERT_KINDS } from './set-desert.js';
+import { KINDS as WORKSPACE_KINDS } from './set-workspace.js';
 
-export const TOUR_KINDS = { ...LOFT_KINDS, ...STREET_KINDS, ...TEMPLE_KINDS, ...OFFICE_KINDS, ...VORTEX_KINDS, ...DESERT_KINDS };
+export const TOUR_KINDS = { ...LOFT_KINDS, ...STREET_KINDS, ...TEMPLE_KINDS, ...OFFICE_KINDS, ...VORTEX_KINDS, ...DESERT_KINDS, ...WORKSPACE_KINDS };
 
 export function applyTourRobots(robots, sim, t) {
   for (const [name, robot] of Object.entries(robots)) {
@@ -62,6 +63,7 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
       const builders = {
         office: () => import('./look-office.js').then((m) => m.buildOfficeLook(assets, renderer, options)),
         desert: () => import('./look-desert.js').then((m) => m.buildDesertLook(assets, renderer)),
+        workspace: () => import('./look-workspace.js').then((m) => m.buildWorkspaceLook(assets, renderer, options)),
         vortex: () => import('./look-vortex.js').then((m) => m.buildVortexLook(assets, renderer)),
       };
       if (!builders[kind]) throw new Error(`Unknown look: ${kind}`);
@@ -70,6 +72,7 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
       scene.background = look.scene.background;
       scene.environment = look.scene.environment;
       scene.fog = look.scene.fog;
+      scene.userData.noDepth = look.scene.userData.noDepth || []; // the film chain's depth pass skips these
       scene.backgroundIntensity = look.scene.backgroundIntensity;
       scene.environmentIntensity = look.scene.environmentIntensity;
       scene.backgroundRotation.copy(look.scene.backgroundRotation);
@@ -86,7 +89,7 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
   const ch = {};
   for (const [k, spec] of Object.entries(plan.channels || {})) ch[k] = simulateChannel(spec, { start, duration });
   const shots = finalizeShots(plan.shots, duration);
-  const camera = new THREE.PerspectiveCamera(FOV, frame.aspect, 0.03, 260);
+  const camera = new THREE.PerspectiveCamera(FOV, frame.aspect, plan.near ?? 0.03, plan.far ?? 260);
   const firstWord = rows.length ? Math.min(...rows.map((r) => r.localStart)) : 0;
   const settleDur = plan.noSettle ? 0 : Math.min(1.0, Math.max(0, firstWord));
   let last = null;

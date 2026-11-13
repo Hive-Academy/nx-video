@@ -254,6 +254,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
   const cat = await M('concrete_cat_statue');
   const plantSmall = await M('potted_plant_04');
   const robots = {};
+  const lamps = [];
   for (const [name, side] of [['Codex', 1], ['Claude', -1]]) {
     const dk = desk(walnut, steel);
     dk.position.set(side * L.desk.at, 0, L.desk.z);
@@ -274,6 +275,7 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
     spot.position.copy(lampHead);
     spot.target.position.copy(dk.position).add(V(side * 0.05, L.desk.top, 0.05));
     scene.add(spot, spot.target);
+    lamps.push(spot);
     onDesk(shadows(fit(pads.clone(true), { w: 0.18 })), side * 0.34, 0.1, side * 0.2);
     onDesk(mug(side > 0 ? '#E8E2D6' : '#2E3A46'), side * 0.38, -0.14);
     if (side > 0) {
@@ -301,6 +303,8 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
     const r = robot(assets, name, at, look, { pose, scale: ROBOT_SCALE });
     reshadeRobot(r, { faceLight: 0, shell: '#CCC3B5', env: 0.9, eyeBoost: 2.6, glass: 0.55, faceBoost: name === 'Claude' ? 1.25 : 1, smooth: Math.PI / 4 });
     scene.add(r.root);
+    // animation handles: the set swivels the chair and re-seats the robot on it
+    Object.assign(r, { chair: ch, seatAt, seatY: ch.userData.seatY, side });
     robots[name] = r;
   }
 
@@ -364,5 +368,6 @@ export async function buildWorkspaceLook(assets, renderer, { shot = 'b' } = {}) 
     bloom: { strength: 0.22, radius: 0.55, threshold: 1.0 },
     grade: { vignette: 0.32, grain: 0.022, ca: 0.0012, lift: [0.003, 0.006, 0.012], seed: 6 },
   };
-  return { scene, camera, bloom: null, exposure: film.exposure, film, handles: { robots, hero, screenMat, screenLight: sl, setScreenSource, shot } };
+  return { scene, camera, bloom: null, exposure: film.exposure, film, handles: { robots, hero, panel, screenMat, screenLight: sl, setScreenSource, shot,
+    lights: { bulb, moon, rim, wash, slatWash, key, up, ceilFill, spill, back, sideSpill, lamps } } };
 }

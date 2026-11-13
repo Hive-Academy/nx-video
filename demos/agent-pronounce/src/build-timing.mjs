@@ -25,12 +25,16 @@ for(const id of ['office','vortex','desert']){
   // Location card: a dark plate so it reads over the busy gold tunnel; place and era on separate lines.
   const extra='<div id="location"><div class="place">MEMPHIS, EGYPT</div><div class="era">around 2600 BC</div></div>';
   fs.writeFileSync(path.join(comp,'vortex.html'),three(s,extra,'#location{position:absolute;top:85px;left:0;right:0;margin:0 auto;width:fit-content;padding:22px 48px 24px;text-align:center;background:rgba(22,12,3,.78);border:3px solid #e8a33d;border-radius:18px;box-shadow:0 12px 40px #0009;white-space:nowrap}#location .place{font:bold 76px/1.05 Georgia,serif;letter-spacing:4px;color:#fff2d3}#location .era{margin-top:8px;font:italic 46px/1.1 Georgia,serif;color:#f0c27a}',"tl.fromTo('#location',{opacity:0,y:30},{opacity:1,y:0,duration:.4},.45).to('#location',{opacity:0,duration:.35},2.85);"));
- }else fs.writeFileSync(path.join(comp,`${id}.html`),three(s));
+ // v4: the opening plays the approved workspace set (src/set-workspace.js) in the office slot
+ }else fs.writeFileSync(path.join(comp,`${id}.html`),three(id==='office'?{...s,kind:'workspace'}:s));
 }
 const office=scenes.find(s=>s.id==='office'),landingStart=office.start+office.cues.landingIn,landingDur=office.cues.landingOut-office.cues.landingIn;
 const landingBody='<video id="landing-video" src="assets/live-demo/landing-scroll.mp4" data-start="0" data-duration="4.500" muted playsinline></video>';
-const landingCss='#root{background:#000!important;opacity:0}#landing-video{position:absolute;left:0;top:50%;width:1920px;height:904px;transform:translateY(-50%);object-fit:cover;transform-origin:50% 50%}';
-const landingScript=`tl.fromTo('#root',{opacity:0},{opacity:1,duration:.3},0).to('#root',{opacity:0,duration:.3},${f(landingDur-.3)}).fromTo('#landing-video',{scale:1},{scale:1.12,duration:${f(landingDur)},ease:'power1.inOut'},0);`;
+// v4: the clip plays on the 3D hero screen. The workspace set holds a straight-on camera whose panel
+// projects to HOLD.px wide, centred (src/set-workspace.js); the clip sits on exactly that rect.
+const HOLD_PX=1650,holdH=HOLD_PX*904/1920;
+const landingCss=`#root{background:transparent!important;opacity:0}#landing-video{position:absolute;left:${(W-HOLD_PX)/2}px;top:${f((H-holdH)/2)}px;width:${HOLD_PX}px;height:${f(holdH)}px;object-fit:fill;filter:brightness(1.04) contrast(.97) saturate(.96)}`;
+const landingScript=`tl.fromTo('#root',{opacity:0},{opacity:1,duration:.3},0).to('#root',{opacity:0,duration:.3},${f(landingDur-.3)});`;
 fs.writeFileSync(path.join(comp,'landing-insert.html'),template('landing-insert',landingDur,landingBody,landingCss,landingScript));
 const desert=scenes.find(s=>s.id==='desert'),appStart=desert.start+desert.cues.showcaseStart,appDur=desert.cues.showcaseEnd-desert.cues.showcaseStart;
 const tours=[['One Command Center',550,160,1200,550,1.20],['Agents In Parallel',290,170,1160,640,1.23],['Review Every Change',825,170,1030,805,1.19],['Track Every Run',180,250,1620,610,1.18]];
