@@ -17,7 +17,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { tex, hdri, canvas2d, canvasTex } from './craft.js';
 import { environment, loungeChair, practical } from './look-kit.js';
 import { createBodiedRobot, BODY } from './robot-body.js';
-import { pbr, reliefTexture } from './desert4-props.js';
+import { pbr } from './desert4-props.js';
 import { hash, hashRange } from './util.js';
 
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -47,6 +47,134 @@ export const SHOTS = {
   // d: the moment before landing. High, looking down past the chairs at the sand rushing up.
   d: { t: 2.45, pos: [-1.55, 0.3, 1.35], target: [0.0, -0.3, 0.0], focal: 18, subject: [0, 0.3, 0], aperture: 0.003, maxblur: 0.006 },
 };
+
+// ------------------------------------------------------------------ hieroglyphs
+// The funnel's glyph bands: columns of Egyptian hieroglyphs (wedjat eye, ankh, vulture, reed,
+// water, cartouche, djed, sun disc, feather, mouth, bread) drawn on canvas. A data texture, not
+// colour: BG 0.61 (no glyph), FG 0.95 (the glyph, carved), RIM 0.48 (the lit edge around each
+// glyph and the column rules). The shader thresholds FG > 0.62 and RIM 0.42..0.56.
+// One tile maps to ~1.1 m x 3.7 m of wall, so the glyphs are drawn squashed by SQ to read square.
+function hieroglyphTexture(seed) {
+  const W = 512, H = 1024, SQ = 0.9, COL = W / 2;
+  const [c, x] = canvas2d(W, H);
+  const BG = '#9C9C9C', FG = '#F2F2F2', RIM = '#7A7A7A';
+  x.fillStyle = BG; x.fillRect(0, 0, W, H);
+  x.lineCap = 'round'; x.lineJoin = 'round';
+  // in the rim pass every shape is also stroked wide in RIM; the FG pass draws on top
+  let rim = false;
+  const F = () => { x.fill(); if (rim) x.stroke(); };
+  const S = () => x.stroke();
+  const G = {
+    ankh(s) {
+      x.beginPath(); x.ellipse(0, -0.24 * s, 0.15 * s, 0.2 * s, 0, 0, TAU); S();
+      x.beginPath(); x.rect(-0.36 * s, -0.04 * s, 0.72 * s, 0.11 * s); F();
+      x.beginPath(); x.rect(-0.065 * s, -0.04 * s, 0.13 * s, 0.5 * s); F();
+    },
+    eye(s) { // wedjat: brow, almond eye, pupil, the drop and the spiral cheek mark
+      x.beginPath(); x.moveTo(-0.44 * s, -0.24 * s); x.quadraticCurveTo(0, -0.42 * s, 0.46 * s, -0.22 * s); x.lineTo(0.46 * s, -0.15 * s); x.quadraticCurveTo(0, -0.33 * s, -0.44 * s, -0.17 * s); x.closePath(); F();
+      x.beginPath(); x.moveTo(-0.42 * s, 0); x.quadraticCurveTo(0, -0.26 * s, 0.44 * s, 0); x.quadraticCurveTo(0, 0.17 * s, -0.42 * s, 0); S();
+      x.beginPath(); x.arc(0.02 * s, -0.03 * s, 0.1 * s, 0, TAU); F();
+      x.beginPath(); x.moveTo(-0.08 * s, 0.1 * s); x.lineTo(-0.1 * s, 0.44 * s); S();
+      x.beginPath(); x.moveTo(0.1 * s, 0.1 * s); x.quadraticCurveTo(0.2 * s, 0.4 * s, 0.38 * s, 0.38 * s); x.arc(0.32 * s, 0.3 * s, 0.08 * s, 0.9, -1.8, true); S();
+    },
+    bird(s) { // vulture in profile, facing left
+      x.beginPath(); x.ellipse(0.02 * s, -0.02 * s, 0.3 * s, 0.17 * s, -0.35, 0, TAU); F();
+      x.beginPath(); x.arc(-0.24 * s, -0.3 * s, 0.1 * s, 0, TAU); F();
+      x.beginPath(); x.moveTo(-0.32 * s, -0.33 * s); x.lineTo(-0.45 * s, -0.24 * s); x.lineTo(-0.3 * s, -0.25 * s); x.closePath(); F();
+      x.beginPath(); x.moveTo(-0.2 * s, -0.2 * s); x.lineTo(-0.12 * s, -0.1 * s); S();
+      x.beginPath(); x.moveTo(0.22 * s, 0.04 * s); x.lineTo(0.46 * s, 0.24 * s); x.lineTo(0.34 * s, 0.28 * s); x.lineTo(0.14 * s, 0.12 * s); x.closePath(); F();
+      x.beginPath(); x.moveTo(-0.04 * s, 0.12 * s); x.lineTo(-0.06 * s, 0.44 * s); x.lineTo(-0.18 * s, 0.46 * s); x.moveTo(0.08 * s, 0.12 * s); x.lineTo(0.08 * s, 0.44 * s); x.lineTo(-0.04 * s, 0.46 * s); S();
+    },
+    reed(s) { // flowering reed
+      x.beginPath(); x.moveTo(0, 0.46 * s); x.lineTo(0, -0.08 * s); S();
+      x.beginPath(); x.moveTo(-0.02 * s, -0.06 * s); x.quadraticCurveTo(-0.12 * s, -0.36 * s, 0.1 * s, -0.48 * s); x.quadraticCurveTo(0.06 * s, -0.24 * s, 0.1 * s, -0.08 * s); x.closePath(); F();
+      x.beginPath(); x.moveTo(0, 0.12 * s); x.quadraticCurveTo(0.16 * s, 0.06 * s, 0.2 * s, -0.1 * s); S();
+    },
+    water(s) { // three ripples
+      for (let r = -1; r <= 1; r++) { x.beginPath(); x.moveTo(-0.44 * s, r * 0.24 * s); for (let j = 1; j <= 8; j++) x.lineTo(-0.44 * s + j * 0.11 * s, r * 0.24 * s + (j % 2 ? -0.07 : 0.07) * s); S(); }
+    },
+    djed(s) {
+      x.beginPath(); x.rect(-0.09 * s, -0.3 * s, 0.18 * s, 0.78 * s); F();
+      for (let i = 0; i < 4; i++) { x.beginPath(); x.rect(-0.3 * s, -0.46 * s + i * 0.12 * s, 0.6 * s, 0.07 * s); F(); }
+      x.beginPath(); x.rect(-0.22 * s, 0.4 * s, 0.44 * s, 0.08 * s); F();
+    },
+    sun(s) { x.beginPath(); x.arc(0, 0, 0.3 * s, 0, TAU); S(); x.beginPath(); x.arc(0, 0, 0.08 * s, 0, TAU); F(); },
+    feather(s) { // maat
+      x.beginPath(); x.moveTo(0.04 * s, 0.46 * s); x.quadraticCurveTo(-0.12 * s, 0, 0.0, -0.4 * s); x.quadraticCurveTo(0.26 * s, -0.5 * s, 0.2 * s, -0.3 * s); x.quadraticCurveTo(0.1 * s, 0, 0.1 * s, 0.46 * s); x.closePath(); F();
+    },
+    mouth(s) {
+      x.beginPath(); x.ellipse(0, 0, 0.4 * s, 0.12 * s, 0, 0, TAU); F();
+      if (!rim) { x.save(); x.strokeStyle = BG; x.lineWidth = 0.035 * s; x.beginPath(); x.moveTo(-0.3 * s, 0); x.lineTo(0.3 * s, 0); S(); x.restore(); }
+    },
+    bread(s) { x.beginPath(); x.moveTo(-0.3 * s, 0.12 * s); x.arc(0, 0.12 * s, 0.3 * s, Math.PI, 0); x.closePath(); F(); },
+  };
+  const NAMES = ['ankh', 'eye', 'bird', 'reed', 'water', 'djed', 'sun', 'feather', 'bird', 'eye', 'ankh', 'reed'];
+  function glyph(name, cx, cy, s) {
+    for (const pass of [true, false]) {
+      rim = pass;
+      x.save(); x.translate(cx, cy); x.scale(1, SQ);
+      x.fillStyle = pass ? RIM : FG; x.strokeStyle = pass ? RIM : FG;
+      x.lineWidth = 0.09 * s + (pass ? 16 : 0);
+      G[name](s);
+      x.restore();
+    }
+  }
+  // column rules, continuous so the tile wraps vertically
+  x.fillStyle = RIM;
+  for (const cx of [0, COL, W]) x.fillRect(cx - 5, 0, 10, H);
+  for (let col = 0; col < 2; col++) {
+    const cx = col * COL + COL / 2;
+    const s = 196, step = s * SQ + 22;
+    let y = 24, i = 0;
+    while (y + step < H - 12) {
+      const r = hash(seed, col, i, 'k');
+      if (r < 0.2 && y + 3 * step < H - 12) {
+        // cartouche: a royal-name ring with its tie bar, three small signs inside
+        const h = 3 * step - 20;
+        for (const pass of [true, false]) {
+          x.save(); x.strokeStyle = pass ? RIM : FG; x.lineWidth = pass ? 30 : 13;
+          x.beginPath(); x.roundRect(cx - 92, y + 6, 184, h - 26, 90 * SQ); x.stroke();
+          x.beginPath(); x.moveTo(cx - 70, y + h - 6); x.lineTo(cx + 70, y + h - 6); x.stroke();
+          x.restore();
+        }
+        const inner = ['sun', 'feather', 'water', 'reed', 'bird', 'ankh'];
+        for (let j = 0; j < 3; j++) glyph(inner[Math.floor(hash(seed, col, i, j, 'in') * inner.length)], cx, y + 20 + (j + 0.5) * (h - 46) / 3, 118);
+        y += 3 * step; i++;
+        continue;
+      }
+      if (r < 0.32) { glyph('mouth', cx - 54, y + step * 0.5, 100); glyph('bread', cx + 54, y + step * 0.5, 100); } // a pair of small signs
+      else glyph(NAMES[Math.floor(hash(seed, col, i, 'g') * NAMES.length)], cx, y + step * 0.5, s);
+      y += step; i++;
+    }
+  }
+  return canvasTex(c, { srgb: false });
+}
+
+// The animated camera: the four approved stills are keys, plus the push in out of the storm (t 0),
+// the landing (LAND) and the settle (3.5). Offsets are relative to the chairs' centre; a Catmull-Rom
+// spline through the keys, focal / roll / aperture eased between them. roll = dutch (rad).
+export const CAM_KEYS = [
+  { t: 0.0, pos: [0.6, 1.0, 2.95], target: [0.0, 0.6, -0.5], focal: 17, roll: 0.16, subject: [0, 0.35, 0], aperture: 0.002, maxblur: 0.006 },
+  { ...SHOTS.a, roll: 0.12 },
+  { ...SHOTS.b, roll: -0.1 },
+  { ...SHOTS.c, roll: 0.0 },
+  { ...SHOTS.d, roll: 0.0 },
+  { t: LAND, pos: [-1.5, 0.42, 1.5], target: [0.0, -0.12, 0.0], focal: 18, roll: 0.0, subject: [0, 0.3, 0], aperture: 0.003, maxblur: 0.006 },
+  { t: 3.5, pos: [-1.85, 0.62, 2.25], target: [0.05, 0.42, 0.0], focal: 18, roll: 0.0, subject: [0, 0.35, 0], aperture: 0.003, maxblur: 0.006 },
+];
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const catmull = (p0, p1, p2, p3, u) => 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+function keyAt(tt) {
+  const K = CAM_KEYS;
+  let i = 0;
+  while (i < K.length - 2 && tt > K[i + 1].t) i++;
+  const a = K[Math.max(0, i - 1)], b = K[i], c = K[i + 1], d = K[Math.min(K.length - 1, i + 2)];
+  const u = clamp01((tt - b.t) / (c.t - b.t));
+  const sm = u * u * (3 - 2 * u);
+  const v3 = (k) => [0, 1, 2].map((j) => catmull(a[k][j], b[k][j], c[k][j], d[k][j], u));
+  const lin = (k) => b[k] + (c[k] - b[k]) * sm;
+  return { pos: v3('pos'), target: v3('target'), subject: v3('subject'), focal: lin('focal'), roll: lin('roll'), aperture: lin('aperture'), maxblur: lin('maxblur') };
+}
 
 // ------------------------------------------------------------------ shader chunks
 const NOISE = /* glsl */`
@@ -103,8 +231,8 @@ function funnelMaterial({ glyphTex, opacity = 1, twist = 0.08, spin = 0.12, scro
         col *= 0.72 + 0.56 * fine; // grain: sheets of sand, not paint
         col += cHi * pow(smoothstep(0.64, 0.92, fine * 0.5 + streak * 0.6), 3.0) * 0.9;
         // carved glyph bands riding the flow (the relief texture: light glyphs on mid grey)
-        float band = smoothstep(0.5, 0.6, fbm(vec2(u * 4.0, v * 0.3 + uSeed * 2.0)));
-        vec2 guv = vec2(fract(u * 26.0), fract(v * 1.5));
+        float band = smoothstep(0.4, 0.5, fbm(vec2(u * 4.0, v * 0.3 + uSeed * 2.0)));
+        vec2 guv = vec2(fract(u * 16.0), fract(v * 1.0));
         float g = texture2D(uGlyph, guv).r;
         float glyphM = smoothstep(0.62, 0.78, g) * band * uGlyphAmt;
         float rimM = smoothstep(0.42, 0.5, g) * (1.0 - smoothstep(0.5, 0.56, g)) * band * uGlyphAmt;
@@ -117,7 +245,7 @@ function funnelMaterial({ glyphTex, opacity = 1, twist = 0.08, spin = 0.12, scro
         col = col * (0.42 + 0.7 * d01) + leakC;
         // the top hole's white rim (the white-out), fading as the hole recedes
         float top = smoothstep(-2.5, 0.0, vY) * uWhite;
-        col = mix(col, vec3(3.2, 3.0, 2.7), top * 0.85);
+        col = mix(col, vec3(3.0, 2.15, 1.25), top * 0.8);
         // the desert end glows gold
         col += cSun * smoothstep(0.82, 1.0, d01) * 3.0;
         float a = uOpacity * mix(dens, 1.0, step(0.999, uOpacity));
@@ -306,6 +434,7 @@ function dustMaterial() {
   });
 }
 
+const ARM_RAISE = -1.6, ARM_SPLAY = 0.55;
 const SUN_BELOW = new THREE.Vector3(1.5, -6, 2.5), SUN_ABOVE = new THREE.Vector3(4.5, 3.2, -1.5);
 
 // ------------------------------------------------------------------ build
@@ -322,7 +451,7 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
   scene.fog = new THREE.FogExp2('#4A2E1C', 0.035);
 
   // ---------------------------------------------------------------- the funnel
-  const glyphTex = reliefTexture(61, 512, 1024, 3);
+  const glyphTex = hieroglyphTexture(61);
   glyphTex.wrapS = glyphTex.wrapT = THREE.RepeatWrapping;
   const funnel = new THREE.Group();
   scene.add(funnel);
@@ -338,14 +467,14 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
     funnel.add(m); handles.shells.push(m);
   }
   // the hole the floor left: a hot white disc above (the white-out), parquet rim around it
-  const hole = new THREE.Mesh(new THREE.CircleGeometry(6.5, 64), new THREE.MeshBasicMaterial({ color: new THREE.Color(4.2, 3.9, 3.5), fog: false, toneMapped: true }));
+  const hole = new THREE.Mesh(new THREE.CircleGeometry(6.5, 64), new THREE.MeshBasicMaterial({ color: new THREE.Color(3.4, 2.5, 1.45), fog: false, toneMapped: true }));
   hole.rotation.x = Math.PI / 2; hole.position.y = 1.2;
   funnel.add(hole);
   // the desert at the bottom: sand ground, lit by the low sun, and a haze above it
   const sandMat = pbr('sand_01', { color: '#F4DDB8', normal: 0.6, env: 0.6 });
   for (const k of ['map', 'normalMap', 'aoMap', 'roughnessMap']) if (sandMat[k]) sandMat[k].repeat.set(70, 70);
   const ground = new THREE.Mesh(new THREE.CircleGeometry(30, 96), sandMat);
-  sandMat.color.set('#D6BC96');
+  sandMat.color.set('#F4E4CE');
   ground.rotation.x = -Math.PI / 2; ground.position.y = -LEN; ground.receiveShadow = true;
   funnel.add(ground);
   const haze = new THREE.Mesh(new THREE.CircleGeometry(9, 64), new THREE.MeshBasicMaterial({ color: C3(PAL.sun).multiplyScalar(1.6), transparent: true, opacity: 0.5, depthWrite: false, fog: false }));
@@ -392,6 +521,7 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
     rig.position.y = -chair.userData.seatY; // pivot at the seat
     scene.add(pivot);
     handles.chairs.push({ ...cfg, pivot, rig, chair, robot });
+    handles.seatY = chair.userData.seatY;
     handles.robots.push(robot);
   }
 
@@ -403,7 +533,7 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
   sunKey.castShadow = true; sunKey.shadow.mapSize.set(2048, 2048);
   Object.assign(sunKey.shadow.camera, { left: -2.5, right: 2.5, top: 2.5, bottom: -2.5, near: 0.5, far: 20 });
   sunKey.shadow.bias = -0.0004; sunKey.shadow.normalBias = 0.02;
-  const topLight = new THREE.DirectionalLight('#FFF4E6', 4.0);
+  const topLight = new THREE.DirectionalLight('#FFD9AE', 4.0);
   topLight.position.set(-0.6, 6, 0.8); topLight.target.position.set(0, 0, 0);
   const rim = new THREE.DirectionalLight('#FFB060', 2.4);
   rim.position.set(-3, 0.5, -3.5); rim.target.position.set(0, 0.3, 0);
@@ -423,82 +553,169 @@ export async function buildVortex4Look(assets, renderer, { shot = 'b', t = null 
     grade: { vignette: 0.38, grain: 0.03, ca: 0.0016, lift: [0.012, 0.007, 0.003], seed: 13 },
   };
 
-  // ---------------------------------------------------------------- update(t): a pure function of t
-  function update(tt) {
-    const rise = FALL * tt;
-    funnel.position.y = TOP0 + rise;
+  // ---------------------------------------------------------------- landing dust (t >= LAND)
+  // A burst of sand thrown out from each chair base when the seats hit, then a slow cloud that
+  // thickens toward the cut to the desert. Positions are a pure function of the time since LAND.
+  const sprite = (() => {
+    const [cv, g] = canvas2d(64, 64);
+    const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    return canvasTex(cv);
+  })();
+  function dustLayer(n, seed, size, color) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ map: sprite, color, size, sizeAttenuation: true, transparent: true, opacity: 0, depthWrite: false, fog: false }));
+    pts.frustumCulled = false; pts.visible = false; pts.renderOrder = 5;
+    pts.userData.p = Array.from({ length: n }, (_, i) => ({
+      chair: i % 2, a: hash(seed, i, 'a') * TAU, v: hashRange(0.4, 1.0, seed, i, 'v'), up: hashRange(0.05, 1.0, seed, i, 'u'), r0: hashRange(0.2, 0.45, seed, i, 'r'),
+    }));
+    scene.add(pts); (scene.userData.noDepth ||= []).push(pts);
+    return pts;
+  }
+  const burst = dustLayer(900, 71, 0.16, '#F0D2A4');
+  const cloud = dustLayer(260, 72, 0.9, '#E8CDA2');
+  Object.assign(handles, { burst, cloud });
+
+  // ---------------------------------------------------------------- update(t, camPos): a pure function of t
+  const SEAT = handles.seatY;
+  const smooth = THREE.MathUtils.smoothstep;
+  const SUN0 = C3('#FFC48A'), SUN1 = C3('#FFE0BE');
+  const FOG0 = C3('#4A2E1C'), FOG1 = C3('#CDB596');
+  const HS0 = C3('#E8B888'), HS1 = C3('#8FB0E6'), HG0 = C3('#4A2C18'), HG1 = C3('#A88C6C');
+  // the seat (pivot) of a chair at t: orbit the axis, bob, settle onto the sand at LAND, thump
+  function pivotPos(c, tt, out = V()) {
+    const tl = Math.min(tt, LAND);
+    const th = c.theta + 0.55 * tl;
+    const k = 1 - smooth(tt, LAND - 0.8, LAND);
+    let y = k * (c.y + 0.08 * Math.sin(tl * 2.3 + c.ph));
+    if (tt > LAND) {
+      const u = tt - LAND;
+      y += -0.035 * Math.sin(Math.PI * clamp01(u / 0.14)) + 0.012 * Math.sin(Math.PI * clamp01((u - 0.14) / 0.12));
+    }
+    return out.set(Math.cos(th) * c.r, y, Math.sin(th) * c.r);
+  }
+  const centreAt = (tt) => handles.chairs.reduce((a, c) => a.add(pivotPos(c, tt)), V()).multiplyScalar(0.5);
+  // the keyed camera at t, in world space
+  function cameraAt(tt) {
+    const k = keyAt(Math.max(0, tt));
+    const ctr = centreAt(tt);
+    return { ...k, pos: ctr.clone().add(V(...k.pos)), target: ctr.clone().add(V(...k.target)), subject: ctr.clone().add(V(...k.subject)) };
+  }
+
+  function update(tt, camPos = null) {
+    const tl = Math.min(tt, LAND), after = Math.max(0, tt - LAND);
+    // the world rises past the chairs and stops dead when the sand meets the chair feet at LAND
+    funnel.position.y = -SEAT + FALL * tl;
     const white = Math.exp(-tt / 0.22);
-    for (const s of handles.shells) { s.material.uniforms.uT.value = tt; s.material.uniforms.uWhite.value = white; }
-    hole.material.color.setRGB(4.2, 3.9, 3.5).multiplyScalar(0.25 + 0.75 * white);
-    for (const s of handles.sand) s.material.uniforms.uT.value = tt;
+    for (const s of handles.shells) { s.material.uniforms.uT.value = tt; s.material.uniforms.uWhite.value = white; } // walls keep swirling
+    hole.material.color.setRGB(3.4, 2.5, 1.45).multiplyScalar(0.25 + 0.75 * white);
+    const ts = tl + 0.3 * after; // the sand and the tablets slow once the fall stops
+    for (const s of handles.sand) s.material.uniforms.uT.value = ts;
     handles.dust.material.uniforms.uT.value = tt;
     // tablets: orbit the axis and rise slower than the walls (they fall with the chairs)
     for (const m of handles.tablets) {
       const p = m.userData.p;
-      const ang = p.a0 + p.w * tt;
+      const ang = p.a0 + p.w * ts;
       const span = 20, lo = -14;
-      const y = lo + ((p.y0 - lo + FALL * p.k * tt) % span + span) % span;
+      const y = lo + ((p.y0 - lo + FALL * p.k * ts) % span + span) % span;
       m.position.set(Math.cos(ang) * p.r, y, Math.sin(ang) * p.r);
-      m.rotation.set(p.rx * tt + p.ph, p.ry * tt + ang, p.rz * tt);
-      // tablets near the top hole are still forming: they grow out of the storm
-      m.scale.setScalar(THREE.MathUtils.smoothstep(funnel.position.y - y, 0.4, 2.0));
+      m.rotation.set(p.rx * ts + p.ph, p.ry * ts + ang, p.rz * ts);
+      // tablets near the top hole are still forming: they grow out of the storm; none below the sand
+      m.scale.setScalar(smooth(funnel.position.y - y, 0.4, 2.0) * smooth(y - (funnel.position.y - LEN), 0.2, 1.0));
+      m.visible = m.scale.x > 0.01;
     }
     // floor shards: fly outward and up with the funnel top, swallowed by ~1.2 s
     for (const m of handles.shards) {
       const p = m.userData.p;
       const r = p.r + p.out * tt * 1.6;
       const ang = p.a + 0.7 * tt;
-      m.position.set(Math.cos(ang) * r, p.y0 + rise * p.up + 0.3, Math.sin(ang) * r);
+      m.position.set(Math.cos(ang) * r, p.y0 + FALL * tt * p.up + 0.3, Math.sin(ang) * r);
       m.rotation.set(p.rx * tt, ang, p.rz * tt);
-      m.scale.setScalar(1 - THREE.MathUtils.smoothstep(tt, 0.7, 1.3));
+      m.scale.setScalar(1 - smooth(tt, 0.7, 1.3));
       m.visible = m.scale.x > 0.01;
     }
-    // chairs: orbit the axis slowly, bob, and tumble (roll, pitch, a slow yaw spin)
+    // chairs: orbit, bob and tumble; the yaw turns each robot's face toward the camera (3/4 view)
     for (const c of handles.chairs) {
-      const th = c.theta + 0.55 * tt;
-      c.pivot.position.set(Math.cos(th) * c.r, c.y + 0.08 * Math.sin(tt * 2.3 + c.ph), Math.sin(th) * c.r);
-      // the tumble eases in after the floor falls and settles upright for the landing
-      const live = THREE.MathUtils.smoothstep(tt, 0.0, 0.5) * (1 - THREE.MathUtils.smoothstep(tt, LAND - 0.45, LAND));
-      c.pivot.rotation.set(
-        live * (0.55 * Math.sin(tt * 2.1 + c.ph) + 0.25),
-        // yaw pi faces the robot to +z (the camera side); a slow swing keeps the faces readable
-        Math.PI + (c.name === 'Codex' ? 0.55 : -0.55) + 0.7 * (1 - THREE.MathUtils.smoothstep(tt, LAND - 0.9, LAND - 0.2)) * Math.sin(tt * 0.9 + c.ph),
-        live * 0.65 * Math.sin(tt * 1.6 + c.ph + 1.0),
-        'YXZ',
-      );
-      c.robot.setPose('seated-idle', 2.35 + tt + c.ph);
-      // reaction: Codex throws both arms up, Claude braces with its hands down on the seat
-      const A = c.robot.handles.arms;
-      for (const [s, arm] of [[1, A.L], [-1, A.R]]) {
-        if (c.arms === 'up') { arm.upper.rotateZ(s * 2.0); arm.upper.rotateX(-0.5); arm.fore.rotateX(-0.6); }
-        else { arm.upper.rotateZ(s * 0.45); arm.upper.rotateX(0.35); }
+      pivotPos(c, tt, c.pivot.position);
+      const live = smooth(tt, 0.0, 0.5) * (1 - smooth(tt, LAND - 0.45, LAND));
+      let yaw = Math.PI + (c.name === 'Codex' ? 0.55 : -0.55);
+      if (camPos) {
+        const dx = camPos.x - c.pivot.position.x, dz = camPos.z - c.pivot.position.z;
+        yaw = Math.atan2(-dx, -dz) + (c.name === 'Codex' ? 0.32 : -0.32);
       }
-      c.robot.handles.headPivot.rotation.x += c.arms === 'up' ? -0.25 : 0.18;
+      yaw += 0.4 * (1 - smooth(tt, LAND - 0.9, LAND - 0.2)) * Math.sin(tt * 0.9 + c.ph);
+      const rock = after > 0 ? 0.06 * Math.exp(-after / 0.18) * Math.sin(after * 26 + c.ph) : 0;
+      c.pivot.rotation.set(live * (0.55 * Math.sin(tt * 2.1 + c.ph) + 0.25) + rock, yaw, live * 0.65 * Math.sin(tt * 1.6 + c.ph + 1.0), 'YXZ');
+      c.robot.setPose('seated-idle', 2.35 + tt + c.ph);
+      // reaction: Codex throws both arms high, Claude braces on the seat; the arms drop after the landing
+      const A = c.robot.handles.arms;
+      const up = (0.6 + 0.4 * smooth(tt, 0.0, 0.35)) * (1 - 0.8 * smooth(tt, LAND + 0.05, LAND + 0.6));
+      if (c.arms === 'up') {
+        // the arms are IK-solved onto the lap: swing each upper arm up about the body's lateral axis,
+        // then splay it out about the body's forward axis (both in the shoulder's parent space)
+        c.pivot.updateMatrixWorld(true);
+        const gq = c.robot.group.getWorldQuaternion(new THREE.Quaternion());
+        for (const [s, arm] of [[1, A.L], [-1, A.R]]) {
+          const pq = arm.upper.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
+          const lat = V(1, 0, 0).applyQuaternion(gq).applyQuaternion(pq);
+          const fwd = V(0, 0, 1).applyQuaternion(gq).applyQuaternion(pq);
+          arm.upper.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(lat, ARM_RAISE * up));
+          arm.upper.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(fwd, s * ARM_SPLAY * up));
+          arm.fore.rotateX(-0.35 * up);
+        }
+      } else {
+        for (const [s, arm] of [[1, A.L], [-1, A.R]]) { arm.upper.rotateZ(s * 0.45); arm.upper.rotateX(0.35); }
+      }
+      c.robot.handles.headPivot.rotation.x += c.arms === 'up' ? -0.25 * up : 0.18;
     }
+    // landing dust: the burst races out low and settles; the cloud rises slowly and thickens
+    const ground = -SEAT;
+    const bases = handles.chairs.map((c) => pivotPos(c, LAND));
+    for (const [layer, kind] of [[burst, 'burst'], [cloud, 'cloud']]) {
+      layer.visible = after > 0;
+      if (!layer.visible) continue;
+      const arr = layer.geometry.attributes.position.array;
+      layer.userData.p.forEach((p, i) => {
+        const b = bases[p.chair];
+        const rr = kind === 'burst' ? p.r0 + 1.6 * p.v * (1 - Math.exp(-after / 0.28)) : p.r0 + 0.9 * p.v * (1 - Math.exp(-after / 0.55));
+        const yy = kind === 'burst' ? ground + 0.04 + 0.45 * p.up * (1 - Math.exp(-after / 0.18)) * Math.exp(-after / 0.9) : ground + 0.12 + 0.8 * p.up * (1 - Math.exp(-after / 0.5));
+        arr[i * 3] = b.x + Math.cos(p.a) * rr; arr[i * 3 + 1] = yy; arr[i * 3 + 2] = b.z + Math.sin(p.a) * rr;
+      });
+      layer.geometry.attributes.position.needsUpdate = true;
+      layer.material.opacity = kind === 'burst' ? 0.95 * smooth(after, 0, 0.03) * (1 - 0.6 * smooth(after, 0.25, 0.9)) : 0.5 * smooth(after, 0.05, 0.85);
+    }
+    // the practical front light rides with the camera onto the faces
+    if (camPos) { front.position.copy(camPos).add(V(0.2, 0.4, 0)); front.target.position.copy(centreAt(tt)).add(V(0, 0.35, 0)); }
     scene.updateMatrixWorld(true);
-    // lights track the white-out fade and the desert approach
-    const near = THREE.MathUtils.smoothstep(tt, 1.4, LAND);
+    // lights track the white-out fade and the desert approach; the grade cools to the desert's
+    const near = smooth(tt, 1.4, LAND);
     topLight.intensity = 0.6 + 5.5 * white;
-    sunKey.intensity = 2.2 + 3.2 * near;
+    sunKey.intensity = 2.2 + 1.5 * near;
+    sunKey.color.lerpColors(SUN0, SUN1, near);
     // the sun leaks up from below during the fall, then swings over the rim as the desert opens
     sunKey.position.lerpVectors(SUN_BELOW, SUN_ABOVE, near);
     handles.haze.material.opacity = 0.5 * (1 - near);
-    hemi.intensity = 0.5 + 0.35 * near;
+    hemi.intensity = 0.55 - 0.1 * near;
+    hemi.color.lerpColors(HS0, HS1, near * 0.85);
+    hemi.groundColor.lerpColors(HG0, HG1, near);
+    scene.fog.color.lerpColors(FOG0, FOG1, near);
+    scene.fog.density = 0.035 - 0.017 * near;
     rim.intensity = 2.4;
   }
-  update(T);
 
-  // camera relative to the chairs' centre at T
-  const centre = handles.chairs.reduce((a, c) => a.add(c.pivot.position), V()).multiplyScalar(0.5);
-  const pos = centre.clone().add(V(...S.pos));
-  const tgt = centre.clone().add(V(...S.target));
-  camera.position.copy(pos); camera.lookAt(tgt); camera.updateMatrixWorld();
-  if (shot === 'a' || shot === 'b') camera.rotateZ(shot === 'a' ? 0.12 : -0.1); // a little dutch: the world is falling
-  const subj = centre.clone().add(V(...S.subject));
-  film.dof.focus = pos.distanceTo(subj);
-  front.position.copy(pos).add(V(0.2, 0.4, 0)); front.target.position.copy(subj);
+  // the stills: the keyed camera at T (the same camera the composition flies)
+  const cam = cameraAt(T);
+  update(T, cam.pos);
+  camera.setFocalLength(cam.focal);
+  camera.position.copy(cam.pos); camera.lookAt(cam.target); camera.updateMatrixWorld();
+  camera.rotateZ(cam.roll);
+  film.dof.focus = cam.pos.distanceTo(cam.subject);
+  film.dof.aperture = cam.aperture; film.dof.maxblur = cam.maxblur;
   for (const s of handles.sand) s.material.uniforms.uRes.value.set(1920, 1080);
 
   const info = { shot, t: T, land: LAND, funnelTop: +funnel.position.y.toFixed(2), groundY: +(funnel.position.y - LEN).toFixed(2), focus: +film.dof.focus.toFixed(2) };
-  return { scene, camera, film, handles, update, info };
+  return { scene, camera, film, handles, update, cameraAt, centreAt, info };
 }
+

@@ -189,5 +189,5 @@ export function sampleCamera(shots, t, duration, seed) {
   const focalPx = (frame.h / 2) / Math.tan(deg(pose.fov) / 2);
   let smear = Math.min(180, (w.speed / FPS) * focalPx * 0.6);
   if (shot.smearAt) smear = Math.max(smear, shot.smearAt(t));
-  return { shot, pose, offset, roll: h.roll, pan: h.pan - w.angle, smear: smear > 2 ? smear : 0 };
+  return { shot, pose, offset, roll: h.roll + (pose.roll || 0), pan: h.pan - w.angle, smear: smear > 2 ? smear : 0 };
 }
