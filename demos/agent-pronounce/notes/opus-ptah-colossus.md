@@ -296,6 +296,20 @@ The command was `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus
 | b: waist-up ¾, voice 0.5 | 4: the scan face, lappets and beard hold; the collar reads as painted inlay; the was–djed–ankh and fists read | 4 | 4 | 4 | 5 | 4 | **pass**. Weakest: the fists are stylised SDF forms on a scan body (two levels of detail meet) |
 | c: head and shoulders, voice 1 | 4: a genuinely carved, weathered face; the glow sits on the eyes | 4 | 4 | 4: the glow is small at this framing | 5 | 4 | **narrow pass**. Weakest: the collar bands turn vertical where the crescent rounds the right shoulder, and the cap is a flat colour field |
 
+### Round 6b: emissive eye glow and the ×4 wide check
+
+- **Eye material.** On the scan, `handles.eyeMaterial` is now an additive `MeshStandardMaterial`: black base, `emissive` teal, and a radial `emissiveMap` (a white core fading to teal, then to black). The disc radius is 0.011·H. Before, it was a `MeshBasicMaterial`, so the desert scene's `emissiveIntensity *= 4` did nothing, and it glowed only while `voice > 0`.
+- **setState.** With the scan, `eyeMaterial.emissiveIntensity = eyeGlow · (0.6 + 0.4·voice)`. Below `eyeGlow` 0.01 the discs are hidden, so the eyes are fully dark in a. The procedural fallback keeps its iris material at 0.22× the same curve.
+- **Wide ×4 check.** `node lookdev/shoot-colossus4.mjs colossus-a --suffix=-glow "--q=glow4=1&state={eyeGlow:1,voice:1}"` (URL-encoded) exited 0. In the 60 m wide, the eyes read as two distinct teal points in the sockets: bright, with no bloom smear onto the brow. **Pass.** The harness `glow4=1` flag multiplies `eyeMaterial.emissiveIntensity` by 4, exactly as the desert scene does.
+- **Re-shoot.** `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus-c colossus-d` exited 0 with no page errors and 568,884 triangles. The sheet has been rebuilt as a 2×2 of a, b, c and d.
+
+| still | Subject | Set | Light | Effect | Text | Continuity | verdict |
+|---|---|---|---|---|---|---|---|
+| a: wide, eyes dark | 4 | 4 | 4 | 4 | 5 | 4 | **pass** (unchanged from round 6) |
+| b: waist-up, voice 0.5 | 4 | 4 | 4 | 4: the glow now reads at waist-up | 5 | 4 | **pass** |
+| c: head, voice 1 | 4: calm carved face; the cap is tight to the skull | 4 | 4 | 4: the eyes glow in the sockets | 5 | 4 | **pass**. Weakest: the vertical collar bands at the right shoulder (defect 2) |
+| d: golden backlight | 4: silhouette and collar gold read against the sky | 4 | 4: warm key with rim on the wig edge | 4 | 5 | 4 | **pass**. Weakest: the front of the figure is in shadow, so the face detail is soft |
+
 
 ## Verification
 
@@ -340,6 +354,7 @@ Round 6 (current, scan):
 3. `headYaw` / `headPitch` move only an empty marker on the scan (one rigid mesh); the head does not turn.
 4. The load cost is 20–60 s for each fresh page (decimation in JS). A pre-baked fitted GLB should replace this before the film render.
 5. A pale band (the maat-pedestal slab) shows between the feet and the plinth in the low wide shot.
+6. The eye glow is a flat additive disc, so at very grazing yaw (beyond about 60°) it shows as an ellipse floating slightly proud of the socket.
 
 
 Round 4 (current):

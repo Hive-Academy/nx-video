@@ -1461,17 +1461,19 @@ export async function createPtahColossus(assets, opts = {}) {
   if (fit) head.position.set(fit.head.x, Y0 + fit.head.capY, fit.head.z);
   else { head.position.copy(HEAD_PIVOT); head.scale.setScalar(HEAD_SCALE); head.add(mk(geos.head, face, 'head')); }
   // iris: dark polished stone; the glow is an inner light confined to the iris ring, pupil stays dark.
-  // On the scan the painted eyes stay as carved; a soft additive glow sits on them only while he speaks.
-  const eyeMat = fit ? new THREE.MeshBasicMaterial({
-    color: eyeCol, map: radialTexture([[0, '#FFFFFF'], [0.35, '#9FF5EC'], [1, '#000000']], 64),
-    transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+  // On the scan the carved eyes stay as carved; a soft additive glow disc sits on each. It is an emissive material
+  // (black base, emissive map) so a scene can scale emissiveIntensity like any other glow; eyeGlow wakes it.
+  const eyeMat = fit ? new THREE.MeshStandardMaterial({
+    color: '#000000', roughness: 1, metalness: 0, envMapIntensity: 0, emissive: eyeCol, emissiveIntensity: 0,
+    emissiveMap: radialTexture([[0, '#FFFFFF'], [0.18, '#CFFFF8'], [0.45, '#3FA79C'], [1, '#000000']], 64),
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
   }) : new THREE.MeshStandardMaterial({
     color: '#1A1512', roughness: 0.35, metalness: 0.0, envMapIntensity: 0.2, emissive: eyeCol, emissiveIntensity: 0,
     emissiveMap: radialTexture([[0, '#0A1414'], [0.3, '#123232'], [0.48, '#9FF5EC'], [0.72, '#FFFFFF'], [0.9, '#6FBFB8'], [1, '#1E3A38']], 128),
   });
   const eyes = [], flares = [];
   if (fit) for (const [i, p] of fit.eyes.entries()) {
-    const e = new THREE.Mesh(new THREE.CircleGeometry(0.0075 * fit.H, 24), eyeMat);
+    const e = new THREE.Mesh(new THREE.CircleGeometry(0.011 * fit.H, 24), eyeMat);
     e.name = i === 0 ? 'eye-right' : 'eye-left';
     e.position.set(p.x, Y0 + p.y, p.z + 0.01);
     e.renderOrder = 2; e.visible = false;
@@ -1529,9 +1531,9 @@ export async function createPtahColossus(assets, opts = {}) {
     head.rotation.x = state.headPitch;
     sceptre.rotation.z = -state.sceptreTilt;
     sceptre.rotation.x = 0.12 * abs(state.sceptreTilt);
-    // a faint inner light in the iris, only while the god speaks (voice > 0); eyeGlow only scales it
-    if (fit) { eyeMat.opacity = 0.55 * v * (0.6 + 0.4 * eg); for (const e of eyes) e.visible = v > 0.01; }
-    else eyeMat.emissiveIntensity = 0.22 * v * (0.6 + 0.4 * eg);
+    // eyeGlow wakes the eyes; voice brightens them while he speaks (0.6x silent .. 1x at voice 1)
+    if (fit) { eyeMat.emissiveIntensity = 1.0 * eg * (0.6 + 0.4 * v); for (const e of eyes) e.visible = eg > 0.01; }
+    else eyeMat.emissiveIntensity = 0.22 * eg * (0.6 + 0.4 * v);
     // no glow on the collar or the inlays: gold leaf stays gold leaf
     inlay.uInlayGlow.value = 0;
     inlay.uVoiceGlow.value = 0;

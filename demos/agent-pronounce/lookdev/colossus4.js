@@ -55,7 +55,8 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     god.group.position.copy(A.position);
     god.group.rotation.y = A.yaw;
     scene.add(god.group);
-    god.setState(S.state);
+    god.setState({ ...S.state, ...(q.get('state') ? JSON.parse(q.get('state')) : {}) });
+    if (q.get('glow4')) god.handles.eyeMaterial.emissiveIntensity *= 4; // as the desert scene does
     if (q.get('hide')) god.group.traverse((o) => { if (o.name === q.get('hide')) o.visible = false; }); // debug: hide a named mesh
     god.group.updateMatrixWorld(true);
     const local = (x, y, z) => god.group.localToWorld(new THREE.Vector3(x, y, z));
