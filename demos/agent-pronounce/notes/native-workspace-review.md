@@ -1,4 +1,4 @@
-﻿# Independent workspace bodies review
+# Independent workspace bodies review
 
 ## Skills loaded
 - C:/Users/abdal/.agents/skills/hyperframes/SKILL.md: "Everything visible is a function of timeline time."
@@ -47,4 +47,3 @@ No blocking source defect identified within the reviewed commit. Non-blocking ma
 
 ## Required remaining integration checks
 Run the integrated HyperFrames/media checks and inspect actual composition frames after scene integration. A source review and the approved saved sheet do not replace those checks.
-

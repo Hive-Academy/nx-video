@@ -646,3 +646,78 @@ Decisions (SPEC.md "Direction v3" is the binding text):
   worktree; regenerate them with `scripts/live-demo/landing-stills.mjs` on a fresh checkout.
 - Next: one Opus child per scene (workspace re-pose with bodies, desert re-shoot with bodies and
   the scan colossus, vortex look-dev). Each still needs user approval before animation.
+
+## 2026-11-13 — vortex look approved (with three fixes)
+
+- Vortex look-dev (`demo/ep06-v4-vortex-look`, `d5a3fde`, `src/look-vortex4.js`, stills A–D)
+  approved by the user. The animation pass must fix three things: keep the right robot readable
+  in B (it is behind its chair back), make the wall glyphs read as Egyptian hieroglyphs, and
+  match D's sand to the approved desert while the funnel walls stay visible. The child's own
+  notes carry over too: a bigger arms-up for Codex, no pure profile in D, and the dust burst
+  belongs to the landing at t ≥ 2.6 s.
+- The same Opus child (`e0a5a3cd…`) now animates the vortex.
+- Rule from the user, sent by a peer session: never stop processes by name, only by your own PID.
+  It now goes into every child and lane brief.
+
+## 2026-11-13 — workspace with real bodies approved as is
+
+- User approved `demo/ep06-v4-workspace-bodies` (`7d791c1`, `createBodiedRobot` size 0.15 on the
+  body-a staging; stills A 18 s, B 0.3 s, C crop, D 9.95 s) as is. The approved camera stays: the
+  opening two-shot from behind is accepted, and typing shows only for 0–0.35 s. The body hop,
+  grip and danger lean-back moved to the head.
+
+## 2026-11-13 � Codex recovery continuation
+
+- User explicitly approved switching remaining visual scene work from failing Opus sessions to Codex.
+- Verified all four earlier child sessions stopped. Desert work is saved at c6008f3; vortex checkpoint acf1e2f is present in both vortex branches. Main episode remains 3798d12; workspace 7d791c1 remains approved and unmerged.
+- Started Codex vortex implementation lane 2e8bb6f3-fe2c-4222-a847-ed9f304e38f2 in existing vortex-anim worktree. Scope is completion and verification of approved vortex, followed by independent review (one fix round planned).
+- Binding Script v4.1 puts O4 (Old.) in desert. Stale vortex look notes assuming an office white-out are superseded; current set-vortex4.js already uses storm-through continuity.
+- Inspected saved desert sheet and full-size E: staging is ready for user review; eye glow remains faint. Requested desert approval with stronger E eye glow as recommended option; answer pending. No desert animation authorized yet.
+- Unrelated MCP/harness/config changes left intact; no media staged or committed.
+- User approved desert stills A-E with stronger eye glow in E. Desert animation gate passed with that required correction. Codex desert animation is now delegated in the existing desert-reshoot worktree; approved scan framing and seat continuity remain binding.
+- User also authorized the Claude API CLI. Plan: Codex scene implementations, Claude API independent review of those changes; Codex independently reviews prior Opus workspace change.
+- Initial CLI launches inherited read-only permission and did not deliver. Resumed same sessions with explicit auto-edit: vortex b5f958b3-727c-4947-b650-c686af7efc91; desert c4fe95b2-f632-41e5-a508-0193121a916e; workspace review 6c8581a6-e9ee-4b98-b717-c877b455b05e. Earlier attempts are not completion evidence.
+- Parent desert baseline verification: no-media passed (478 files); HyperFrames check exit 0, ok:true, no reported errors. It exceeded 120s render-ready wait before checking current state; five warnings include nested media timing, music length and canvas-edge content. This is not a substitute for scene snapshots.
+- Recovery blocker confirmed: explicit auto-edit on resumed Codex still yields read-only sandbox write rejection; Ptah MCP did not connect. Fresh Claude API Opus lane a012f76d-9f54-4262-b592-36d66609d924 also entered plan mode despite permission:auto-edit; notes write blocked and ptah_agent_report refused while in plan mode. No scene implementation deliverables produced by these attempts. Stopped remaining workspace review lane to avoid blocked spend. Lane completion/output tools work; direct child reporting and writes do not. Resolve effective CLI permissions/MCP before restarting. User approvals remain recorded above.
+
+## 2026-11-13 - permission probe recovery
+- Adopted HANDOFF.md and preserved existing approvals; no predecessor session ID supplied, so handoff acknowledgment cannot be addressed without guessing.
+- Gate 0.1: lanes enabled per explicit user request; approval mode lane-review for future document gates, existing visual approvals retained. Memory search returned no hits. Codex installed/confirmed room; Claude Api available, limits unknown. Requested permission auto-edit on both fresh probes; effective mode must be verified, not assumed.
+- Probe lanes: Codex 3e4ede99-01ec-41c5-b551-a7d7cda3b3ef in vortex-anim; Claude Api 21d61bd9-c97c-4d29-89e6-1f6f4d5c5486 in desert-reshoot. Sole deliverable in each: demos/agent-pronounce/notes/permission-probe-20261113-a.md. No scene work until create/read/edit/command and direct report delivery pass for both.
+
+## 2026-11-13 - fresh probe results (gate FAILED)
+- Both lanes completed exit 0 but their declared deliverables are MISSING, independently confirmed by parent Test-Path. No scene source changes in either worktree; existing harness/MCP modifications preserved.
+- Codex 3e4ede99-01ec-41c5-b551-a7d7cda3b3ef (CLI session 01a1d4bc-6bb5-7612-acf9-7b4243e17078), requested permission:auto-edit. Observed: sandbox read-only, approval never, Default mode, no supplied writable roots. Exact write error: `patch rejected: writing is blocked by read-only sandbox; rejected by user approval settings`. Exact MCP error: `Ptah MCP did not connect for this lane (handshake-timeout); report in your final message.` ptah_agent_report unavailable.
+- Claude API 21d61bd9-c97c-4d29-89e6-1f6f4d5c5486, requested permission:auto-edit, tier opus, effort medium; observed model claude-opus-5-5. Effective plan mode restricted writes to C:/Users/abdal/.claude/plans/permission-report-probe-only-required-velvety-truffle.md; native create/edit skipped under policy. Ptah MCP connected, report tool loaded, attempted final:false token EP06-CLAUDE-20261113-PROBE-A. Exact error: `Cannot call mcp__ptah__ptah_agent_report while in plan mode.` ExitPlanMode unavailable.
+- Both harmless command probes passed: node -e "console.log('COMMAND_OK',process.cwd(),6*7)" printed COMMAND_OK, the correct intended worktree root, and 42. File read/edit/reread could not be completed because creation was blocked.
+- No direct agent-report envelope received by parent. Read/wait output is NOT delivery evidence. Effective process invocation/settings propagation cause remains unconfirmed; no policy bypass, settings changes, retries, process stops, scene implementation, merges or pushes performed.
+- Gate remains failed. Next: correct host lane permission propagation (Codex sandbox/approval and Claude plan mode) and Codex MCP handshake, then repeat fresh small probes and verify real parent report receipt before scene implementation. Existing video approvals remain valid. Actual lane token totals unavailable from the current parent output.
+
+## 2026-11-13 - user switches execution away from CLI lanes
+- User explicitly requested child sessions and native subagents; CLI lanes disabled until further notice. Existing Episode 6 scope/approvals retained.
+- Child session start attempted with branch demo/ep06-v4-vortex-session-recovery based on demo/ep06-v4-vortex-anim, probe only. Refused exactly: `ptah_session_start refused (unattributed-caller): ptah_session_start must be called from a live chat session; this caller has no live session id`. No successful child created by this request.
+- Native subagent /root/native_permission_probe started, sole ownership of desert notes/native-permission-probe-20261113.md; results pending. No scene changes authorized until alternate execution path probe passes.
+- User comparison evidence: D:/projects/ptah-extension also has permission settings reverting to Plan, but CLI lanes and MCP connections work there. User identifies Codex app-server parent orchestrator here as the apparent difference. Treat as comparison/hypothesis, not proven root cause. New child-session attribution refusal strengthens need to trace parent identity across app-server tool dispatch.
+
+## 2026-11-13 - native execution recovery PASSED
+- Native subagent /root/native_permission_probe created/read/edited/reread notes/native-permission-probe-20261113.md in desert worktree and ran node command in correct cwd with result42. Parent independently read state=edited and received NATIVE-EP06-20261113 via collaboration.send_message. Native reporting verified; ptah_agent_report not tested on this path.
+- User-authorized native execution now resumes approved desert (same agent) and vortex (/root/native_vortex, its own probe first). Desert owns GPU capture slot; vortex static work only until released. Workspace independent review /root/workspace_review saves missing review artifact. No CLI lanes or child sessions used after child attribution refusal.
+- Fix prompt saved as PTAH_PERMISSIONS_FIX_PROMPT.md for user's separate Ptah workspace investigation. This task does not edit Ptah itself.
+
+## 2026-11-13 - video continuation with native subagents
+- User reaffirmed native-subagent execution. Prior native tasks were no longer active and had left only probe files, so implementation assignments restarted as /root/desert and /root/vortex; /root/workspace_review resumed. No CLI calls.
+- Desert owns GPU slot; vortex static review until released. Workspace independent review covers original Opus implementation. Later Codex-authored changes will require an independent native Codex reviewer: weaker cross-family evidence, specific reason is user has disabled CLI lanes and child sessions fail caller attribution. Preserve this limitation explicitly.
+- Existing main branch remains demo/ep06-p-is-not-silent at3798d12. No scene integration claimed yet.
+- Workspace review now saved by independent native Codex reviewer, APPROVED8/10 medium confidence; author commit credits Claude Opus5.5. Parent reran syntax/diff checks and read review. Existing approved sheet inspected; fresh runtime seek verification deferred to integrated check.
+- Merged approved workspace-bodies branch into episode branch (no conflicts); only source and prior author notes changed by merge. Copied independent review note for final documentation commit. Root media check passed220/220. Vortex owns GPU after desert released it during implementation.
+- Vortex final9-frame actual-composition sheet inspected by parent/reviewer. Lower label clears faces; Codex arms visibly raised. Four visible geometry/camera seek hashes exact; pixel rounding at most1/255; no console errors. Independent native review APPROVED8/10 with same-family limitation recorded. Full HyperFrames check stalled; not claimed pass.
+- Committed explicit vortex source/generated files + author/reviewer notes as9fb90ba, then merged vortex branch into episode branch without conflict. Unrelated config/media edits remain unstaged.
+- Desert reviewed APPROVED8/10,21 scene-runtime frames inspected, stronger eyes and3D tour preserved. Six state hashes match;5 exact PNG pairs, one differs17pixels by1/255, title end exact. One CanvasTexture replaces261 GPU textures; CPU decoded frame cache remains~918MiB worst case.
+- Desert committed11e0758; merged39d3e1d after worker resolved only tour.js union and independent reviewer approved source. Workspace/vortex/desert all integrated. Copied ignored tour frame sequences and contact sheets into main demo; no media committed. Parent syntax/diff/no-media checks passed491 files.
+- Integrated HyperFrames check currently running; final overlays/endcard/intro seam need actual rendered evidence. Reviewer identified pre-existing possible one-frame gap at96.666667s between desert96.651end and intro96.670start; investigate before assuming blank output.
+- Parent integrated check: node node_modules/hyperframes/dist/cli.js check --json --timeout120000, own exec session76252. Hardware GPU detected, then render-ready120000ms warning. No final verdict after >2 additional minutes; parent stopped only own session viaCtrl-C, exit1. This is INCOMPLETE/TIMEOUT, not pass. No full draft render or push authorized as complete by this result.
+- Independent reviewer now owns GPU for assembled actual bundle/host timing/caption/endcard/seam captures, skipping unrelated3D mounts to bound warm-up. This does not prove full-episode simultaneous loading readiness.
+- Final integrated HyperFrames check completed13:17UTC, exit0, ok:true; lint/runtime/layout errorCount0. Four warnings: three nested-media timing hints in unhosted retired app-window.html; music0 length36.99 vs slot37.07. Startup readiness120s warning remains. Layout samples17.778/53.335/88.892 plus checker internal dense sweep; contrast explicitly disabled, motion disabled. Actual frames manually inspected. Full log snapshots/native-integration/full-check.log.
+- Corrected assembled independent review APPROVED8/10: workspace duration37.07 and backward seek, desert56.1, exact96.666667 sandstone frame (gap eliminated), intro96.7, captions and endcard104.5. Integration correction committed262c23a. No draft render yet; preparing persistent preview under HyperFrames preview-before-render workflow.
+- Final Episode6 PR source review at262c23a APPROVED8/10, no scoped code blockers. Same-family limitation and unrelated inherited branch history explicitly stated in notes/native-final-pr-review.md. No full rendered/audio approval claimed.
+- Preview reused existing server PID15380 (NOT owned by this continuation; do not stop it). URL http://127.0.0.1:3002/#project/agent-pronounce; rootHTTP verified200. HyperFrames CLI skill preview gate remains before draft render; current work delivered for preview approval, render not started.

@@ -1,0 +1,34 @@
+# Final PR code review
+
+## Verdict
+APPROVED — 8/10 for the Episode 6 task source at HEAD 262c23a37ebcc5f8fc1254a752bbe61b18fbe4f8 against main. No remaining concrete code blocker found in the scoped task. The corrected full HyperFrames check returned ok:true / exit0 under the parent, with the warnings and disabled audits recorded below. This does not itself approve the final rendered draft/audio.
+
+Review family: native Codex, independent agent. Some current implementation is also native Codex, so this is weaker same-family evidence. The specific reason is the user's disabling CLI lanes after permission/report failures and child-session attribution failures; prior approved look work was Claude. The code author did not self-review.
+
+## Scope and reused evidence
+Read git diff main...HEAD for the task's production runtime adapters, timing/generation path and deterministic footage generator; traced the relevant callers and final fix commit. Reused this agent's independent native-workspace-review.md, native-vortex-review.md, native-desert-review.md and native-integration-review.md for the already inspected scene internals, approved images, seek evidence and bounded fixes.
+
+The branch also contains substantial inherited agent-comparison/agent-tribunal demos and tooling absent from main. This is not a claim of fresh line-by-line review of that unrelated history. Scope is the requested Episode 6 task, its reviewed phase changes, final integration fixes, generated callers and known cross-file contracts. Existing visual approvals were not reopened.
+
+## Caller and integration findings
+- src/build-timing.mjs:17-19 passes explicit duration, absoluteStart, rows/actions/cues into api.mount. Line29 maps the office slot to kind workspace, so its composition id remains office while src/tour.js:24-26 selects the approved workspace adapter. The old office kind is not accidentally selected by the generated opening.
+- src/scene.js:191-198 now prioritizes valid cfg.duration, preserving its fallback for legacy configurations. Callers at lines341-343 pass the resulting scene-local duration to mountTour; the seek listener at368-372 subtracts cfg.absoluteStart once and clamps within the correct duration. Assembled evidence confirms office37.07 and desert56.1 rather than parent106.67.
+- src/tour.js:46-56 builds rows/context consistently; cribs.js:68-75 normalizes word envelopes, and set-desert4.js:71 adds localStart when reading words. The generic robot loop receives empty robots for the three custom body adapters, so it cannot overwrite their current-time body poses.
+- src/tour.js:65-79 preserves both new look builders and the shared per-object noDepth propagation. scene.js:348-349 rebuilds exclusions from those flags; set-vortex4.js:25 covers the veil added after look adoption. Camera roll propagated through cribs-camera.js:191 and the caller remains compatible with legacy poses using a zero default.
+- set-workspace.js:50-71 resets/bakes poses before blending; body/chair/decal coordinates are assigned from current time. look-vortex4.js resets seated poses and refreshes ancestor matrices before IK, then derives arm targets in body space. set-desert4.js:102 similarly refreshes haulGroup before hand IK. robot-body.js:353 keeps haulCycle opt-in. Prior phase and assembled seek checks support these contracts.
+- set-desert4.js:16-33 uses batched image loads and a single CanvasTexture; lines75-80 select absolute frame by time and restore idle outside tours. scripts/live-demo/tour-stills.mjs uses the same10fps/count contract and fails if ffmpeg fails. Missing source frames reject mount rather than silently playing stale footage. Known decoded-image CPU footprint remains bounded but unprofiled; see desert review resource audit.
+- scripts/audio/running-order.mjs:39-40 now records the snapped boundary for adjacent scenes. Lines55-57 preserve the existing titleTilt cue while padding only the ending. Both generate.mjs:51 and build-timing.mjs:9 consume layout; the current cached cues and generated index/desert/timing output agree. No voice regeneration or scene-start move was introduced by the bounded fix.
+- build-timing.mjs:27 preserves the approved lower vortex label. Line62 removes only the retired app-window host while retaining landing insert, captions and audio. Endcard credit survives regeneration because that custom composition is preserved. Current generated outputs were inspected in actual assembled captures, including the formerly blank96.666667 frame.
+
+## Verification
+- HEAD independently verified as262c23a37ebcc5f8fc1254a752bbe61b18fbe4f8.
+- Checked every frame timestamp for current106.67s at30fps: all3201 have exactly one scene owner; zero gaps or overlaps.
+- Compared final timing with262c23a parent: rows unchanged, captions unchanged, scene starts unchanged, total106.67 unchanged. Desert duration/end is the intended padding change.
+- Relative imports across12 reviewed runtime/generator files: zero missing paths.
+- Scoped git diff --check main...HEAD on those production files: passed. Syntax checks on final scene/timing source passed during integration review; prior scene syntax checks reused.
+- Reused actual assembled capture evidence: final sandstone at96.633333 and96.666667, intro wall96.7, readable captions45.9/62/workspace21.7, readable endcard104.5. Corrected workspace forward/back state sample21.7 exact; original four-sample workspace state check exact. Scene-specific vortex/desert seek evidence and explicit raster tolerance are in their review files.
+
+Reference discovery used rg and manual caller tracing. Ptah LSP reference lookup was attempted; the first call rejected its position fields, and the corrected lookup eventually returned a truncated JavaScript text-scan containing only the declaration. It did not establish caller coverage; rg and direct caller reads supplied that evidence. Runtime compiler/host behavior was directly established by the earlier assembled browser captures.
+
+## Limits and handoff
+Parent's earlier full check timed out without verdict. The final corrected check completed with exit0 and ok:true; I read snapshots/native-integration/full-check.log. Lint errors0 with3 nested-media timing warnings in retired/unhosted app-window.html; runtime errors0 with1 music-0 fit warning (36.99s media versus37.07s slot); layout findings0. The120s render-ready warning remains, so this is not warning-free startup. Contrast and motion audits were explicitly disabled. The completed check supports full simultaneous-load usability after warmup, not an exhaustive motion/contrast/audio pass. Audio has not been auditioned by this reviewer, and no final full rendered draft is approved here. Existing media/asset restoration prerequisites remain as documented. No new source change, fix round, GPU work, commit or process stop was performed during this final review. Only this report was written.

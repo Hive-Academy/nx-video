@@ -1,0 +1,3 @@
+
+## 2026-11-13 - recovery routing
+Continuation: CREATIVE, Partial (existing approved scope), with Minimal permission probes first. Pre-flight taskType source=model confidence=0.9256726700341398 fallbackCause=null modelProposal=null; depth source=skill-table confidence=null fallbackCause=low-confidence modelProposal={option:o1,confidence:0.15416391122755424}; selected Partial from existing scope. overallConfidence=0.9256726700341398; reasons: model creative type; skill-table depth fallback. Routing usage requests=1 inputTokens=455 outputTokens=0 costUsd=null. User pins Codex and Claude API. Two probe calls, no implementation calls until verified. Existing handoff gates and approvals retained.

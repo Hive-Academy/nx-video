@@ -1,4 +1,4 @@
-﻿# Independent integration review
+# Independent integration review
 
 ## Verdict
 APPROVED — 8/10 for the merged source and scoped assembled visual evidence. No remaining blocker in this reviewed scope. Both identified integration defects were corrected in one bounded round. This is not final episode delivery approval: the parent's full integrated HyperFrames check and audio/draft review remain separate gates.
@@ -45,4 +45,3 @@ Reviewer ran syntax checks for resolved tour.js/build-timing.mjs and final scene
 Parent's initial full check in owned session76252 exceeded120s render-ready and then produced no verdict for more than two further minutes. Parent interrupted only that owned session; exit1. This was incomplete, not pass. The scoped captures subsequently completed, but do not substitute for the queued corrected full check. Audio was not auditioned and no full rendered draft was reviewed. Existing scene-level review reports remain applicable within their stated scope.
 
 Reviewer wrote only this report and ignored capture harness/frames, launched sequential owned browser sessions, and closed them through their handles. No production edits, commits, unrelated configuration changes or process-name stops.
-
