@@ -2105,6 +2105,106 @@
       "licence": "CC0-1.0",
       "changes": "Tinted and tiled on the Ptah colossus statue",
       "sha256": "39f2680f1c09926cd6350e4e3e39d6e203c2394708a97559c4ae6536dcbb10ea"
+    },
+    {
+      "path": "assets/third-party/textures/sandstone_cracks/sandstone_cracks_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sandstone_cracks/sandstone_cracks_diff_2k.jpg",
+      "title": "Sandstone Cracks - Diffuse (albedo)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "6d3f99604c85a818277150db784ac66e67a4d91ddc255dabf61b3e956564090d"
+    },
+    {
+      "path": "assets/third-party/textures/sandstone_cracks/sandstone_cracks_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sandstone_cracks/sandstone_cracks_nor_gl_2k.jpg",
+      "title": "Sandstone Cracks - Normal (GL)",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "904e852268e1fb1bd5c0d035382f6a0e64c98dceea784fe957b1983d98b0231a"
+    },
+    {
+      "path": "assets/third-party/textures/sandstone_cracks/sandstone_cracks_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sandstone_cracks/sandstone_cracks_rough_2k.jpg",
+      "title": "Sandstone Cracks - Roughness",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "45347870225f1f1b223968e8fc0ac2125374c0b1e0907cda7ad93b1c5dda39f4"
+    },
+    {
+      "path": "assets/third-party/textures/sandstone_cracks/sandstone_cracks_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sandstone_cracks/sandstone_cracks_ao_2k.jpg",
+      "title": "Sandstone Cracks - Ambient occlusion",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "a58ec86af4beb8c0e6ae1572a02fda97e3f23b768c8da47b0ae6a368de22ddd9"
+    },
+    {
+      "path": "assets/third-party/textures/sandstone_cracks/sandstone_cracks_disp_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sandstone_cracks/sandstone_cracks_disp_2k.jpg",
+      "title": "Sandstone Cracks - Displacement",
+      "author": "Rob Tuytel",
+      "source": "https://polyhaven.com/a/sandstone_cracks",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "6cfefa6461a06c2c8ddc8a4fbb56df9a0aab34db4b5c5b3429d0dc039c058158"
+    },
+    {
+      "path": "assets/third-party/textures/dark_rock/dark_rock_diff_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dark_rock/dark_rock_diff_2k.jpg",
+      "title": "Dark Rock - Diffuse (albedo)",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "0f01bfec36ec4546e23576a10c52ef073f9eb815826c5fce2a1cdb08cd8188b8"
+    },
+    {
+      "path": "assets/third-party/textures/dark_rock/dark_rock_nor_gl_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dark_rock/dark_rock_nor_gl_2k.jpg",
+      "title": "Dark Rock - Normal (GL)",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "abb3c5f1f932693537333a6d467c3e79bb810afa84416d0deaa10ead9fb4f628"
+    },
+    {
+      "path": "assets/third-party/textures/dark_rock/dark_rock_rough_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dark_rock/dark_rock_rough_2k.jpg",
+      "title": "Dark Rock - Roughness",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "de4dc9e276ea769f0eb58faae8c3bc04b512ad62ca49301a0287efe35d26b058"
+    },
+    {
+      "path": "assets/third-party/textures/dark_rock/dark_rock_ao_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dark_rock/dark_rock_ao_2k.jpg",
+      "title": "Dark Rock - Ambient occlusion",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "ab74e7bd4d52bbc66bcf6955430f88b5bc34525cb570873897e20237504090c2"
+    },
+    {
+      "path": "assets/third-party/textures/dark_rock/dark_rock_disp_2k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/dark_rock/dark_rock_disp_2k.jpg",
+      "title": "Dark Rock - Displacement",
+      "author": "Amal Kumar",
+      "source": "https://polyhaven.com/a/dark_rock",
+      "licence": "CC0-1.0",
+      "changes": "None",
+      "sha256": "b72e529899ee15361d5b3ca14a75d6bbfecb7164388a4bf76a70809bbd978b77"
     }
   ]
 }
