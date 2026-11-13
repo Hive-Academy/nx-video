@@ -24,7 +24,7 @@ for(const id of ['office','vortex','desert']){
  if(id==='vortex'){
   // Location card: a dark plate so it reads over the busy gold tunnel; place and era on separate lines.
   const extra='<div id="location"><div class="place">MEMPHIS, EGYPT</div><div class="era">around 2600 BC</div></div>';
-  fs.writeFileSync(path.join(comp,'vortex.html'),three(s,extra,'#location{position:absolute;top:85px;left:0;right:0;margin:0 auto;width:fit-content;padding:22px 48px 24px;text-align:center;background:rgba(22,12,3,.78);border:3px solid #e8a33d;border-radius:18px;box-shadow:0 12px 40px #0009;white-space:nowrap}#location .place{font:bold 76px/1.05 Georgia,serif;letter-spacing:4px;color:#fff2d3}#location .era{margin-top:8px;font:italic 46px/1.1 Georgia,serif;color:#f0c27a}',"tl.fromTo('#location',{opacity:0,y:30},{opacity:1,y:0,duration:.4},.45).to('#location',{opacity:0,duration:.35},2.85);"));
+  fs.writeFileSync(path.join(comp,'vortex.html'),three(s,extra,'#location{position:absolute;bottom:65px;left:0;right:0;margin:0 auto;width:fit-content;padding:14px 36px 16px;text-align:center;background:rgba(22,12,3,.78);border:3px solid #e8a33d;border-radius:18px;box-shadow:0 12px 40px #0009;white-space:nowrap}#location .place{font:bold 64px/1.05 Georgia,serif;letter-spacing:4px;color:#fff2d3}#location .era{margin-top:8px;font:italic 38px/1.1 Georgia,serif;color:#f0c27a}',"tl.fromTo('#location',{opacity:0,y:30},{opacity:1,y:0,duration:.4},.45).to('#location',{opacity:0,duration:.35},2.85);"));
  // v4: the opening plays the approved workspace set (src/set-workspace.js) in the office slot
  }else fs.writeFileSync(path.join(comp,`${id}.html`),three(id==='office'?{...s,kind:'workspace'}:s));
 }

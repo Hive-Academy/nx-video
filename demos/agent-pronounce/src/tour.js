@@ -19,7 +19,7 @@ import { KINDS as LOFT_KINDS } from './tour-loft.js';
 import { KINDS as STREET_KINDS } from './tour-street.js';
 import { KINDS as TEMPLE_KINDS } from './tour-temple.js';
 import { KINDS as OFFICE_KINDS } from './set-office.js';
-import { KINDS as VORTEX_KINDS } from './set-vortex.js';
+import { KINDS as VORTEX_KINDS } from './set-vortex4.js';
 import { KINDS as DESERT_KINDS } from './set-desert.js';
 import { KINDS as WORKSPACE_KINDS } from './set-workspace.js';
 
@@ -65,6 +65,7 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
         desert: () => import('./look-desert.js').then((m) => m.buildDesertLook(assets, renderer)),
         workspace: () => import('./look-workspace.js').then((m) => m.buildWorkspaceLook(assets, renderer, options)),
         vortex: () => import('./look-vortex.js').then((m) => m.buildVortexLook(assets, renderer)),
+        vortex4: () => import('./look-vortex4.js').then((m) => m.buildVortex4Look(assets, renderer, options)),
       };
       if (!builders[kind]) throw new Error(`Unknown look: ${kind}`);
       const look = await builders[kind]();
@@ -73,6 +74,9 @@ export async function mountTour(cfg, scene, assets, duration, def, renderer) {
       scene.environment = look.scene.environment;
       scene.fog = look.scene.fog;
       scene.userData.noDepth = look.scene.userData.noDepth || []; // the film chain's depth pass skips these
+      // mount() rebuilds this list by traversing object flags after adopting the look.
+      // Preserve its exclusions so transparent storm veils do not become solid DOF occluders.
+      for (const object of scene.userData.noDepth) object.userData.noDepth = true;
       scene.backgroundIntensity = look.scene.backgroundIntensity;
       scene.environmentIntensity = look.scene.environmentIntensity;
       scene.backgroundRotation.copy(look.scene.backgroundRotation);

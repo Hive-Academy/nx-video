@@ -1,1 +1,1 @@
-{"name":"agent-cribs","private":true,"type":"module","devDependencies":{"hyperframes":"0.8.98","three":"0.181.2"},"scripts":{"timing":"node src/build-timing.mjs"}}
+{"name":"agent-cribs","private":true,"type":"module","devDependencies":{"hyperframes":"0.8.98","three":"0.181.2"},"scripts":{"timing":"node src/build-timing.mjs","lookdev:vortex":"node lookdev/shoot-vortex4.mjs"}}
