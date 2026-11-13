@@ -311,6 +311,35 @@ The command was `node lookdev/shoot-colossus4.mjs colossus-a colossus-b colossus
 | d: golden backlight | 4: silhouette and collar gold read against the sky | 4 | 4: warm key with rim on the wig edge | 4 | 5 | 4 | **pass**. Weakest: the front of the figure is in shadow, so the face detail is soft |
 
 
+## Round 7 (orchestrator review of 26f2cb7: framing limit and polish)
+
+**Framing rule.** The source is a small, eroded figurine, so at 24 m the face is soft. The colossus is used only in wide and mid shots, and the tightest is waist-up (b). Shot c (head and shoulders) is retired from the deliverables.
+
+Changes in `src/ptah-colossus.js`:
+- **Collar off the lappets and the beard.** The relief mask uses the front-most surface on a 0.006·H grid. For each row, a flat opening (erode, then dilate) over a window of 0.5 shoulder half-widths recovers the chest under the lappets. Cells more than `relief.d` = 0.008·H proud of that chest count as lappet or beard, and so do their x neighbours, provided they also stand off the chest. The collar is never painted there.
+- **Collar shape.** The bands no longer run up over the shoulders: `over` is gone, `outer` 1.0 became 0.74, and the paint fades out where `nz` drops below 0.45. The crescent ends tuck under the lappets, and the rows follow the chest curve.
+- **Cap.**
+  - The lapis is modulated by the scan's own albedo grain (normalised to the mean under the cap) and worn off the carving's crests (`cap.wear` 0.55, driven by cavity). The wig carving shows through the pigment.
+  - A carved channel just under the cap edge on the face side (`cap.groove` 0.0035·H) and a tighter paint edge (±0.003·H) give a crisp brow line.
+- **Stone detail.** The scan has its own material, `materials.scanStone`, using the CC0 Poly Haven `sandstone_cracks` 2k set (already in the manifest) at triplanar scale 0.11/m with normal 1.1 (`SCAN_FIT.stone`). The soft photogrammetry surface reads as cracked, weathered sandstone at mid distance.
+- **Bug fixed.** `aPaint.z = 1` had been swallowed by a trailing comment, so every scan vertex had `aPaint.z = 0`. That put the voice and inlay glow at half strength across the whole figure.
+- **Pre-bake.**
+  - `loadScan` first fetches `fitted-<quality>-<key>.bin` next to the scan. The folder is `assets/third-party/…`, which is git-ignored. The key hashes the bake version, URL, quality, `SCAN_FIT` and the overrides, so any fit change misses the cache and fits live.
+  - On a miss it fits live. `createPtahColossus` then returns `scanBake = { url, hit, serialize() }`, and the look-dev harness PUTs the bytes once. `shoot-colossus4.mjs` accepts PUT only for `/assets/third-party/models/**/fitted-*.bin`.
+  - The format is `PTFB`, then version, JSON metadata, and the position, normal, color, aPaint and index arrays: 10.0 MB. Pass `opts.bake: false` to force a live fit.
+- **Timing.** Measured page loads: 89 s on a miss and 61 s on a hit, a saving of about 28 s. What remains is the desert set and the software-GL film render, not the statue.
+
+### Round-7 scorecard
+
+The command was `node lookdev/shoot-colossus4.mjs colossus-m colossus-a colossus-b colossus-d`: exit 0, no page errors, 568,884 triangles. m baked; a, b and d hit the cache. The sheet is `snapshots/lookdev/colossus-sheet.jpg` (a, m, b, d).
+
+| still | Subject | Set | Light | Effect | Text | Continuity | verdict |
+|---|---|---|---|---|---|---|---|
+| a: wide, eyes dark | 4 | 4 | 4 | 4 | 5 | 4 | **pass**. The collar is narrower now but still reads as gold and colour under the lappets |
+| m: mid, 35 mm, low desert angle, voice 1 (new) | 4: whole statue, plinth to crown, a monument, not a figurine | 4 | 4 | 4: the eyes read as teal points | 5 | 4 | **pass**. Weakest: the eye glow is small at this distance (by design: the ×4 scene boost was checked in round 6b) |
+| b: waist-up (the tightest allowed), voice 0.5 | 4: cracked sandstone, the lapis cap worn into the wig carving, the collar under the lappets | 4 | 4 | 4 | 5 | 4 | **pass**. Weakest: the face is still soft (the framing rule applies) |
+| d: golden backlight | 4 | 4 | 4 | 4 | 5 | 4 | **pass** (unchanged) |
+
 ## Verification
 
 Run from `demos/agent-pronounce` unless noted.
@@ -348,11 +377,12 @@ Run from `demos/agent-pronounce` unless noted.
 
 ## Open defects
 
-Round 6 (current, scan):
+Round 7 (current, scan):
+0. The face is soft at 24 m because the source is a small, eroded figurine. Never frame it tighter than waist-up.
 1. Iconography: W2059 is a Ptah-Sokar-Osiris figure with a tripartite wig, so it is not a pure Ptah. The lapis cap is painted over the wig's crown, but the lappets remain. Hands are not part of the scan; the fists are procedural.
-2. The collar bands turn vertical at the right shoulder in the c framing.
+2. ~~The collar bands turn vertical at the right shoulder.~~ Fixed in round 7 (relief mask; outer 0.74).
 3. `headYaw` / `headPitch` move only an empty marker on the scan (one rigid mesh); the head does not turn.
-4. The load cost is 20–60 s for each fresh page (decimation in JS). A pre-baked fitted GLB should replace this before the film render.
+4. ~~20–60 s decimation on every page.~~ Fixed in round 7 by the pre-baked `fitted-*.bin` cache. The film render must run the look-dev shooter once, or otherwise put the bake in place, before HyperFrames loads the scene, or the first load fits live.
 5. A pale band (the maat-pedestal slab) shows between the feet and the plinth in the low wide shot.
 6. The eye glow is a flat additive disc, so at very grazing yaw (beyond about 60°) it shows as an ellipse floating slightly proud of the socket.
 

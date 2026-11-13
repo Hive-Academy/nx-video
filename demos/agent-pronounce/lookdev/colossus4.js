@@ -1,5 +1,5 @@
 // Ptah colossus look-dev inside the approved desert v4 set (src/look-desert4.js), 1920x1080.
-//   colossus4.html?shot=a|b|c|d[&post=base|preview][&quality=high|draft][&scan=0|<asset path>][&cam=x,y,z&tgt=x,y,z&mm=N]
+//   colossus4.html?shot=a|b|c|d|m[&bake=0][&post=base|preview][&quality=high|draft][&scan=0|<asset path>][&cam=x,y,z&tgt=x,y,z&mm=N]
 // The figure is the museum scan when its file is present (scan=0 forces the procedural one). Shot distances
 // and heights are authored for the 24.08 m procedural statue and scale with the built height (k below), so
 // the framing carries over to any mesh.
@@ -22,6 +22,8 @@ const SHOTS = {
   c: { set: 'b', bearing: 18, dist: 32, eye: 13, look: [0, 21.7, 0.6], mm: 85, state: { voice: 1, eyeGlow: 1, headPitch: 0.04 }, rim: 2.8 },
   // d: backlit at golden hour: a low frontal three-quarter looking up at the god against the deep anti-sun sky; the key light
   //    swings behind the statue, low and amber, so the shoulders, cap and sceptre are edged in gold and the front falls into shape
+  // m: mid from the low desert angle on a 35 mm: the whole statue, plinth to crown, eyes lit at voice 1 (the closest the film goes)
+  m: { set: 'b', bearing: 34, dist: 50, eye: 1.4, look: [0, 12.6, 0], mm: 35, state: { voice: 1, eyeGlow: 1 }, rim: 1.6 },
   d: { set: 'b', bearing: 24, dist: 58, eye: 1.4, look: [0, 13.2, 0], mm: 40, state: { voice: 0 }, rim: 0,
        golden: { side: 1.9, elev: 0.2, color: '#FF9440', sun: 12, env: 0.14, hemi: 0.2 } },
 };
@@ -51,6 +53,11 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     if (handles.ptahProxy) handles.ptahProxy.visible = false;
     const scanQ = q.get('scan');
     const god = await createPtahColossus(assets, { quality: q.get('quality') || 'high', ...(scanQ ? { scan: scanQ === '0' ? false : scanQ } : {}), ...(q.get('fit') ? { scanFit: JSON.parse(q.get('fit')) } : {}) });
+    // pre-bake: a live fit is written once to the git-ignored cache next to the scan (the shooter accepts the PUT)
+    if (god.scanBake && !god.scanBake.hit && q.get('bake') !== '0') {
+      const r = await fetch(`../${god.scanBake.url}`, { method: 'PUT', body: god.scanBake.serialize() }).catch(() => null);
+      if (!r || !r.ok) console.warn('colossus bake not written', r && r.status);
+    }
     const k = god.height / 24.08; // framing scale against the procedural statue the shots were authored for
     god.group.position.copy(A.position);
     god.group.rotation.y = A.yaw;
@@ -116,7 +123,7 @@ const vec = (s) => new THREE.Vector3(...s.split(',').map(Number));
     const film = post === 'base' ? { ...film0, ao: false, dof: false } : { ...film0, dof: S.world ? false : { focus: dist, aperture: 0.00025, maxblur: 0.003 } };
     const draw = () => renderFilm(renderer, scene, camera, film, W, H, 0);
     draw(); draw();
-    window.__lookdevInfo = { shot, post, triangles: god.triangles, source: god.source, height: +god.height.toFixed(2), camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), tgt: tgt.toArray().map((v) => +v.toFixed(2)) } };
+    window.__lookdevInfo = { shot, post, triangles: god.triangles, source: god.source, bake: god.scanBake ? { url: god.scanBake.url, hit: god.scanBake.hit } : null, height: +god.height.toFixed(2), camera: { pos: pos.toArray().map((v) => +v.toFixed(2)), tgt: tgt.toArray().map((v) => +v.toFixed(2)) } };
     window.__lookdev = 'done';
   } catch (e) {
     console.error(e);

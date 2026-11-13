@@ -4,7 +4,7 @@
 // Writes snapshots/lookdev/<scene><suffix>.png and prints page errors, console errors and 4xx/5xx.
 // A 404 on the Sketchfab scan is expected until the archive is fetched: the statue falls back to procedural.
 import { createServer } from 'node:http';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { extname, join, resolve, normalize } from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -23,6 +23,15 @@ const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/ja
 const server = createServer(async (req, res) => {
   const p = normalize(join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname)));
   if (!p.startsWith(ROOT)) { res.writeHead(403).end(); return; }
+  // the colossus fit cache: only fitted-*.bin under the git-ignored assets/third-party folder may be written
+  if (req.method === 'PUT') {
+    const rel = p.slice(ROOT.length).replace(/\\/g, '/');
+    if (!/^\/assets\/third-party\/models\/[\w./-]+\/fitted-[\w-]+\.bin$/.test(rel) || rel.includes('..')) { res.writeHead(403).end(); return; }
+    const chunks = []; for await (const c of req) chunks.push(c);
+    const body = Buffer.concat(chunks);
+    await writeFile(p, body); console.log(`  baked ${rel} (${(body.length / 1e6).toFixed(1)} MB)`);
+    res.writeHead(204).end(); return;
+  }
   try {
     const body = await readFile(p);
     res.writeHead(200, { 'content-type': TYPES[extname(p)] || 'application/octet-stream' }).end(body);

@@ -810,6 +810,7 @@ function sandDriftGeometry() {
 // ---------------------------------------------------------------- textures and materials
 const ROCK = 'assets/third-party/textures/worn_rock_natural_01/worn_rock_natural_01_';
 const SAND = 'assets/third-party/textures/aerial_sand/aerial_sand_';
+const SANDSTONE = 'assets/third-party/textures/sandstone_cracks/sandstone_cracks_';
 async function loadTex(path, srgb) {
   try {
     const t = await new THREE.TextureLoader().loadAsync(assetUrl(path));
@@ -1157,14 +1158,17 @@ export const SCAN_FIT = {
   soles: 0, crown: 1,       // fractions of the raw extent along up: soles > 0 trims the scan's own base off
   targetTris: 260000,       // decimation target at 'high' (a third at 'draft')
   paint: 0.5,               // how much of the scan's own paint survives on the stone (0 = bare stone)
-  cap: { line: 0.915, front: -0.055, squash: 0.84, color: [0.02, 0.045, 0.17] }, // line, front: fractions of height
+  // line, front, groove: fractions of height; wear: lapis worn off the carving's crests (0..1)
+  cap: { line: 0.915, front: -0.055, squash: 0.84, color: [0.02, 0.045, 0.17], wear: 0.55, groove: 0.0035 },
   pillar: null,             // { z, halfW }: cut triangles behind z within |x| < halfW (the back pillar)
   cuts: [],                 // [{ min: [x, y, z], max: [x, y, z] }]: cut triangles inside (wig lappets, base)
   eyes: { y: 0.875, x: 0.021 }, // fractions of height; z is found on the face surface
   // painted collar: top (fraction of height, from the widest slice), inner and outer half-widths (fractions of the
-  // shoulder half-width), drop and over (bands carried up over the shoulders; fractions of height), rows, paint (0 bare stone .. 1 full pigment)
-  collar: { top: 0, inner: 0.5, outer: 1.0, drop: 0.16, rows: 5, paint: 1, over: 0.035 },
+  // shoulder half-width), drop (fraction of height), rows, paint (0 bare stone .. 1 full pigment), relief: the lappet
+  // and beard mask (w: opening window, fraction of the shoulder half-width; d: how proud of the chest, fraction of height)
+  collar: { top: 0, inner: 0.5, outer: 0.74, drop: 0.16, rows: 5, paint: 1, relief: { w: 0.5, d: 0.008 } },
   sceptre: { dy: 0, dz: -0.2, scale: 1 }, // metres, after the automatic chest fit
+  stone: { scale: 0.11, normal: 1.1, detail: 1.0 }, // sandstone detail on the scan: triplanar scale (1/m), normal strength, albedo detail
 };
 // Where the procedural collar and sceptre were designed to sit (statue space), for fitting onto the scan.
 const PROC = { shoulderY: figY(17.2), halfW: 3.6, chestY: figY(15.8), chestZ: 1.92 };
@@ -1195,7 +1199,7 @@ function albedoSampler(mat, fallbackImg) {
 
 // Load, orient, scale, decimate, cut and recolour the scan; measure where the procedural parts go.
 async function fitScan(url, quality, over = {}) {
-  const F = { ...SCAN_FIT, ...over, cap: { ...SCAN_FIT.cap, ...(over.cap || {}) }, eyes: { ...SCAN_FIT.eyes, ...(over.eyes || {}) }, collar: { ...SCAN_FIT.collar, ...(over.collar || {}) } };
+  const F = { ...SCAN_FIT, ...over, cap: { ...SCAN_FIT.cap, ...(over.cap || {}) }, eyes: { ...SCAN_FIT.eyes, ...(over.eyes || {}) }, collar: { ...SCAN_FIT.collar, ...(over.collar || {}), relief: { ...SCAN_FIT.collar.relief, ...((over.collar && over.collar.relief) || {}) } } };
   const gltf = await new GLTFLoader().loadAsync(assetUrl(url));
   gltf.scene.updateMatrixWorld(true);
   const meshes = [];
@@ -1302,8 +1306,14 @@ async function fitScan(url, quality, over = {}) {
     const w = sstep(cy - 0.012 * H, cy + 0.02 * H, y) * (1 - F.cap.squash);
     pa[3 * i] = hx + (x - hx) * (1 - w);
     if (z < hz) pa[3 * i + 2] = hz + (z - hz) * (1 - w);
-    onCap[i] = sstep(cy - 0.004 * H, cy + 0.004 * H, y);
+    onCap[i] = sstep(cy - 0.003 * H, cy + 0.003 * H, y);
+    // a carved channel just under the cap edge on the face side, so the brow line reads crisp, not painted on
+    const fr = clamp01((z - hz) / hr * 2), d = (y - cy + 0.004 * H) / (0.004 * H), g = Math.exp(-d * d) * fr * F.cap.groove * H;
+    if (g > 1e-5) { const rx = pa[3 * i] - hx, rz = pa[3 * i + 2] - hz, rl = Math.hypot(rx, rz) || 1; pa[3 * i] -= rx / rl * g; pa[3 * i + 2] -= rz / rl * g; }
   }
+  let capLum = 0, capN = 0; // mean albedo under the cap: the lapis is modulated by the scan's grain around it
+  for (let i = 0; i < n; i++) if (onCap[i] > 0.5) { capLum += ca[3 * i] + ca[3 * i + 1] + ca[3 * i + 2]; capN++; }
+  capLum = max(1e-3, capLum / max(capN, 1));
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pa, 3));
   geo.setIndex(T);
@@ -1341,16 +1351,35 @@ async function fitScan(url, quality, over = {}) {
   //    hung below the wig lappets, rows of worn lapis, turquoise and carnelian divided by gold lines (aPaint.y < 0)
   const CL = F.collar, cTop = shoulderY + CL.top * H, axI = CL.inner * halfW, ayI = 0.045 * H, axO = CL.outer * halfW, ayO = CL.drop * H;
   const ROWS = [[0.03, 0.09, 0.36], [0.07, 0.32, 0.30], [0.36, 0.08, 0.04], [0.03, 0.09, 0.36], [0.07, 0.32, 0.30]];
+  // relief mask: the wig lappets and the beard stand proud of the chest. Per row, a flat opening (erode, then
+  // dilate) of the front-most surface over a window wider than a lappet recovers the chest under them; a vertex
+  // more than relief.d above that chest is on a lappet or the beard, and the collar is never painted there.
+  const RC = 0.006 * H, rx0 = -1.2 * halfW, ry0 = cTop - ayO - 0.03 * H, RW = Math.ceil(2.4 * halfW / RC), RH = Math.ceil((ayO + 0.08 * H) / RC);
+  const zf = new Float32Array(RW * RH).fill(-Infinity);
+  const rcell = (x, y) => { const ix = floor((x - rx0) / RC), iy = floor((y - ry0) / RC); return ix < 0 || iy < 0 || ix >= RW || iy >= RH ? -1 : iy * RW + ix; };
+  for (let i = 0; i < n; i++) if (nrm[3 * i + 2] > 0) { const c = rcell(pa[3 * i], pa[3 * i + 1]); if (c >= 0) zf[c] = max(zf[c], pa[3 * i + 2]); }
+  const chestZf = new Float32Array(RW * RH).fill(-Infinity), rr = max(1, Math.round(CL.relief.w * halfW / RC / 2));
+  for (let iy = 0; iy < RH; iy++) {
+    const er = new Float32Array(RW).fill(-Infinity);
+    for (let ix = 0; ix < RW; ix++) { let lo = Infinity; for (let j = max(0, ix - rr); j <= min(RW - 1, ix + rr); j++) if (zf[iy * RW + j] > -Infinity) lo = Math.min(lo, zf[iy * RW + j]); if (lo < Infinity) er[ix] = lo; }
+    for (let ix = 0; ix < RW; ix++) { let hi = -Infinity; for (let j = max(0, ix - rr); j <= min(RW - 1, ix + rr); j++) hi = max(hi, er[j]); chestZf[iy * RW + ix] = hi; }
+  }
+  const proudCell = new Uint8Array(RW * RH);
+  for (let c = 0; c < RW * RH; c++) if (zf[c] - chestZf[c] > CL.relief.d * H) proudCell[c] = 1;
+  const proudAt = (x, y, z) => { // on a proud cell (or its x neighbour) and standing off the chest
+    const c = rcell(x, y); if (c < 0) return false;
+    const ix = c % RW, near = proudCell[c] || (ix > 0 && proudCell[c - 1]) || (ix < RW - 1 && proudCell[c + 1]);
+    return !!near && z > chestZf[c] + 0.25 * CL.relief.d * H;
+  };
   const collarAt = (x, y, z, nz, out) => { // out: [weight 0..1, row 0..rows-1, gold signed distance in metres]
     out[0] = 0; out[2] = 1;
-    // over the shoulders (outside the lappets) the bands run on up the curve instead of stopping at a flat edge
-    const sh = abs(x) > CL.inner * 1.15 * halfW ? CL.over * H : 0;
-    if (y > cTop + sh || nz < -0.1) return;
+    if (y > cTop || nz < 0.05) return;
     const dy = max(0, cTop - y), ti = Math.hypot(x / axI, dy / ayI), to = Math.hypot(x / axO, dy / ayO);
-    if (ti < 1 || to > 1) return;
+    if (ti < 1 || to > 1 || proudAt(x, y, z)) return;
     const s = (ti - 1) / ((ti - 1) + (1 - to) + 1e-6), u = s * CL.rows, f = u - floor(u);
     const rowW = (ayO - ayI) / CL.rows;
-    out[0] = sstep(-0.1, 0.4, nz) * (y > cTop ? 1 - sstep(cTop, cTop + sh, y) : 1); out[1] = min(CL.rows - 1, floor(u));
+    // the bands stay on the front of the chest: they fade out where the surface turns toward the shoulders
+    out[0] = sstep(0.18, 0.45, nz); out[1] = min(CL.rows - 1, floor(u));
     out[2] = (min(f, 1 - f) - 0.07) * rowW; // gold divider lines between rows
     if (s > 0.94) out[2] = -(s - 0.94) * rowW; // a gold rim along the outer edge
   };
@@ -1360,8 +1389,10 @@ async function fitScan(url, quality, over = {}) {
     const ao = Math.min(1.08, Math.max(0.32, 1 - 1.8 * max(cav[i], 0) + 0.25 * max(-cav[i], 0)));
     const y = pa[3 * i + 1] / H;
     const foot = 0.75 + 0.25 * sstep(0, 0.06, y); // ground occlusion at the soles
-    const m = onCap[i] * (1 - 0.4 * sstep(0.55, 0.8, vnoise(pa[3 * i] * 1.7, pa[3 * i + 1] * 1.7, pa[3 * i + 2] * 1.7, 41))), k = 0.92 + 0.16 * vnoise(pa[3 * i] * 2, pa[3 * i + 1] * 2, pa[3 * i + 2] * 2, 21);
-    collarAt(pa[3 * i], pa[3 * i + 1], pa[3 * i + 2], nrm[3 * i + 2], cw);
+    // lapis worn off the crests of the wig carving and in seeded patches; kept in the recesses
+    const m = onCap[i] * (1 - 0.4 * sstep(0.55, 0.8, vnoise(pa[3 * i] * 1.7, pa[3 * i + 1] * 1.7, pa[3 * i + 2] * 1.7, 41))) * (1 - F.cap.wear * sstep(0.03, 0.22, -cav[i]));
+    const k = (0.92 + 0.16 * vnoise(pa[3 * i] * 2, pa[3 * i + 1] * 2, pa[3 * i + 2] * 2, 21)) * (onCap[i] > 0 ? min(1.5, max(0.55, (ca[3 * i] + ca[3 * i + 1] + ca[3 * i + 2]) / capLum)) : 1); // the scan's own grain under the pigment
+    collarAt(pa[3 * i], pa[3 * i + 1], pa[3 * i + 2], nrm[3 * i + 2], cw, i);
     const wear = 0.6 + 0.6 * vnoise(pa[3 * i] * 1.3, pa[3 * i + 1] * 1.3, pa[3 * i + 2] * 1.3, 33); // pigment flaked off in patches
     const cm = cw[0] * CL.paint * sstep(0.3, 0.7, wear), row = ROWS[cw[1] % ROWS.length];
     for (let j = 0; j < 3; j++) {
@@ -1369,7 +1400,8 @@ async function fitScan(url, quality, over = {}) {
       vc[3 * i + j] = (m * F.cap.color[j] * k + (1 - m) * (st * (1 - cm) + row[j] * k * cm)) * ao;
     }
     ap[3 * i] = m * 0.04 + (1 - m) * clamp01(0.25 + 2.2 * max(cav[i], 0) + 0.4 * (1 - sstep(0.02, 0.2, y)));
-    ap[3 * i + 1] = cw[0] > 0.5 && m < 0.5 ? cw[2] + 0.06 * (vnoise(pa[3 * i] * 4, pa[3 * i + 1] * 4, pa[3 * i + 2] * 4, 37) - 0.45) : 1; // gold leaf worn through in flecks ap[3 * i + 2] = 1;
+    ap[3 * i + 1] = cw[0] > 0.5 && m < 0.5 ? cw[2] + 0.06 * (vnoise(pa[3 * i] * 4, pa[3 * i + 1] * 4, pa[3 * i + 2] * 4, 37) - 0.45) : 1; // gold leaf worn through in flecks
+    ap[3 * i + 2] = 1; // no glow line on the scan (the eyes carry the glow)
   }
   geo.setAttribute('color', new THREE.BufferAttribute(vc, 3));
   geo.setAttribute('aPaint', new THREE.BufferAttribute(ap, 3));
@@ -1386,10 +1418,58 @@ async function fitScan(url, quality, over = {}) {
   const eyes = [-1, 1].map((sd) => new THREE.Vector3(sd * ex, ey, frontZ(sd * ex, ey, 0.005 * H, 0.005 * H, hz + hr)));
   return { geo, H, triangles: T.length / 3, head: { x: hx, z: hz, r: hr, capY: capY(hz) }, shoulderY, halfW, chestY, chestZ, eyes };
 }
+// ---- pre-baked fit: the fitted, decimated, painted geometry written once next to the scan (git-ignored) so a page
+// does not spend 20-60 s decimating in JS. The key covers the bake format, the quality and every fit parameter, so
+// a SCAN_FIT change misses the cache and fits live again. Layout: 'PTFB' | u32 version | u32 json bytes | json
+// (padded to 4) | per array: u32 byte length + data (position, normal, color, aPaint: f32; index: u32).
+const BAKE_VERSION = 2;
+export function scanBakeUrl(url, quality, over = {}) {
+  const key = Math.floor(hash(BAKE_VERSION, url, quality, JSON.stringify(SCAN_FIT), JSON.stringify(over || {})) * 4294967296).toString(16).padStart(8, '0');
+  return url.replace(/[^/]*$/, `fitted-${quality}-${key}.bin`);
+}
+export function serializeScanFit(fit) {
+  const meta = new TextEncoder().encode(JSON.stringify({ H: fit.H, triangles: fit.triangles, head: fit.head, shoulderY: fit.shoulderY, halfW: fit.halfW,
+    chestY: fit.chestY, chestZ: fit.chestZ, eyes: fit.eyes.map((e) => e.toArray()) }));
+  const g = fit.geo, arrays = [g.attributes.position.array, g.attributes.normal.array, g.attributes.color.array, g.attributes.aPaint.array, Uint32Array.from(g.index.array)];
+  const metaLen = (meta.length + 3) & ~3, total = 12 + metaLen + arrays.reduce((s, a) => s + 4 + a.byteLength, 0);
+  const buf = new ArrayBuffer(total), dv = new DataView(buf), u8 = new Uint8Array(buf);
+  u8.set([0x50, 0x54, 0x46, 0x42]); dv.setUint32(4, BAKE_VERSION, true); dv.setUint32(8, meta.length, true); u8.set(meta, 12);
+  let o = 12 + metaLen;
+  for (const a of arrays) { dv.setUint32(o, a.byteLength, true); u8.set(new Uint8Array(a.buffer, a.byteOffset, a.byteLength), o + 4); o += 4 + a.byteLength; }
+  return buf;
+}
+function deserializeScanFit(buf) {
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  if (u8[0] !== 0x50 || u8[1] !== 0x54 || u8[2] !== 0x46 || u8[3] !== 0x42 || dv.getUint32(4, true) !== BAKE_VERSION) throw new Error('bad bake');
+  const metaN = dv.getUint32(8, true), meta = JSON.parse(new TextDecoder().decode(u8.subarray(12, 12 + metaN)));
+  let o = 12 + ((metaN + 3) & ~3);
+  const take = (T) => { const n = dv.getUint32(o, true); const a = new T(buf.slice(o + 4, o + 4 + n)); o += 4 + n; return a; };
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(take(Float32Array), 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(take(Float32Array), 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(take(Float32Array), 3));
+  geo.setAttribute('aPaint', new THREE.BufferAttribute(take(Float32Array), 3));
+  geo.setIndex(new THREE.BufferAttribute(take(Uint32Array), 1));
+  geo.computeBoundingBox(); geo.computeBoundingSphere();
+  return { ...meta, geo, eyes: meta.eyes.map((e) => new THREE.Vector3(...e)) };
+}
+async function loadBakedScan(bakeUrl) {
+  try {
+    const r = await fetch(assetUrl(bakeUrl));
+    if (!r.ok) return null;
+    return deserializeScanFit(await r.arrayBuffer());
+  } catch { return null; }
+}
 const scanCache = new Map();
-function loadScan(url, quality, over) {
-  const key = `${url}|${quality}|${JSON.stringify(over || {})}`;
-  if (!scanCache.has(key)) scanCache.set(key, fitScan(url, quality, over).catch((e) => {
+function loadScan(url, quality, over, useBake = true) {
+  const key = `${url}|${quality}|${JSON.stringify(over || {})}|${useBake}`;
+  if (!scanCache.has(key)) scanCache.set(key, (async () => {
+    const bakeUrl = scanBakeUrl(url, quality, over);
+    const baked = useBake ? await loadBakedScan(bakeUrl) : null;
+    if (baked) return { ...baked, bakeUrl, baked: true };
+    const fit = await fitScan(url, quality, over); // the cache is missing or stale: fit live
+    return { ...fit, bakeUrl, baked: false };
+  })().catch((e) => {
     if (!/404|Not Found|Failed to fetch/i.test(String(e && e.message))) console.warn('ptah-colossus: scan unusable, procedural fallback:', e);
     return null;
   }));
@@ -1409,7 +1489,7 @@ function loadScan(url, quality, over) {
  */
 export async function createPtahColossus(assets, opts = {}) {
   const { quality = 'high', eyeColor = '#5FF2E0', drift = true, scan = SCAN_URL } = opts;
-  const fit = scan ? await loadScan(scan, quality, opts.scanFit) : null;
+  const fit = scan ? await loadScan(scan, quality, opts.scanFit, opts.bake !== false) : null;
   const NATIVE = fit ? Y0 + fit.H : NATIVE_HEIGHT;
   const height = opts.height || NATIVE;
   const [diff, nor, rough, ao, disp, sNor, sRough] = await Promise.all([
@@ -1417,10 +1497,13 @@ export async function createPtahColossus(assets, opts = {}) {
     loadTex(`${ROCK}ao_2k.jpg`, false), loadTex(`${ROCK}disp_2k.jpg`, false),
     loadTex(`${SAND}nor_gl_1k.jpg`, false), loadTex(`${SAND}rough_1k.jpg`, false),
   ]);
+  // the scan body: CC0 sandstone at a large scale, so the soft photogrammetry surface reads as weathered carved stone at mid distance
+  const scanMaps = fit ? Object.fromEntries(await Promise.all(['diff', 'nor', 'rough', 'ao', 'disp'].map(async (k) => [k, await loadTex(`${SANDSTONE}${k === 'nor' ? 'nor_gl' : k}_2k.jpg`, k === 'diff')]))) : null;
   const { geos, dust } = buildGeometry(quality, !!fit);
   const maps = { diff, nor, rough, ao, disp };
   const shared = glowUniforms();
   const stone = makeStoneMaterial(maps, shared, { tint: '#E6CFAE', scale: 0.2, normalScale: 0.6 });
+  const scanStone = fit ? makeStoneMaterial(scanMaps, shared, { tint: '#E6CFAE', scale: SCAN_FIT.stone.scale, normalScale: SCAN_FIT.stone.normal, detail: SCAN_FIT.stone.detail }) : stone;
   const fine = makeStoneMaterial(maps, shared, { tint: '#E6CFAE', scale: 0.42, normalScale: 0.5 });
   const face = makeStoneMaterial(maps, shared, { tint: '#E3CBA8', scale: 0.5, normalScale: 0.7, inlayMetal: 0, detail: 1.05 });
   const granite = makeStoneMaterial(maps, shared, { tint: '#D8C8B4', scale: 0.17, normalScale: 0.75 });
@@ -1442,7 +1525,7 @@ export async function createPtahColossus(assets, opts = {}) {
   // fit: the scan figure on the maat pedestal; its collar is inlaid into the scan itself (fitScan step 8)
   let sc = 1;
   if (fit) {
-    root.add(mk(fit.geo, stone, 'scan-figure')).children.at(-1).position.y = Y0;
+    root.add(mk(fit.geo, scanStone, 'scan-figure')).children.at(-1).position.y = Y0;
     sc = fit.halfW / PROC.halfW;
   } else root.add(collar, mk(geos.bodyLower, stone, 'body-lower'), mk(geos.bodyUpper, stone, 'body-upper'));
   if (drift) {
@@ -1548,9 +1631,11 @@ export async function createPtahColossus(assets, opts = {}) {
     handles: { head, eyes, eyeMaterial: eyeMat, eyeFlares: flares, sceptre, sceptreArm: sceptre, chestGlow: inlay.uInlayGlow, plinth, bounds, anchors },
     setState,
     getState: () => ({ ...state }),
-    materials: { stone, fine, face, granite, eye: eyeMat },
+    materials: { stone, scanStone, fine, face, granite, eye: eyeMat },
     triangles: Math.round(triangles),
     source: fit ? 'scan' : 'procedural',
+    // pre-bake: where the fitted scan is cached, whether this build came from it, and the bytes to write when it did not
+    scanBake: fit ? { url: fit.bakeUrl, hit: fit.baked, serialize: () => serializeScanFit(fit) } : null,
   };
 }
 
