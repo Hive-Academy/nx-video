@@ -23,6 +23,8 @@
 //   'stand-up'       t = progress 0..1    scoots to the seat edge, slides down onto its feet, straightens
 //   'standing-idle'  t = time (s)         stands at state.standZ, arms relaxed, breathing
 //   'point'          t = progress 0..1    standing, the right arm rises and points at state.pointAt
+//   'haul'           t = time (s)         desert crews: leans into a chest strap, long stride, fists on
+//                                         the strap; the rope ties on behind the state.haulSide shoulder
 // `time` (seconds) drives the secondary motion (breath, blinks, taps) of the progress poses.
 //
 // State (setState(patch), merged): eyeGlow (1 = rest), typing (0..1 tap intensity), lookAt (world
@@ -338,6 +340,17 @@ export function createBodiedRobot(assets, { agent = 'Claude', color = null, qual
         if (t > 0.3) arm = lerpArm(p, knee, smooth(0.32, 0.52, t));
         P.arms[s] = lerpArm(arm, hang, smooth(0.62, 1, t));
       }
+    } else if (name === 'haul') {
+      // Leans into a chest strap: long stride, knees bent, chest well forward, both fists on the strap
+      // in front of the chest. The rope ties on behind the shoulder on state.haulSide (+1 = +x side), so
+      // the rear (push-off) foot is on that side. Arm specs are chest-local (chest: true).
+      const s0 = state.haulSide || 1;
+      const sway = 0.04 * u * Math.sin(time * 1.7 + hash(state.seed, 'st') * 6);
+      P.hip = V(0, hipStand - 0.2 * u + 0.006 * u * breath, state.standZ + 0.1 * u);
+      P.spine.set(0.42 + 0.01 * breath, 0, 0); P.chestRot.set(0.08, 0, 0);
+      P.legs[-s0] = { ankle: V(-s0 * 0.38 * u, B.ankleY * u, state.standZ + 0.5 * u + sway), pole: V(0, 0, 1), pitch: 0 };
+      P.legs[s0] = { ankle: V(s0 * 0.4 * u, B.ankleY * u + 0.1 * u, state.standZ - 0.6 * u - sway), pole: V(0, 0, 1), pitch: 0.3 };
+      for (const s of [1, -1]) P.arms[s] = { chest: true, wrist: V(s * 0.3 * u, 0.62 * u, 0.95 * u), fingerDir: V(-s, -0.25, -0.2), back: V(0.25 * s, 0, 1), pole: V(s, -0.6, -0.4), curl: [1.0, 1.05, 1.05, 0.7] };
     } else { // standing-idle, point
       P.hip = V(0, hipStand + 0.006 * u * breath, state.standZ);
       P.spine.set(0.02 * breath * 0.5, 0, 0);
@@ -406,7 +419,11 @@ export function createBodiedRobot(assets, { agent = 'Claude', color = null, qual
       const side = s > 0 ? 'L' : 'R';
       let spec = P.arms[s];
       if (P.typing) spec = typingArm(s, time);
-      else if (spec) spec = { ...spec, wrist: group.localToWorld(spec.wrist.clone()), fingerDir: Ld(spec.fingerDir.x, spec.fingerDir.y, spec.fingerDir.z), back: Ld(spec.back.x, spec.back.y, spec.back.z), pole: Ld(spec.pole.x, spec.pole.y, spec.pole.z) };
+      else if (spec && spec.chest) {
+        const q = chest.getWorldQuaternion(new THREE.Quaternion());
+        const d = (v) => v.clone().applyQuaternion(q).normalize();
+        spec = { ...spec, wrist: chest.localToWorld(spec.wrist.clone()), fingerDir: d(spec.fingerDir), back: d(spec.back), pole: d(spec.pole) };
+      } else if (spec) spec = { ...spec, wrist: group.localToWorld(spec.wrist.clone()), fingerDir: Ld(spec.fingerDir.x, spec.fingerDir.y, spec.fingerDir.z), back: Ld(spec.back.x, spec.back.y, spec.back.z), pole: Ld(spec.pole.x, spec.pole.y, spec.pole.z) };
       if (P.turn != null && state.lookAt && spec) spec = turnGesture(s, spec, P.turn, time);
       if (P.point != null && state.pointAt && s < 0) spec = pointArm(spec, P.point);
       if (spec) solveArm(side, spec);
