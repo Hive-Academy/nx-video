@@ -589,3 +589,22 @@ Decisions (SPEC.md "Direction v3" is the binding text):
 - Workspace animation started (child `0e86981c…`), scope limited to the opening workspace
   scene. The desert integration child `b66fe09e…` keeps the colossus behind its API only.
 - Vortex: no look-dev still exists yet, so it is not cleared for animation.
+
+## 2026-11-13 — user decisions: statue scan, robot bodies, public footage
+
+- User: "use whatever you see perfect for the job", "they should get bodies", "everything
+  stays public just fine".
+- Colossus base mesh: the Sketchfab museum scan "Ptah-Sokar-Osiris Figure (W2059)", by The Egypt
+  Centre, Swansea University, CC BY 4.0. Research: `demos/agent-pronounce/notes/lane-e-statue-scans.md`
+  (Codex lane `ab324775…`). End-card credit required. Download needs a Sketchfab API token in
+  `.env` (`SKETCHFAB_API_TOKEN`); Codex lane `b670a502…` adds token support to
+  `tools/media/fetch-media.mjs`. Colossus child `9de7bb0f…` builds the fitting path with a
+  procedural fallback.
+- Robots get real bodies: the ball head, visor, eyes and agent colour stay; a torso, arms, hands
+  and legs are added. New child `3a5ae7fd…` (branch `demo/ep06-v4-robot-bodies`, from
+  `demo/ep06-v4-workspace-look`) does look-dev: `src/robot-body.js`, stills body-a..d. The
+  workspace animation (`a41aaff` plus fixes) has to be re-posed with bodies after approval.
+- Tour footage: the blurred cost figures and readable workspace names, session titles and task
+  id are accepted for the public film.
+- N5 take: not explicitly chosen; the film keeps `n5-codex.mp3` ("Puh-TAH"), which matches the
+  v4.1 script (Codex says the name correctly).
