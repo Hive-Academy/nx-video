@@ -189,11 +189,12 @@ function renderFrame(scene, camera, dof, post) {
 }
 
 function sceneDuration(cfg, canvas) {
+  // Compiled sub-composition hosts may lose data-duration; config stays scene-local.
+  const c = Number(cfg.duration);
+  if (Number.isFinite(c) && c > 0) return c;
   const host = canvas.closest?.('[data-duration]');
   const d = Number(host?.getAttribute('data-duration'));
   if (Number.isFinite(d) && d > 0) return d;
-  const c = Number(cfg.duration);
-  if (Number.isFinite(c) && c > 0) return c;
   return Math.max(0.5, ...(cfg.rows || []).map((r) => (Number(r.localStart) || 0) + (Number(r.duration) || 0))) + 0.25;
 }
 

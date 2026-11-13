@@ -36,7 +36,8 @@ export function layout(voices){
    }
    if(id==='office')t+=3.6;if(id==='desert')t+=2.7;
   }
-  s.duration=r(t-start);s.end=r(t);scenes.push(s);t=snap(t);
+  // Assign the snapped boundary to both adjacent scenes, including the tail frame.
+  t=snap(t);s.end=r(t);s.duration=r(s.end-start);scenes.push(s);
  }
  const by=id=>scenes.find(s=>s.id===id);
  const word=(id,value,edge='start')=>{const w=rows[id].words.find(x=>clean(x.word)===clean(value));if(!w)throw Error(`missing ${id} ${value}`);return rows[id].start+w[edge]};
@@ -51,7 +52,9 @@ export function layout(voices){
  const tours=tourRows.map((row,i)=>({row,clip:`tour-${i+1}`,start:local('desert',rows[row].start-.3),end:0}));
  for(let i=0;i<4;i++)tours[i].end=i<3?tours[i+1].start:local('desert',rows.F4.start+rows.F4.duration+.8);
  const showcaseStart=tours[0].start,showcaseEnd=tours[3].end,pan=local('desert',rows.D2.start+rows.D2.duration+.2),stamp=r(pan+.6),portal=r(showcaseStart-.3);
- desert.cues={sofaLand:.3,reveal:1.8,rise:local('desert',rows.O4.start),pan,stamp,portal,pushIn:portal,showcaseStart,showcaseEnd,tours,d6:local('desert',rows.D6.start),titleTilt:r(desert.duration-2),end:desert.duration};
+ // Keep the approved tilt cue tied to D6; frame padding only extends the held end.
+ const titleTilt=local('desert',rows.D6.start+rows.D6.duration+.7);
+ desert.cues={sofaLand:.3,reveal:1.8,rise:local('desert',rows.O4.start),pan,stamp,portal,pushIn:portal,showcaseStart,showcaseEnd,tours,d6:local('desert',rows.D6.start),titleTilt,end:desert.duration};
  by('intro').cues={chisel:.6,tag:3.2,line:4.2,end:6};by('endcard').cues={end:4};
  const hits=[['electric-spark',office.start+office.cues.spark],['lights-dip',office.start+office.cues.dip],['rumble',office.start+rumble],['sandstorm',office.start+pull],['desert-wind',desert.start-.4],['work-crew',desert.start],['choir-swell',desert.start+showcaseStart-.3],['chisel',by('intro').start+.6]];
  return {total:r(t),rows,timeline:Object.values(rows),scenes,sfxHits:hits.map(([take,at])=>({id:take,take,at:r(at),volume:take==='desert-wind'||take==='work-crew'?.25:.7}))};

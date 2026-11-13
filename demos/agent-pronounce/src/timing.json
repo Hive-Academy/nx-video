@@ -846,7 +846,7 @@
         "D6"
       ],
       "start": 40.57,
-      "duration": 56.081,
+      "duration": 56.1,
       "cues": {
         "sofaLand": 0.3,
         "reveal": 1.8,
@@ -885,7 +885,7 @@
         ],
         "d6": 50.455,
         "titleTilt": 54.081,
-        "end": 56.081
+        "end": 56.1
       }
     },
     {
